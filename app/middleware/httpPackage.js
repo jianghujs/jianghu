@@ -57,7 +57,7 @@ module.exports = options => {
     ctx.packageResource = await jianghuKnex(tableEnum._resource).where({ pageId, actionId }).first();
     if (!ctx.packageResource) throw new BizError(errorInfoEnum.resource_not_found);
     ctx.packageResource.resourceId = resourceId;
-    ctx.packageResource.resourceHook = JSON.parse(ctx.packageResource.resourceHook || '{}'); 
+    ctx.packageResource.resourceHook = JSON.parse(ctx.packageResource.resourceHook || '{}');
     ctx.packageResource.resourceData = JSON.parse(ctx.packageResource.resourceData || '{}');
     ctx.packageResource.appDataSchema = JSON.parse(ctx.packageResource.appDataSchema || '{}');
 
@@ -65,17 +65,17 @@ module.exports = options => {
 
     try {
       // 2. 记录 request resource; 这里的错误不能影响主业务 所以 try catch一下
-      await packageUtil.recordResourceRequestLog(ctx);
+      await packageUtil.saveRequestLogForResource(ctx);
 
       // 3. 更新 _resource.requestDemo & _resource.responseDemo
       if (jiangHuConfig.updateRequestDemoAndResponseDemo) {
         await packageUtil.updateRequestDemoAndResponseDemo(ctx);
       }
     } catch (err) {
-      logger.error('[recordResourceRequestLog error]', err);
+      logger.error('[saveRequestLogForResource error]', err);
     }
 
-    logger.info("[httpPackage.js " + resourceId + " - cost]", {
+    logger.info('[httpPackage.js ' + resourceId + ' - cost]', {
       useTime: `${new Date().getTime() - midTime}/ms`,
     });
   };

@@ -36,7 +36,7 @@ class ResourceController extends Controller {
 
     // TODO: base64场景 appData太大了
     if (ignoreListOfResourceRequestLog.indexOf(resourceId) === -1) {
-      app.logger.debug("[resource.js httpRequest body]", {
+      app.logger.debug('[resource.js httpRequest body]', {
         packageId,
         resourceId,
         appData,

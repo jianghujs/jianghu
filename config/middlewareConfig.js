@@ -67,13 +67,6 @@ module.exports.middlewareMatch = {
         && ctx.request.path.startsWith(`/${ctx.app.config.appId}/upload/`);
     },
   },
-  etag: {
-    match(ctx) {
-      // url 格式符合 /appId/upload/etag
-      return (ctx.request.method === 'GET' || ctx.request.method === 'HEAD')
-        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/upload/etag`);
-    },
-  },
   httpPackage: {
     match(ctx) {
       return ctx.request.path === `/${ctx.app.config.appId}/resource`;

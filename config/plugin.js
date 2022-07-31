@@ -18,10 +18,6 @@ module.exports = {
   static: {
     enable: true,
   },
-  etag: {
-    enable: true,
-    package: 'egg-etag',
-  },
   socketIO: {
     enable: true,
     path: path.join(__dirname, '../plugins/socket-io'),

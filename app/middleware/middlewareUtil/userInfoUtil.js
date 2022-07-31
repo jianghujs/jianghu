@@ -28,7 +28,7 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
       .where({ userId: userSession.userId })
       .first();
     if (userResult) {
-      const { clearTextPassword, password, md5Salt, ...userTmp } = userResult;
+      const userTmp = _.omit(userResult, [ 'clearTextPassword', 'password', 'md5Salt' ]);
       user = userTmp;
       user.deviceId = userSession.deviceId;
       user.deviceType = userSession.deviceType;
@@ -43,7 +43,6 @@ module.exports = {
     config,
     body,
     jianghuKnex,
-    logger,
     isGroupIdRequired,
     appType,
     xiaochengxuUserId = null,
@@ -83,7 +82,7 @@ module.exports = {
 
   async getUserRuleDataFromCache(jianghuKnex, userId) {
     userId = userId || 'visitor';
-    const cache = jianghuKnex(tableEnum._cache).where(userId).first();
+    const cache = await jianghuKnex(tableEnum._cache).where(userId).first();
     if (cache.content) {
       return JSON.parse(cache.content);
     }
@@ -104,19 +103,19 @@ module.exports = {
       // Tip: resource指定groupId后 ===> 只能取当前的groupId ===> params: { groupId }
       userGroupRoleList = groupId
         ? await jianghuKnex(tableEnum._user_group_role)
-            .where({ userId, groupId })
-            .select()
+          .where({ userId, groupId })
+          .select()
         : await jianghuKnex(`${tableEnum._user_group_role} as a`)
-            .innerJoin(`${tableEnum._group} as b`, "b.groupId", "a.groupId")
-            .innerJoin(`${tableEnum._role} as c`, "c.roleId", "a.roleId")
-            .where({ "a.userId": userId })
-            .select(
-              "a.*",
-              "b.groupName",
-              "b.groupAvatar",
-              "b.groupExtend",
-              "c.roleName"
-            );
+          .innerJoin(`${tableEnum._group} as b`, 'b.groupId', 'a.groupId')
+          .innerJoin(`${tableEnum._role} as c`, 'c.roleId', 'a.roleId')
+          .where({ 'a.userId': userId })
+          .select(
+            'a.*',
+            'b.groupName',
+            'b.groupAvatar',
+            'b.groupExtend',
+            'c.roleName'
+          );
     }
 
     const { userIdList, groupIdList, roleIdList } = this.getRuleIdList(

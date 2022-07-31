@@ -65,7 +65,7 @@ module.exports = async ctx => {
   if (allowResourceList.findIndex((x) => x.resourceId === resourceId) === -1) {
     // 3.1 若未登陆 则 提示用户登陆后再来 请求这个 resource
     if (!isLoginUser) {
-      throw new BizError(errorInfoEnum.user_not_in_xiaochengxu);
+      throw new BizError(errorInfoEnum.request_token_invalid);
     } else {
       throw new BizError(errorInfoEnum.resource_forbidden);
     }

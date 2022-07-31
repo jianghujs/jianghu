@@ -1,16 +1,14 @@
 'use strict';
 
-const _ = require('lodash');
 const { tableEnum } = require('../../constant/constant');
 const geoip = require('geoip-lite');
-const dayjs = require('dayjs');
 
 module.exports = {
 
-  async recordResourceRequestLog(ctx) {
+  async saveRequestLogForResource(ctx) {
     const { app, body: responseBody, request, packageResource, userInfo } = ctx;
-    const { ignoreListOfResourceRequestLog=[] }= app.config.jiangHuConfig;
-    const { resourceRequestLogRecordUserId }= app.config.jiangHuConfig.compatibleConfig;
+    const { ignoreListOfResourceRequestLog = [] } = app.config.jiangHuConfig;
+    const { resourceRequestLogRecordUserId } = app.config.jiangHuConfig.compatibleConfig;
     const { resourceId } = packageResource;
     if (ignoreListOfResourceRequestLog.indexOf(resourceId) > -1) {
       return;
@@ -42,19 +40,12 @@ module.exports = {
       insertData.userId = userId;
     }
 
-    // TEXT: 65,535 bytes => ~64kb, utf8mb4 中一个字符占 4个byte
-    if (insertData.responseBody && insertData.responseBody.length > 16383) {
-      insertData.responseBody = insertData.responseBody.substring(0, 16383);
-    }
-    if (insertData.requestBody && insertData.requestBody.length > 16383) {
-      insertData.requestBody = insertData.requestBody.substring(0, 16383);
-    }
     await jianghuKnex(tableEnum._resource_request_log)
       .insert(insertData);
   },
 
   async updateRequestDemoAndResponseDemo(ctx) {
-    const { body: responseBody, app, request } = ctx
+    const { body: responseBody, app, request } = ctx;
     const { jianghuKnex } = app;
     const requestBody = Object.assign({}, request.body);
     const { pageId, actionId } = requestBody.appData;

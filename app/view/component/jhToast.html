@@ -2,7 +2,6 @@
 <!--jhConfirmDialog.html start-->
 <script type="text/x-template" id="jhToast">
   <v-snackbar
-  style="top: 55px;"
   :color="color"
   :timeout="timer"
   v-model="showSnackbar"
@@ -91,7 +90,7 @@
           this.message = message;
         }
         this.color = 'primary';
-        this.timer = 30000;
+        this.timer = 12000;
         this.icon = 'mdi-check';
         this.showLoading = true;
         this.showSnackbar = true;

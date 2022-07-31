@@ -25,19 +25,15 @@ module.exports = options => {
 
     if (ctx.userInfo && ctx.userInfo.user && Object.keys(ctx.userInfo.user).length) {
       // 兼容 /upload 开头的配置
-      let maxage = jiangHuConfig.uploadFileMaxAge || 0;
-      if (ctx.path.includes('/upload/etag')) {
-        maxage = null;
-      }
       if (ctx.path.startsWith(`/${config.appId}/upload/`)) {
         await send(ctx, decodeURI(ctx.path.replace(`/${config.appId}/upload/`, '')), {
           root: config.baseDir + '/upload',
-          maxage,
+          maxage: jiangHuConfig.uploadFileMaxAge || 0,
         });
       } else {
         await send(ctx, decodeURI(ctx.path.replace('/upload/', '')), {
           root: config.baseDir + '/upload',
-          maxage,
+          maxage: jiangHuConfig.uploadFileMaxAge || 0,
         });
       }
     } else {

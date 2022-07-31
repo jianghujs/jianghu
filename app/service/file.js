@@ -10,15 +10,6 @@ const mime = require('mime');
 // ========================================常用 require end=============================================
 const path = require('path');
 const crypto = require('crypto');
-const fs = require('fs');
-const util = require('util');
-const exists = util.promisify(fs.exists);
-const readFile = util.promisify(fs.readFile);
-const stat = util.promisify(fs.stat);
-const copyFile = util.promisify(fs.copyFile);
-const writeFile = util.promisify(fs.writeFile);
-const open = util.promisify(fs.open);
-const read = util.promisify(fs.read);
 const {
   tableEnum,
 } = require('../constant/constant');
@@ -114,14 +105,14 @@ class FileService extends Service {
     validateUtil.validate(actionDataScheme.getChunkInfo, actionData);
     const { downloadPath } = actionData;
     const filePath = path.join(uploadDir, downloadPath);
-    const isFileExists = await exists(filePath);
+    const isFileExists = await fileUtil.exists(filePath);
     if (!isFileExists) {
       throw new BizError(errorInfoEnum.file_not_found);
     }
 
     const KB = 1024;
     const MB = 1024 * KB;
-    const fileStates = await stat(filePath);
+    const fileStates = await fileUtil.stat(filePath);
     const fileSize = fileStates.size;
     let chunkSize = 3 * MB;
     if (fileSize > 100 * MB) {
@@ -130,7 +121,7 @@ class FileService extends Service {
       chunkSize = 8 * MB;
     }
     const total = Math.ceil(fileSize / chunkSize);
-    const buffer = await readFile(filePath);
+    const buffer = await fileUtil.readFile(filePath);
     const fsHash = crypto.createHash('md5');
     fsHash.update(buffer);
     const hash = fsHash.digest('hex');
@@ -141,7 +132,6 @@ class FileService extends Service {
   async uploadFileDone() {
     const app = this.app;
     const { userId } = this.ctx.userInfo;
-
     const { jianghuKnex, config } = app;
     const { uploadDir, downloadBasePath } = config;
     const { tmpdir } = config.multipart;
@@ -163,14 +153,14 @@ class FileService extends Service {
 
     const fileUploadPath = path.join(uploadDir, fileDirectory);
     const filePath = path.join(fileUploadPath, filenameStorage);
-    const isFileExists = await exists(fileUploadPath);
+    const isFileExists = await fileUtil.exists(fileUploadPath);
     if (!isFileExists) {
       await fileUtil.checkAndPrepareFilePath(fileUploadPath);
     }
 
     // 读取所有分片文件
     const chunksPath = path.join(tmpdir, userId, hash);
-    const chunks = await fs.promises.readdir(chunksPath);
+    const chunks = await fileUtil.readdir(chunksPath);
     const chunksPathList = [];
     if (chunks.length !== total || chunks.length === 0) {
       await fileUtil.deleteFileAndDirByPath(chunksPath);
@@ -184,7 +174,7 @@ class FileService extends Service {
     await fileUtil.streamMerge(chunksPathList, filePath, chunkSize);
     await fileUtil.deleteFileAndDirByPath(chunksPath);
     // check md5是否一致
-    const buffer = await readFile(filePath);
+    const buffer = await fileUtil.readFile(filePath);
     const fsHash = crypto.createHash('md5');
     fsHash.update(buffer);
     const fileHash = fsHash.digest('hex');
@@ -193,7 +183,7 @@ class FileService extends Service {
     }
 
     const downloadPath = `/${fileDirectory}/${filenameStorage}`;
-    const fileStates = await stat(filePath);
+    const fileStates = await fileUtil.stat(filePath);
     const binarySize = fileUtil.formatByteSize(fileStates.size);
     const file = {
       fileId,
@@ -220,7 +210,7 @@ class FileService extends Service {
     const { hash, indexString } = actionData;
     const chunksPath = path.join(tmpdir, userId, hash);
     const filepath = path.join(chunksPath, hash + '_' + indexString);
-    const isFileExists = await exists(chunksPath);
+    const isFileExists = await fileUtil.exists(chunksPath);
     if (!isFileExists) {
       await fileUtil.checkAndPrepareFilePath(chunksPath);
     }
@@ -230,8 +220,8 @@ class FileService extends Service {
     }
 
     const file = this.ctx.request.files[0];
-    await copyFile(file.filepath, filepath);
-    fs.promises.unlink(file.filepath);
+    await fileUtil.copyFile(file.filepath, filepath);
+    fileUtil.unlink(file.filepath);
   }
 
   async uploadFileChunkByBase64() {
@@ -243,7 +233,7 @@ class FileService extends Service {
     const { hash, indexString, fileBase64 } = actionData;
     const chunksPath = path.join(tmpdir, userId, hash);
     const filepath = path.join(chunksPath, hash + '_' + indexString);
-    const isFileExists = await exists(chunksPath);
+    const isFileExists = await fileUtil.exists(chunksPath);
     if (!isFileExists) {
       await fileUtil.checkAndPrepareFilePath(chunksPath);
     }
@@ -255,7 +245,7 @@ class FileService extends Service {
       throw new BizError(errorInfoEnum.file_buffer_is_null);
     }
     const buffer = fileUtil.base64ToBlob(fileBase64);
-    await writeFile(filepath, buffer);
+    await fileUtil.writeFile(filepath, buffer);
     this.ctx.request.body.appData.actionData.fileBase64 = null;
   }
 
@@ -269,7 +259,7 @@ class FileService extends Service {
     const chunksPath = path.join(tmpdir, userId, hash);
     const filepath = path.join(chunksPath, hash + '_' + indexString);
 
-    const isFileExists = await exists(chunksPath);
+    const isFileExists = await fileUtil.exists(chunksPath);
     if (!isFileExists) {
       await fileUtil.checkAndPrepareFilePath(chunksPath);
     }
@@ -286,7 +276,7 @@ class FileService extends Service {
     bufferStream.end(fileBuffer);
     // 进一步使用
     bufferStream.pipe(process.stdout);
-    await writeFile(filepath, fileBuffer, 'binary');
+    await fileUtil.writeFile(filepath, fileBuffer, 'binary');
     this.ctx.request.body.appData.actionData.fileBuffer = null;
   }
 
@@ -301,12 +291,12 @@ class FileService extends Service {
     );
     const { total, index, chunkSize, hash, downloadPath } = actionData;
     const filePath = path.join(uploadDir, downloadPath);
-    const isFileExists = await exists(filePath);
+    const isFileExists = await fileUtil.exists(filePath);
     if (!isFileExists) {
       throw new BizError(errorInfoEnum.file_not_found);
     }
 
-    const buffer = await readFile(filePath);
+    const buffer = await fileUtil.readFile(filePath);
     const currentBuffer = buffer.slice(
       index * chunkSize,
       (index + 1) * chunkSize
@@ -332,18 +322,18 @@ class FileService extends Service {
     );
     const { fileSize, total, index, chunkSize, hash, downloadPath } = actionData;
     const filePath = path.join(uploadDir, downloadPath);
-    const isFileExists = await exists(filePath);
+    const isFileExists = await fileUtil.exists(filePath);
     if (!isFileExists) {
       throw new BizError(errorInfoEnum.file_not_found);
     }
 
-    const fd = await open(filePath);
+    const fd = await fileUtil.open(filePath);
     let length = chunkSize;
     if ((index + 1) === total) {
       length = fileSize - index * chunkSize;
     }
     const currentBuffer = Buffer.alloc(length);
-    await read(fd, currentBuffer, 0, length, index * chunkSize);
+    await fileUtil.read(fd, currentBuffer, 0, length, index * chunkSize);
 
     return { fileBuffer: currentBuffer, index };
   }

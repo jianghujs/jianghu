@@ -69,12 +69,8 @@ module.exports = option => {
     }
 
     // 4. 已登录 则重定向到首页
-    if (pageId === "login") {
-      if (ctx.request.query.errorCode) {
-        // 放行
-      } else if (isLoginUser) {
-        ctx.redirect(ctx.app.config.indexPage);
-      }
+    if (pageId === "login" && isLoginUser) {
+      ctx.redirect(ctx.app.config.indexPage);
     }
     await next();
   };

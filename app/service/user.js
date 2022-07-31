@@ -6,37 +6,37 @@ const { BizError, errorInfoEnum } = require('../constant/error');
 const { tableEnum, userStatusEnum } = require('../constant/constant');
 const validateUtil = require('../common/validateUtil');
 const idGenerateUtil = require('../common/idGenerateUtil');
-const geoip = require("geoip-lite");
+const geoip = require('geoip-lite');
 // ========================================常用 require end=============================================
-const md5 = require("md5-node");
+const md5 = require('md5-node');
 const actionDataaScheme = Object.freeze({
   passwordLogin: {
-    type: "object",
+    type: 'object',
     additionalProperties: true,
-    required: ["userId", "password", "deviceId"],
+    required: [ 'userId', 'password', 'deviceId' ],
     properties: {
-      userId: { type: "string", minLength: 3 },
-      password: { type: "string" },
-      deviceId: { type: "string" },
-      deviceType: { type: "string" },
-      needSetCookies: { anyOf: [{ type: "boolean" }, { type: "null" }] },
+      userId: { type: 'string', minLength: 3 },
+      password: { type: 'string' },
+      deviceId: { type: 'string' },
+      deviceType: { type: 'string' },
+      needSetCookies: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
     },
   },
   logout: {
-    type: "object",
+    type: 'object',
     additionalProperties: true,
     required: [],
     properties: {
-      needSetCookies: { anyOf: [{ type: "boolean" }, { type: "null" }] },
+      needSetCookies: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
     },
   },
   resetPassword: {
-    type: "object",
+    type: 'object',
     additionalProperties: true,
-    required: ["oldPassword", "newPassword"],
+    required: [ 'oldPassword', 'newPassword' ],
     properties: {
-      oldPassword: { type: "string" },
-      newPassword: { type: "string" },
+      oldPassword: { type: 'string' },
+      newPassword: { type: 'string' },
     },
   },
 });
@@ -83,10 +83,10 @@ class UserService extends Service {
       .where({ userId, deviceId })
       .first();
 
-    const userAgent = this.ctx.request.body.appData.userAgent || "";
-    const userIp = this.ctx.header["x-real-ip"] || this.ctx.request.ip || "";
+    const userAgent = this.ctx.request.body.appData.userAgent || '';
+    const userIp = this.ctx.header['x-real-ip'] || this.ctx.request.ip || '';
     const geo = geoip.lookup(userIp);
-    let userIpRegion = "";
+    let userIpRegion = '';
     if (geo) {
       userIpRegion = `${geo.country}|${geo.region}|${geo.timezone}|${geo.city}|${geo.ll}|${geo.range}`;
     }
@@ -147,7 +147,7 @@ class UserService extends Service {
     }
     await jianghuKnex(tableEnum._user_session, this.ctx)
       .where({ id: userSession.id })
-      .jhUpdate({ authToken: "" });
+      .jhUpdate({ authToken: '' });
     if (needSetCookies) {
       this.ctx.cookies.set(`${appId}_authToken`, null);
     }
@@ -162,8 +162,8 @@ class UserService extends Service {
     const { jianghuKnex } = this.app;
     if (userId) {
       userInfo.socketList = await jianghuKnex(tableEnum._user_session)
-        .where({ userId, socketStatus: "online" })
-        .select("userId", "deviceId", "socketStatus");
+        .where({ userId, socketStatus: 'online' })
+        .select('userId', 'deviceId', 'socketStatus');
     }
     return userInfo;
   }
@@ -198,7 +198,7 @@ class UserService extends Service {
       clearTextPassword: newPassword,
       md5Salt: newMd5Salt,
     });
-    await jianghuKnex(tableEnum._user_session, this.ctx).where({ userId }).jhUpdate({ authToken: "" })
+    await jianghuKnex(tableEnum._user_session, this.ctx).where({ userId }).jhUpdate({ authToken: '' });
     return {};
   }
 }

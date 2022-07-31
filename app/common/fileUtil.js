@@ -10,6 +10,12 @@ const readdir = util.promisify(fs.readdir);
 const lstat = util.promisify(fs.lstat);
 const unlink = util.promisify(fs.unlink);
 const rmdir = util.promisify(fs.rmdir);
+const stat = util.promisify(fs.stat);
+const readFile = util.promisify(fs.readFile);
+const open = util.promisify(fs.open);
+const read = util.promisify(fs.read);
+const writeFile = util.promisify(fs.writeFile);
+const copyFile = util.promisify(fs.copyFile);
 const Promise = require('bluebird');
 const stream = require('readable-stream');
 const atob = require('atob');
@@ -402,4 +408,13 @@ module.exports = {
   base64ToBlob,
   checkAndPrepareFilePath,
   streamToBuffer,
+  exists,
+  stat,
+  read,
+  readFile,
+  readdir,
+  writeFile,
+  copyFile,
+  unlink,
+  open,
 };
