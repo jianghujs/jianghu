@@ -1,0 +1,88 @@
+<!--jhConfirmDialog.html start-->
+<script type="text/x-template" id="jhConfirmDialog">
+  <v-dialog
+  v-model="dialog"
+  max-width="290"
+  @click:outside="dialogDone = false; dialog = false">
+  <v-card>
+  <v-card-title v-if="editToast.title" :class="titleClass" style="font-size: 1.25rem !important;;">
+    {{ editToast.title }}
+  </v-card-title>
+  <v-card-text v-if="editToast.content" v-html="editToast.content" style="white-space: pre-line;" class="pa-6">
+  </v-card-text>
+  <v-card-actions>
+    <v-spacer></v-spacer>
+    <v-btn
+        v-if="cancelBtn"
+        text
+        @click="dialogDone = false; dialog = false"
+    >
+      取消
+    </v-btn>
+    <v-btn
+        :color="confirmColor"
+        text
+        @click="dialogDone = true; dialog = false"
+    >
+      确定
+    </v-btn>
+  </v-card-actions>
+  </v-card>
+  </v-dialog>
+</script>
+
+<script>
+  Vue.component("jhConfirmDialog", {
+    template: "#jhConfirmDialog",
+    vueComponent: 'jhConfirmDialog',
+    mixins: [ window.jianghuUiActionMixins || {} ],
+    vuetify: new Vuetify(),
+    data: () => ({
+      dialog: false,
+      editToast: { title: '', action: null },
+      dialogDone: null,
+      cancelBtn: true,
+      titleClass: 'text-h5',
+      confirmColor: 'green darken-1'
+    }),
+    computed: {
+      isMobile() {
+        return window.innerWidth < 600;
+      },
+    },
+    destroyed() {
+      if (this.interval) {
+        clearInterval(this.interval)
+      }
+    },
+    watch: {
+      dialog(v) {
+        window.dialogIsOpen = v;
+      }
+    },
+    async created() {
+      window.confirmDialog = this.confirmDialog;
+    },
+    methods: {
+      async confirmDialog({ title, content, cancelBtn = true, confirmColor = 'green darken-1' }) {
+        this.editToast.title = title;
+        this.editToast.content = content;
+        this.dialog = true;
+        this.cancelBtn = cancelBtn;
+        this.dialogDone = null;
+        this.confirmColor = confirmColor;
+        return new Promise((resolve) => {
+          this.interval = setInterval(() => {
+            if (this.dialogDone != null) {
+              clearInterval(this.interval);
+              resolve(this.dialogDone)
+              this.dialog = false;
+              this.dialogDone = null;
+            }
+          }, 60)
+        })
+      },
+    },
+  })
+</script>
+<!--jhConfirmDialog.html end-->

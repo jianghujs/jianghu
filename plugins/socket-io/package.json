@@ -1,0 +1,28 @@
+{
+  "name": "socketIO",
+  "version": "1.0.0",
+  "description": "",
+  "eggPlugin": {
+    "name": "socketIO"
+  },
+  "keywords": [
+    "egg",
+    "eggPlugin",
+    "egg-plugin"
+  ],
+  "dependencies": {
+    "@socket.io/redis-adapter": "^7.1.0",
+    "ioredis": "^4.28.2"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {},
+  "files": [
+    "app",
+    "lib",
+    "config",
+    "app.js"
+  ]
+}

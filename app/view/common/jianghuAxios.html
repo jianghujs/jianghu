@@ -1,0 +1,515 @@
+<script src="/<$ ctx.app.config.appId $>/public/js/lib/spark-md5.js"></script>
+<!--jianghuAxios.html start-->
+<script>
+(function () {
+  const KB = 1024;
+  const MB = 1024 * KB;
+  const GB = 1024 * MB;
+  const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+
+  class BizError extends Error {
+    constructor({errorCode, errorReason, errorReasonSupplement, response}) {
+      super(errorCode);
+      this.name = 'BizError';
+      this.errorCode = errorCode;
+      this.errorReason = errorReason;
+      this.errorReasonSupplement = errorReasonSupplement;
+      this.response = response;
+    }
+  }
+
+  window.jianghuAxios = axios.create({
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    timeout: 30000,
+    withCredentials: false
+  });
+
+  window.jianghuAxios.base64ToFile = ({ base64, name }) => { 
+    var arr = base64.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const theBlob = new Blob([u8arr], { type: mime });
+    theBlob.lastModifiedDate = new Date();
+    theBlob.name = name;
+    return theBlob;
+  } 
+
+  window.jianghuAxios.base64ToUint8Array = function (base64) {
+    const bstr = window.atob(base64)
+    let n = bstr.length,
+    u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return u8arr;
+  }
+
+  window.jianghuAxios.fileToBase64 = async (file) => { 
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.error = function(err) {
+        reject(err);
+      }
+      reader.onload = function() {
+        resolve(this.result);
+      }
+    })
+    return base64;
+  }   
+
+  window.jianghuAxios.downloadBufferToChrome = ({ buffer, filename }) => { 
+    let url = window.URL.createObjectURL(new Blob( [buffer], {type: "arraybuffer"}) )
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  window.jianghuAxios.downloadBase64ToChrome = ({ base64, filename }) => { 
+    var arr = base64.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const theBlob = new Blob([u8arr], { type: mime });
+    theBlob.lastModifiedDate = new Date();
+    theBlob.name = name;
+
+    let url = window.URL.createObjectURL(theBlob)
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }    
+
+  /**
+   * desc: 请求拦截器 ==> 数据填充
+   * [axios文档](https://axios-http.com/zh/docs/interceptors)
+   */
+  window.jianghuAxios.interceptors.request.use(async config => {
+
+    const data = config.data;
+    if (!data.appData) { data.appData = {}; }
+    const { pageId, actionId } = data.appData;
+    const resourceId = `${pageId}.${actionId}`;
+
+    // config.data 的 优先级更高
+    const packageId = `${Date.now()}_${_.random(1000000, 9999999)}`;
+    if (!data.packageId) { data.packageId = packageId; }
+    const packageType = 'httpRequest';
+    if (!data.packageType) { data.packageType = packageType; }
+    const { appId, userAgent } = window.appInfo;
+    if (!data.appData.appId) { data.appData.appId = appId; }
+    if (!data.appData.userAgent) { data.appData.userAgent = userAgent; }
+    const authToken = localStorage.getItem(`${window.appInfo.appId}_authToken`);
+    if (!data.appData.authToken) { data.appData.authToken = authToken; }
+
+
+    const baseURL = `/${appId}/resource?resourceId=${resourceId}`;
+    const method = 'post';
+
+    return { ...config, baseURL, method, data };
+  }, err => {
+    return Promise.reject(err);
+  });
+
+  /**
+   * desc: 响应拦截器 ==> 异常处理
+   * [axios文档](https://axios-http.com/zh/docs/interceptors)
+   */
+  window.jianghuAxios.interceptors.response.use(async response => {
+    const data = response.data || {};
+    const responseData = data.appData || {};
+    const {errorCode, errorReason} = responseData;
+    if (errorCode === 'request_token_invalid' || errorCode === 'request_user_not_exist' ||
+        errorCode === 'request_token_expired' || errorCode === 'user_banned') {
+      localStorage.removeItem(`${window.appInfo.appId}_authToken`);
+      window.vtoast.fail({ message: errorReason });
+      if (location.pathname === `/${window.appInfo.appId}/page/login`) {
+        throw new BizError({
+          errorCode,
+          errorReason,
+          response
+        });
+      }
+      location.href = `/${window.appInfo.appId}/page/login`;
+      return response;
+    }
+
+    // 需要把 errorCode 转成异常抛出来
+    if (errorCode) {
+      window.vtoast.fail({ message: errorReason });
+      throw new BizError({
+        errorCode,
+        errorReason,
+        response
+      });
+    }
+
+    // logResource(appId, pageId, actionId, actionData, where, data.appData, true, startTime);
+    return response;
+  }, err => {
+    const {code, message, response} = err;
+    let {errorCode, errorReason} = err;
+    if (!errorCode && code) {
+      errorCode = code;
+    }
+    if (!errorReason && message) {
+      errorReason = message;
+    }
+    window.vtoast.fail({ message: errorReason });
+    // logResource(appId, pageId, actionId, actionData, where, err, false, startTime);
+    return Promise.reject(new BizError({errorCode, errorReason, response}));
+  });
+
+  const logResource = (appId, pageId, actionId, actionData, where, resultData, success, startTime) => {
+    if ('true' !== '<$ ctx.app.config.debug $>') {
+      return;
+    }
+    const resource = window.allResourceList.find(
+        x => x.actionId === actionId && x.pageId === pageId);
+
+    if (success) {
+      console.groupCollapsed(
+          `\n\n┌ %c${resource.desc}  (${appId}.${pageId}.${actionId})(${new Date().getTime() -
+          startTime}ms)`,
+          'background: green; color: white; padding: 10px;');
+    } else {
+      console.groupCollapsed(
+          `\n\n┌ %c${resource.desc}  (${appId}.${pageId}.${actionId})(${new Date().getTime() -
+          startTime}ms)`,
+          'background: red; color: white; padding: 10px;');
+    }
+
+    if (actionData) {
+      console.log('├ actionData:');
+      console.table(actionData);
+    }
+    if (where) {
+      console.log('├ where:');
+      console.table(where);
+    }
+    if (resultData) {
+      const normalFields = [];
+      const listFields = [];
+      // todo Object.entries 手机不识别
+      Object.entries(resultData).map(([key, value]) => {
+        if (value instanceof Array && value.length) {
+          listFields.push(key);
+        } else {
+          normalFields.push(key);
+        }
+      });
+      if (normalFields.length) {
+        console.log('├ resultData:');
+        console.table(resultData, normalFields);
+      }
+      // 将 resultData 中的 list，另外打印
+      listFields.forEach(listField => {
+        console.log(`├ resultData.${listField}:`);
+        console.table(resultData[listField]);
+      });
+    }
+    console.log(`└ debug info end ${resource.desc}  (${appId}.${pageId}.${actionId})\n\n`);
+    console.groupEnd();
+  };
+
+  window.jianghuAxios.httpUploadByStream = async({ file, fileDirectory, fileDesc, filenameStorage, onProgress = () =>{} }) => {
+    const filename = file.name;
+
+    const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
+      const forms = new FormData();
+      const { appId, userAgent } = window.appInfo;
+      const packageId = `${Date.now()}_${_.random(1000000, 9999999)}`;
+      const data = {
+        packageId,
+        packageType: 'httpRequest',
+        appData: {
+          appId,
+          pageId: 'allPage',
+          actionId: 'httpUploadByStream',
+          userAgent,
+          authToken: localStorage.getItem(`${window.appInfo.appId}_authToken`),
+          actionData: {
+            chunFile, chunkSize, indexString, hash, total,
+            filename,
+          }
+        }
+      };
+      forms.append('files', chunFile);
+      forms.append('body', JSON.stringify(data));
+      return axios.post(`/${window.appInfo.appId}/resource?resourceId=${data.appData.pageId}.${data.appData.actionId}`, forms, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000,
+      });
+    };
+
+    const uploadDoneFunc = async ({ hash, total, chunkSize, filename, fileDirectory, fileDesc }) => {
+      return await window.jianghuAxios({
+        data: {
+          appData: {
+            pageId: 'allPage',
+            actionId: 'uploadFileDone',
+            actionData: { hash, total, chunkSize, filename, filenameStorage, fileDirectory, fileDesc }
+          }
+        }
+      });
+    }
+    
+    return await upload({file, filename, fileDirectory, fileDesc, uploadFunc, uploadDoneFunc, onProgress});
+  };
+  window.jianghuAxios.socketUploadByBase64 = async({ file, fileDirectory, fileDesc , onProgress = () =>{}}) => {
+    const filename = file.name;
+    const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
+      const fileBase64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(chunFile);
+        reader.error = function(err) {
+          reject(err);
+        }
+        reader.onload = function() {
+          resolve(this.result);
+        }
+      })
+
+      return await window.socket.emit("resource", {
+        data: {
+          packageType: 'socketRequest',
+          appData: {
+            pageId: 'allPage',
+            actionId: 'socketUploadByBase64',
+            actionData: {
+              chunFile, chunkSize, indexString, hash, total,
+              filename,
+              fileBase64,
+            }
+          }
+        }
+      });
+    };
+
+    const uploadDoneFunc = async ({ hash, total, chunkSize, filename, fileDirectory, fileDesc }) => {
+      return await window.socket.emit("resource", {
+        data: {
+          packageType: 'socketRequest',
+          appData: {
+            pageId: 'allPage',
+            actionId: 'uploadFileDone',
+            actionData: { hash, total, chunkSize, filename, fileDirectory, filenameStorage, fileDesc }
+          }
+        }
+      }); 
+    }
+    
+    return await upload({file, filename, fileDirectory, fileDesc, uploadFunc, uploadDoneFunc, onProgress});
+  }
+
+  window.jianghuAxios.httpDownloadByStream = async({ downloadPath, filename, onProgress = () => {}}) => {
+    const oReq = new XMLHttpRequest();
+    const url = `/${window.appInfo.appId}/upload/${encodeURI(downloadPath)}`;
+    oReq.open("GET", url, true);
+    oReq.responseType = "arraybuffer";
+    oReq.onprogress = function (event) {
+      if (event.lengthComputable) {
+        onProgress(event.total, event.loaded);
+      }
+    }
+    return new Promise((resolve, reject) => {
+      oReq.onload = function (oEvent) {
+        const arrayBuffer = oReq.response;
+        resolve(arrayBuffer);
+      };
+      oReq.send(null); 
+    })
+  }
+  window.jianghuAxios.socketDownloadByBase64 = async({ downloadPath, filename, onProgress = () => {}}) => {
+    const downloadFunc = async function ({ fileSize, total, chunkSize, hash, downloadPath, filename, success = () => {}}) {
+      let allFileBase64 = "";
+      const mergedArray = new Uint8Array(fileSize);
+      let offset = 0;
+      for (let i = 0; i < total; i++) {
+        const { fileBase64 } = (await window.socket.emit("resource", {
+          data: {
+            packageType: 'socketRequest',
+            appData: {
+              pageId: 'allPage',
+              actionId: 'socketDownloadByBase64',
+              actionData: { total, index: i, chunkSize, hash, downloadPath }
+            }
+          }
+        })).data.appData;
+
+        allFileBase64 = allFileBase64 + fileBase64
+        let base64 = fileBase64
+        if (i == 0) {
+          const arr = base64.split(',');
+          base64 = arr[1];
+        }
+        const part = window.jianghuAxios.base64ToUint8Array(base64)
+        mergedArray.set(part, offset)
+        offset += part.length;
+        success();
+      }
+      return {base64: allFileBase64, buffer: mergedArray.buffer};
+    }
+    
+    const chunkInfo = (await window.socket.emit("resource", {
+      data: {
+        packageType: 'socketRequest',
+        appData: {
+          pageId: 'allPage',
+          actionId: 'getChunkInfo',
+          actionData: { downloadPath }
+        }
+      }
+    })).data.appData;
+    const { total, chunkSize, hash, fileSize } = chunkInfo;
+    let loaded = 0; 
+    const {base64, buffer} = await downloadFunc({ fileSize, total, chunkSize, hash, downloadPath, filename, 
+      success: () => {
+        loaded++;
+        onProgress(total, loaded);
+        if (loaded === total) {
+          return true;
+        }
+      }  
+    });
+    const spark = new SparkMD5.ArrayBuffer()
+    spark.append(buffer)
+    const download_hash = spark.end()
+    if (download_hash != hash) {
+      throw new BizError({ errorCode: 'download_fail', errorReason: "文件下载失败!请重试." })
+    }
+    
+    return base64;    
+  }
+
+  async function upload({ file, filename, fileDirectory, fileDesc, uploadFunc, uploadDoneFunc, onProgress = () => {}}) {
+    const { hash, total, chunkSize } = await getChunkInfo(file);
+    
+    let loaded = 0;
+    await uploadFileChunkListByStream({ file, total, chunkSize, hash, uploadFunc, 
+      success: () => {
+        loaded++;
+        onProgress(total+2, loaded);
+      }
+    });
+
+    const result = await uploadDoneFunc({hash, total, chunkSize, filename, fileDirectory, fileDesc });
+    onProgress(total+2, loaded+2);
+    return result;    
+  }
+
+  async function uploadFileChunkListByStream({ total, chunkSize, file, hash, uploadFunc, success }) {
+    const requestArr = [];
+    const loaded = 0;
+    const dataArr = []
+    const filename = file.name;
+    for (let i = 0; i < total; i++) {
+      // 构建需要上传的分片数据
+      const start = i * chunkSize;
+      const end = Math.min(file.size, start + chunkSize);
+      const indexString = i.toString().padStart(4, "0");
+      if (indexString.length < 3) { indexString = `0${indexString}`; }
+      if (indexString.length < 3) { indexString = `0${indexString}`; }
+      if (indexString.length < 3) { indexString = `0${indexString}`; }
+      if (indexString.length < 3) { indexString = `0${indexString}`; }
+      dataArr.push({
+        index: i,
+        indexString,
+        chunFile: blobSlice.call(file, start, end)
+      })
+    }
+    const arr = _.chunk(dataArr, 4);
+    for (const dataChunkArr of arr) {
+      const requestArr = dataChunkArr.map(item => {
+        return new Promise(async (resolve, reject) => {
+          const maxRetryTimes = 3;
+          for (let time = 0; time <= maxRetryTimes; time++) {
+            try {
+              const {indexString, chunFile} = item;
+              const result = await uploadFunc({chunFile, chunkSize, indexString, hash, total});
+              success();
+              resolve(result);  
+              break;
+            } catch (err) {
+              console.error(`重试机制, ${filename}第${item.index}分片 第${time}次上传失败;`, err);
+            }
+            if (time === maxRetryTimes) {
+              console.error(`!!重试机制, ${filename}第${item.index}分片 ${maxRetryTimes}次重试全部失败;`);
+              throw new BizError({ errorCode: 'upload_fail', errorReason: "上传失败!请重试." });
+            }
+          }
+        })
+      })
+      await Promise.all(requestArr)
+    }
+  
+    return true;
+  }
+
+  function getChunkInfo(file) {
+    const fileSize = file.size;
+    let chunkSize = 3 * MB
+    if (fileSize > 100 * MB) {
+      chunkSize = 5 * MB;
+    } else if (fileSize > 500 * MB) {
+      chunkSize = 8 * MB;
+    }
+
+    return new Promise((resolve, reject) => {
+      const chunksNum = Math.ceil(file.size / chunkSize);
+
+      let currentChunk = 0;
+      const spark = new SparkMD5.ArrayBuffer();
+      const fileReader = new FileReader();      
+      fileReader.onerror = function (err) {
+        reject(err);
+      };
+
+      function loadNext() {
+        const start = currentChunk * chunkSize;
+        const end = start + chunkSize >= file.size ? file.size : start + chunkSize;
+        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+      }
+
+      fileReader.onload = function (e) {
+        spark.append(e.target.result); // Append array buffer
+        currentChunk++;
+
+        if (currentChunk < chunksNum) {
+          loadNext();
+        } else {
+          const hash = spark.end();
+          resolve({
+            total: chunksNum,
+            hash,
+            chunkSize
+          });
+        }
+      };
+
+      loadNext();
+    })
+  }
+
+})();
+</script>
+<!--jianghuAxios.html end-->

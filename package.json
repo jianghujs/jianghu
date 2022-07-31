@@ -1,0 +1,79 @@
+{
+    "name": "@jianghujs/jianghu",
+    "version": "3.0.3",
+    "description": "Progressive Enterprise Framework, beginners will enjoy learning and using.",
+    "dependencies": {
+        "@socket.io/redis-adapter": "^7.1.0",
+        "ajv": "^8.7.1",
+        "ajv-formats": "^2.1.1",
+        "await-stream-ready": "^1.0.1",
+        "axios": "^0.21.1",
+        "dayjs": "^1.10.5",
+        "egg": "^2.15.1",
+        "egg-cors": "^2.2.3",
+        "egg-etag": "^1.2.0",
+        "egg-knex": "^3.0.1",
+        "egg-scripts": "^2.11.0",
+        "egg-static": "^2.2.0",
+        "egg-view-nunjucks": "^2.3.0",
+        "geoip-lite": "^1.4.2",
+        "ioredis": "^4.28.2",
+        "koa-send": "^5.0.1",
+        "lodash": "^4.17.21",
+        "md5-node": "^1.0.1",
+        "mime": "3.0.0",
+        "nanoid": "3.3.1",
+        "node-rsa": "^1.1.1",
+        "socket.io": "4.4.1",
+        "socket.io-client": "4.4.1"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.16.0",
+        "@babel/eslint-parser": "^7.16.3",
+        "@vue/cli-plugin-babel": "^4.5.15",
+        "autod": "^3.0.1",
+        "autod-egg": "^1.1.0",
+        "egg-bin": "^4.11.0",
+        "egg-mock": "^3.21.0",
+        "eslint": "^7.3.0",
+        "eslint-config-egg": "^10.0.0",
+        "eslint-plugin-flow-vars": "^0.5.0",
+        "eslint-plugin-html": "^6.2.0"
+    },
+    "engines": {
+        "node": ">=12.0.0"
+    },
+    "scripts": {
+        "test": "npm run lint -- --fix && egg-bin pkgfiles && npm run test-local",
+        "test-local": "egg-bin test",
+        "cov": "egg-bin cov",
+        "lint": "eslint . --resolve-plugins-relative-to .",
+        "ci": "npm run lint && egg-bin pkgfiles --check && npm run cov",
+        "autod": "autod",
+        "pkgfiles": "egg-bin pkgfiles"
+    },
+    "keywords": [
+        "egg",
+        "egg-framework"
+    ],
+    "author": "",
+    "files": [
+        "app",
+        "config",
+        "plugins",
+        "lib",
+        "app.js",
+        "agent.js",
+        "index.js"
+    ],
+    "eslintIgnore": [
+        "coverage",
+        "dist"
+    ],
+    "homepage": "https://cn.openjianghu.org",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jianghujs/jianghu.git"
+    },
+    "license": "GLP"
+}

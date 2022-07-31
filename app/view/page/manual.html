@@ -1,0 +1,33 @@
+{% extends 'template/jhTemplate.html'%}
+
+<!-- vue template 代码块 -->
+{% block vue_template %}
+
+<jh-layout>
+  <iframe :src="`/${appInfo.appId}/pageDoc`" width="100%" height="100%"></iframe>
+</jh-layout>
+
+
+{% endblock %}
+
+{% block vue_body %}
+
+{% include 'layout/jhLayout.html' %}
+
+<script type="module">
+
+new Vue({
+  el: '#app',
+  template: '#app-template',
+  vuetify: new Vuetify(),
+  data: () => ({
+    appInfo: window.appInfo,
+  }),
+  computed: {},
+  watch: {},
+  created() {},
+  mounted() {},
+  methods: {}
+})
+</script>
+{% endblock %}
