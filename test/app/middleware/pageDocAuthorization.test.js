@@ -5,9 +5,9 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const pageAuthorization = require('../../../app/middleware/pageAuthorization');
+const pageDocAuthorization = require('../../../app/middleware/pageDocAuthorization');
 
-describe('test/app/middleware/pageAuthorization.test.js', () => {
+describe('test/app/middleware/pageDocAuthorization.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -18,7 +18,7 @@ describe('test/app/middleware/pageAuthorization.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware pageAuthorization', () => {
+  describe('Test middleware pageDocAuthorization', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         select: () => {},
@@ -27,7 +27,7 @@ describe('test/app/middleware/pageAuthorization.test.js', () => {
       mock(this.app, 'jianghuKnex', () => {
         return jianghuKnexResult;
       });
-      this.pageAuthorization = pageAuthorization();
+      this.pageDocAuthorization = pageDocAuthorization();
       this.nextSpy = sinon.spy();
       this.redirectStub = sinon.stub(this.ctx, 'redirect');
       this.selectStub = sinon.stub(jianghuKnexResult, 'select');
@@ -77,7 +77,7 @@ describe('test/app/middleware/pageAuthorization.test.js', () => {
 
       this.selectStub.returns(expAllUserGroupRolePageList);
 
-      await this.pageAuthorization(this.ctx, this.nextSpy);
+      await this.pageDocAuthorization(this.ctx, this.nextSpy);
 
       assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(this.redirectStub.callCount, 0);
@@ -124,7 +124,7 @@ describe('test/app/middleware/pageAuthorization.test.js', () => {
 
       this.selectStub.returns(expAllUserGroupRolePageList);
 
-      await this.pageAuthorization(this.ctx, this.nextSpy);
+      await this.pageDocAuthorization(this.ctx, this.nextSpy);
 
       assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(this.redirectStub.callCount, 1);
@@ -177,7 +177,7 @@ describe('test/app/middleware/pageAuthorization.test.js', () => {
 
       this.selectStub.returns(expAllUserGroupRolePageList);
 
-      await this.pageAuthorization(this.ctx, this.nextSpy);
+      await this.pageDocAuthorization(this.ctx, this.nextSpy);
 
       assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(this.redirectStub.callCount, 1);
