@@ -25,7 +25,8 @@ class PageController extends Controller {
         logger.error('[page.js] _ui.uiActionConfig JSON.parse异常', { pageId, uiActionId })
       }
     });
-    await ctx.render(`page/${packagePage.pageId}.html`, {
+    const targetHtml = packagePage.pageFile || `${packagePage.pageId}.html`;
+    await ctx.render(`page/${targetHtml}`, {
       ...ctx.hookResult,
       uiActionList
     });
