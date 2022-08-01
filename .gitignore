@@ -10,6 +10,7 @@ package-lock.json
 yarn.lock
 .travis.yml
 appveyor.yml
+.nyc_output
 
 .github/
 .travis.yml
