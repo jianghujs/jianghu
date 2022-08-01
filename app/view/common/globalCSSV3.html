@@ -397,6 +397,7 @@ pre.hide .string { color: green; }
 
 body {
   font-size: 14px;
+  background: #f5f8fa!important;
 }
 /* 固定表头部第一个字段 */
 table > tbody > tr > td.fixed:nth-child(1),
@@ -520,7 +521,7 @@ th:not(.v-picker th) {
   position: sticky !important;
   position: -webkit-sticky !important;
   left: 0;
-  z-index: 14;
+  z-index: 3;
   background: white;
 }
 
@@ -554,9 +555,6 @@ th:not(.v-picker th) {
   overflow: visible;
 }
 
-.theme--light.v-application {
-  background: #f5f8fa!important;
-}
 .theme--light.v-app-bar.v-toolbar.v-sheet {
   background: #ffffff!important;
   box-shadow: 0 1px 20px 0 rgb(0 0 0 / 2%)!important;
@@ -670,38 +668,25 @@ body .v-data-table__checkbox .v-input--selection-controls__input .v-icon.mdi-che
     margin: 2px 15px;
     background-color: #a5a9ab !important;
   }
-  .v-application .col-sm-4-flex {
-    flex: 4 !important;
-  }
-  .v-application .col-sm-8-flex {
-    flex: 8 !important;
-  }
-  .v-application .pa-xs-0 {
-    padding: 0!important;
-  }
-  .v-application .pt-xs-11  {
-    padding-top: 22px!important;
-  }
-  .v-application .pa-xs-2  {
-    padding-top: 4px!important;
-  }
-  .v-application .pa-xs-4  {
-    padding-top: 8px!important;
-  }
-  .v-application .pb-xs-2  {
-    padding-bottom: 4px!important;
-  }
-  .v-application .pb-xs-4  {
-    padding: 8px!important;
-  }
   .v-data-footer  {
     flex-wrap: nowrap;
   }
   .v-data-footer__pagination  {
     margin: 0 5px!important;
+    white-space: nowrap;
   }
   .v-application--is-ltr .v-data-footer__select .v-select {
-    margin-left: 10px!important;
+    margin-left: 5px!important;
+  }
+  // 抽屉的表格分页，间隔缩小
+  .v-navigation-drawer__content .v-data-footer .v-application--is-ltr .v-text-field .v-input__append-inner .v-input__icon,
+  .v-navigation-drawer__content .v-data-footer .v-application--is-rtl .v-text-field .v-input__prepend-inner .v-input__icon {
+    min-width: 14px;
+    width: 14px;
+  }
+  .v-navigation-drawer__content .v-data-footer .v-application--is-ltr .v-text-field .v-input__append-inner .mdi-menu-down::before,
+  .v-navigation-drawer__content .v-data-footer .v-application--is-rtl .v-text-field .v-input__prepend-inner .mdi-menu-down::before {
+    font-size: 16px;
   }
   .v-application--is-ltr .v-data-table--fixed-header .v-data-footer   {
     margin-right: 5px!important;
@@ -729,6 +714,15 @@ body .v-data-table__checkbox .v-input--selection-controls__input .v-icon.mdi-che
   table > tbody > tr > td.fixed:nth-child(2),
   table > thead > tr > th.fixed:nth-child(2) {
     left: 0!important;
+  }
+  // 手机的完整表格太窄。加宽20px
+  body .v-data-table--dense>.v-data-table__wrapper>table>tbody>tr>td,
+  body .v-data-table--dense>.v-data-table__wrapper>table>tbody>tr>th,
+  body .v-data-table--dense>.v-data-table__wrapper>table>tfoot>tr>td,
+  body .v-data-table--dense>.v-data-table__wrapper>table>tfoot>tr>th,
+  body .v-data-table--dense>.v-data-table__wrapper>table>thead>tr>td,
+  body .v-data-table--dense>.v-data-table__wrapper>table>thead>tr>th {
+    height: 52px;
   }
 }
 </style>
