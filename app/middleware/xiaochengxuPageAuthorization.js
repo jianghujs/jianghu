@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const { userStatusEnum, tableEnum } = require("../constant/constant");
-const { BizError, errorInfoEnum } = require("../constant/error");
+const { userStatusEnum, tableEnum } = require('../constant/constant');
+const { BizError, errorInfoEnum } = require('../constant/error');
 
-module.exports = (option) => {
+module.exports = option => {
   return async (ctx, next) => {
     const { packagePage, userInfo } = ctx;
     const { user, userAppList, allowPageList } = userInfo;
@@ -17,8 +17,8 @@ module.exports = (option) => {
       tableEnum._user_group_role_page
     ).select();
     const isNotPublic = !allUserGroupRolePageList.find(
-      (rule) =>
-        rule.group === "public" && rule.role === "*" && rule.page === pageId
+      rule =>
+        rule.group === 'public' && rule.role === '*' && rule.page === pageId
     );
     const { originalUrl } = ctx.request;
     const originalUrlEncode = encodeURIComponent(originalUrl);
@@ -35,7 +35,7 @@ module.exports = (option) => {
     }
 
     // 3. 判断用户是否有 当前 packagePage 的权限
-    if (allowPageList.findIndex((x) => x.pageId === pageId) === -1) {
+    if (allowPageList.findIndex(x => x.pageId === pageId) === -1) {
       throw new BizError(errorInfoEnum.page_forbidden);
     }
   };
