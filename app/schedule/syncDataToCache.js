@@ -32,7 +32,7 @@ module.exports = app => {
         if (cacheList.find(cache => cache.userId === userId)) {
           await jianghuKnex(tableEnum._cache).where({ userId }).update({ userId, content: JSON.stringify(userRuleData) });
         } else {
-          await jianghuKnex(tableEnum._cache).where({ userId }).insert({ userId, content: JSON.stringify(userRuleData) });
+          await jianghuKnex(tableEnum._cache).insert({ userId, content: JSON.stringify(userRuleData) });
         }
       }
 
