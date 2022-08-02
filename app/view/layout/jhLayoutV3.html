@@ -55,7 +55,7 @@
           style="z-index: 4;"
           flat
       >
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="isMobile"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon color="success" @click.stop="drawer = !drawer" v-if="isMobile"></v-app-bar-nav-icon>
 
         <v-toolbar-title ref="toolbarTitle" class="mr-8 pa-0 align-center" style="font-size: 14px" :style="{'flex': isMobile ? 1 : 'none'}">
           <span class="title" style="font-size: 18px!important; font-weight: bold">{{ appTitle }}</span>
@@ -90,7 +90,7 @@
           <v-menu offset-y>
             <template v-slot:activator="{ on }">
               <template v-if="!isMobile">
-                <v-btn disabled text class="ml-1 text-none" v-on="on">
+                <v-btn disabled text class="ml-1 mr-0 pr-0 text-none" v-on="on">
                   {{ userInfo.user.username }}
                 </v-btn>
               </template>
@@ -149,16 +149,19 @@
       </v-app-bar>
 
       <v-main class="d-flex flex-column">
-        <div class="d-flex" :class="{'px-12': !isMobile, 'px-4': isMobile}">
+        <div class="d-flex" :style="{'flex-wrap': isMobile ? 'wrap' : 'nowrap'}" :class="{'px-12': !isMobile, 'px-4': isMobile}">
           <div>
             <div class="appTitle pt-5" style="font-size: 18px; font-weight: bold"><slot name='breadcrumbsTitle'>{{breadcrumbs[1].fullText}}</slot></div>
-            <v-breadcrumbs
+            <slot name='breadcrumbsList'>
+              <v-breadcrumbs
                 class="pb-4 pt-0 pl-0"
                 :items="breadcrumbs"
                 divider="-"
-            ></v-breadcrumbs>
+              ></v-breadcrumbs>
+            </slot>
           </div>
-          <div style="flex: 1" class="pt-2 outSideMain">
+          <slot name="topRightWidget"></slot>
+          <div style="flex: 1" class="outSideMain" :class="{'pt-0': isMobile, 'pt-2': !isMobile}" >
             <slot name='serverSearch'></slot>
           </div>
         </div>
@@ -214,7 +217,7 @@ Vue.component("jh-layout-v3", {
     inMenuList: [],
     inAvatarMenuList: [],
     profileMenus: [],
-    tabsMaxWidth: 'calc(100vw - 373px)'
+    tabsMaxWidth: 'calc(100vw - 353px)'
   }),
 
   watch: {},
@@ -237,7 +240,7 @@ Vue.component("jh-layout-v3", {
     getTabsMaxWidth() {
       this.$nextTick(() => {
         if(this.$refs.toolbarTitle) {
-          this.tabsMaxWidth = 'calc(100vw - ' + (this.$refs.toolbarTitle.offsetWidth + 269) + 'px)';
+          this.tabsMaxWidth = 'calc(100vw - ' + (this.$refs.toolbarTitle.offsetWidth + 249) + 'px)';
         }
       })
     },
