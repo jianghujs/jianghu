@@ -34,7 +34,6 @@ class ResourceController extends Controller {
       }
     }
 
-    // TODO: base64场景 appData太大了
     if (ignoreListOfResourceRequestLog.indexOf(resourceId) === -1) {
       app.logger.debug('[resource.js httpRequest body]', {
         packageId,
@@ -50,7 +49,7 @@ class ResourceController extends Controller {
         ctx.body = httpResponse.success({
           packageId,
           // TODO: ...resultData, resultData 为兼容代码
-          appData: { ...resultData, resultData, appId, pageId, actionId },
+          appData: { resultData, appId, pageId, actionId },
         });
         break;
       case resourceTypeObj.service:
@@ -58,7 +57,7 @@ class ResourceController extends Controller {
         ctx.body = httpResponse.success({
           packageId,
           // TODO: ...resultData, resultData 为兼容代码
-          appData: { ...resultData, resultData, appId, pageId, actionId },
+          appData: { resultData, appId, pageId, actionId },
         });
         break;
       default:

@@ -78,12 +78,11 @@ function resourcePackageBuild({ packageId, packageType, status, appData }) {
   };
 }
 
-
-
 module.exports.duoxingSocketStatusObj = Object.freeze({
   online: 'online',
   offline: 'offline',
 });
+
 module.exports.noticeTypeObj = Object.freeze({
   // group
   createGroup: 'createGroup',
