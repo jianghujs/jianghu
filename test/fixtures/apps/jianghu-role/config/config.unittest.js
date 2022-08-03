@@ -29,7 +29,7 @@ module.exports = appInfo => {
     },
     knex: {
       client: {
-        dialect: 'mysql',
+        dialect: 'mysql2',
         connection: {
           host: '0.0.0.0',
           port: 3306,
