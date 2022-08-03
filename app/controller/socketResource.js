@@ -15,7 +15,6 @@ const socketPackage = require('../middleware/socketPackage');
 const socketPackageRecord = require('../middleware/socketPackageRecord');
 const socketUserInfo = require('../middleware/socketUserInfo');
 const socketAuthorization = require('../middleware/socketAuthorization');
-const syncSocketStatus = require('../schedule/syncSocketStatus');
 const socketResourceBeforeHook = require('../middleware/socketResourceBeforeHook');
 const socketResourceAfterHook = require('../middleware/socketResourceAfterHook');
 
