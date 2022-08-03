@@ -22,13 +22,13 @@ module.exports = appInfo => {
     loginPage: `/${appId}/page/login`,
     helpPage: `/${appId}/page/help`,
     jiangHuConfig: {
+      enableSocket: false,
       packageIdCheck: false,
       updateRequestDemoAndResponseDemo: false,
       enableUserInfoCache: false,
       userInfoCacheRefreshInterval: "10s",
       enableSyncSocketStatus: false,
       syncSocketStatusRefreshInterval: "60s",
-      enableSocket: false,
       ignoreListOfResourceRequestLog: ['allPage.getConstantList', 
         'allPage.httpUploadByStream', 'allPage.httpUploadByBase64', 'allPage.httpDownloadByBase64'],
       // /appId/upload 下的文件在鉴权通过之后，设置 max-age，默认 30 天缓存
@@ -128,12 +128,7 @@ module.exports = appInfo => {
           appData: { errorCode, errorReason, errorReasonSupplement },
         });
       },
-    },
-    siteFile: {
-      "/favicon.ico": fs.readFileSync(
-        path.join(__dirname, "../app/public/img/logo.svg")
-      ),
-    },
+    }
   };
 
   return {
