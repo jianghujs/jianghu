@@ -36,8 +36,8 @@ module.exports = appInfo => {
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
       // Tip: 兼容配置, 下一个大版本删除
       compatibleConfig: {
-        // true =====》 ALTER TABLE `duoxing_v5`.`_resource_request_log` ADD COLUMN `userId` varchar(255) NULL COMMENT '用户ID' AFTER `userAgent`;
-        resourceRequestLogRecordUserId: false
+        // true =====》 ALTER TABLE `_resource_request_log` ADD COLUMN `userId` varchar(255) NULL COMMENT '用户ID' AFTER `userAgent`;
+        // resourceRequestLogRecordUserId: false
       }
     },
     security: {

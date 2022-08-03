@@ -33,12 +33,8 @@ module.exports = {
       requestBody: requestBodyString,
       responseBody: responseBodyString,
       responseStatus,
+      userId: userId,
     };
-
-    // 适配代码: 3.0 版本删除
-    if (resourceRequestLogRecordUserId === true) {
-      insertData.userId = userId;
-    }
 
     await jianghuKnex(tableEnum._resource_request_log)
       .insert(insertData);
