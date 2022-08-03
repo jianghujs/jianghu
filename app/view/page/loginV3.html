@@ -1,0 +1,283 @@
+{% extends 'template/jhTemplateV3.html'%}
+
+<!-- vue template 代码块 -->
+{% block vue_template %}
+<v-app>
+<v-main>
+  <v-container fluid class="d-flex flex-column justify-center" style="height: 100vh;">
+    <v-row
+        align="center"
+        justify="center"
+    >
+      <v-col cols="12" xs="1"></v-col>
+      <v-col
+          cols="12"
+          xs="10"
+          md="3"
+      >
+        <div style="text-align: center; font-size: 23px; font-weight: bold;" class="mb-0">
+          <$ ctx.app.config.appTitle $>
+        </div>
+        <div style="text-align: center; font-size: 18px; color: #bbc4d3" class="mb-12">
+          - 登录 -
+        </div>
+        <v-form>
+          <v-text-field
+              v-model="userId"
+              prefix="账号:"
+              outlined
+              color="success"
+              prepend-inner-icon="mdi-account-circle"
+              background-color="#ffffff"
+          />
+
+          <v-text-field
+              v-model="password"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showPassword ? 'text' : 'password'"
+              @click:append="showPassword = !showPassword"
+              prefix="密码:"
+              color="success"
+              data-type="password"
+              @keyup.enter.exact="login"
+              outlined
+              prepend-inner-icon="mdi-lock-question"
+              background-color="#ffffff"
+          />
+
+        </v-form>
+        <v-card-actions class="pa-0" >
+          <v-checkbox
+              v-model="remember"
+              color="success"
+              :label="`记住密码`"
+          />
+          <v-spacer></v-spacer>
+        </v-card-actions>
+        <v-card-actions class="pa-0" >
+          <v-btn large block color="success" type="submit" @click="login">登入</v-btn>
+        </v-card-actions>
+      </v-col>
+      <v-col cols="12" xs="1"></v-col>
+    </v-row>
+  </v-container>
+</v-main>
+</v-app>
+{% endblock %}
+
+
+<!-- vue script 代码块 -->
+<!-- 注意：本项目的 vue 为每个页面使用一个 vue 实例 -->
+{% block vue_body %}
+
+<script type="module">
+new Vue({
+  el: '#app',
+  template: '#app-template',
+  vuetify: new Vuetify(),
+  components: {},
+  data() {
+    return {
+      userId: '',
+      password: '',
+      showPassword: false,
+      remember: true,
+      loginError: false,
+      loginErrorText: '',
+    };
+  },
+  created() {
+  },
+  mounted() {
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('errorReason')) {
+      window.vtoast.fail(urlParams.get('errorReason'));
+    }
+  },
+  methods: {
+    async login() {
+      const urlParams = new URLSearchParams(location.search);
+      const redirectUrl = urlParams.get('redirectUrl');
+      const deviceId = await this.getDeviceId();
+      const userId = (this.userId + '').replace(/\s+/g, '');
+      const password = this.password + '';
+
+      try {
+        const resultData = (await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'login',
+              actionId: 'passwordLogin',
+              actionData: { userId, password, deviceId },
+            }
+          }
+        })).data.appData.resultData;
+        if (resultData.authToken) {
+          localStorage.setItem(`${window.appInfo.appId}_authToken`, resultData.authToken);
+          localStorage.setItem(`${window.appInfo.appId}_userId`, resultData.userId);
+          localStorage.setItem(`${window.appInfo.appId}_deviceId`, deviceId);
+          vtoast.success('登陆成功');
+
+          let redirectTo = `/${window.appInfo.appId}`;
+          if (redirectUrl) {
+            redirectTo = decodeURIComponent(redirectUrl);
+          }
+          location.href = redirectTo;
+        }
+
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async getDeviceId() {
+      const {osName, osVersion} = this.getOsInfo();
+      const browserMachineId = `${osName}.${osVersion}`;
+      const machineId = browserMachineId;
+      const fingerprint = this.getFingerprint();
+      const host = window.location.host;
+      const browser = this.getBrowserInfo();
+      const deviceId = `${host}_${machineId}_${fingerprint}_${browser}`;
+      return deviceId;
+    },
+    getOsInfo() {
+      let userAgent = navigator.userAgent.toLowerCase();
+      let osName = 'Unknown';
+      let osVersion = 'Unknown';
+      if (userAgent.indexOf('win') > -1) {
+        osName = 'Windows';
+      } else if (userAgent.indexOf('iphone') > -1) {
+        osName = 'Iphone';
+      } else if (userAgent.indexOf('mac') > -1) {
+        osName = 'Mac';
+      } else if (userAgent.indexOf('x11') > -1 || userAgent.indexOf('unix') > -1 || userAgent.indexOf('sunname') > -1 || userAgent.indexOf('bsd') > -1) {
+        osName = 'Unix';
+      } else if (userAgent.indexOf('linux') > -1) {
+        if (userAgent.indexOf('android') > -1) {
+          osName = 'Android';
+        } else {
+          osName = 'Linux';
+        }
+      }
+
+      // 系统版本信息
+      const u = window.navigator.userAgent;
+      const osVersionFunc = {
+        'Windows': function () {
+          const v = u.replace(/^.*Windows NT ([\d.]+);.*$/, '$1')
+          const oldWindowsVersionMap = {
+            '6.4': '10',
+            '6.3': '8.1',
+            '6.2': '8',
+            '6.1': '7',
+            '6.0': 'Vista',
+            '5.2': 'XP',
+            '5.1': 'XP',
+            '5.0': '2000'
+          }
+          return oldWindowsVersionMap[v] || v
+        },
+        'Android': function () {
+          return u.replace(/^.*Android ([\d.]+);.*$/, '$1')
+        },
+        'iOS': function () {
+          return u.replace(/^.*OS ([\d_]+) like.*$/, '$1').replace(/_/g, '.')
+        },
+        'Debian': function () {
+          return u.replace(/^.*Debian\/([\d.]+).*$/, '$1')
+        },
+        'Windows Phone': function () {
+          return u.replace(/^.*Windows Phone( OS)? ([\d.]+);.*$/, '$2')
+        },
+        'Mac': function () {
+          return u.replace(/^.*Mac OS X ([\d_]+).*$/, '$1').replace(/_/g, '.')
+        },
+        'WebOS': function () {
+          return u.replace(/^.*hpwOS\/([\d.]+);.*$/, '$1')
+        }
+      }
+
+      if (osVersionFunc[osName]) {
+        osVersion = osVersionFunc[osName]()
+      }
+
+      return {osName, osVersion};
+    },
+    getFingerprint() {
+      function bin2hex(s) {
+        let i, l, n, o = ''
+        s += ''
+        for (i = 0, l = s.length; i < l; i++) {
+          n = s.charCodeAt(i).toString(16)
+          o += n.length < 2 ? '0' + n : n
+        }
+        return o
+      }
+
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const txt = window.location.host
+      ctx.textBaseline = "top"
+      ctx.font = "14px 'Arial'"
+      ctx.textBaseline = "tencent"
+      ctx.fillStyle = "#f60"
+      ctx.fillRect(125, 1, 62, 20)
+      ctx.fillStyle = "#069"
+      ctx.fillText(txt, 2, 15)
+      ctx.fillStyle = "rgba(102, 204, 0, 0.7)"
+      ctx.fillText(txt, 4, 17)
+      const b64 = canvas.toDataURL().replace("data:image/png;base64,", "")
+      const bin = atob(b64)
+      const crc = bin2hex(bin.slice(-16, -12))
+      const fingerprint = crc;
+      return fingerprint;
+    },
+    getBrowserInfo() {
+      let explorer = window.navigator.userAgent;
+      explorer = explorer.toLowerCase();
+
+      //ie
+      if (explorer.indexOf("msie") >= 0) {
+        return "ie";
+      }
+      // flutterApp
+      else if (explorer.indexOf("Android") >= 0) {
+        return "Android";
+      }
+      //firefox
+      else if (explorer.indexOf("firefox") >= 0) {
+        return "firefox";
+      }
+      //Chrome
+      else if (explorer.indexOf("chrome") >= 0) {
+        return "chrome";
+      }
+      //Opera
+      else if (explorer.indexOf("opera") >= 0) {
+        return "opera";
+      }
+      //Safari
+      else if (explorer.indexOf("safari") >= 0) {
+        return "safari";
+      }
+      if (explorer.indexOf("edge") >= 0) {
+        return "edge";
+      }
+      //遨游浏览器
+      if (explorer.indexOf("maxthon") >= 0) {
+        return "maxthon";
+      }
+      //QQ浏览器
+      if (explorer.indexOf("qqbrowser") >= 0) {
+        return "qqbrowser";
+      }
+      //搜狗浏览器
+      if (explorer.indexOf("se 2.x") >= 0) {
+        return "sogou";
+      }
+      return "others";
+    }
+  }
+});
+</script>
+
+{% endblock %}
