@@ -44,10 +44,13 @@ module.exports = appInfo => {
     },
     knex: {
       client: {
-        dialect: 'sqlite',
-        useNullAsDefault: true,
+        dialect: 'postgresql',
         connection: {
-          filename: path.join(process.cwd(), 'jianghu.db'),
+          host: '0.0.0.0',
+          port: 5432,
+          user: 'postgres',
+          password: '123456',
+          database: 'jianghu',
         },
         pool: { min: 0, max: 5 },
         acquireConnectionTimeout: 30000,

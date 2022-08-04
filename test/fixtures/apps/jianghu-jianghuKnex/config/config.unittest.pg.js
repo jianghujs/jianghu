@@ -25,7 +25,7 @@ module.exports = appInfo => {
     },
     knex: {
       client: {
-        dialect: 'pg',
+        dialect: 'postgresql',
         connection: {
           host: '0.0.0.0',
           port: 5432,
