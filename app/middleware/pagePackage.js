@@ -1,6 +1,6 @@
 'use strict';
 
-const { tableEnum } = require('../constant/constant');
+const { tableObj } = require('../constant/constant');
 
 module.exports = () => {
   return async (ctx, next) => {
@@ -16,14 +16,14 @@ module.exports = () => {
     // 并将 param[] 放到 ctx.pathParams 中
     if (pageId.includes('/')) {
       const parts = pageId.split('/');
-      page = await jianghuKnex(tableEnum._page).where({ pageId: parts[0] }).first();
+      page = await jianghuKnex(tableObj._page).where({ pageId: parts[0] }).first();
       if (page && page.pageType === 'seo') {
         ctx.pathParams = parts.splice(1);
       }
     }
 
     if (!page) {
-      page = await jianghuKnex(tableEnum._page).where({ pageId }).first();
+      page = await jianghuKnex(tableObj._page).where({ pageId }).first();
     }
 
     ctx.packagePage = page;

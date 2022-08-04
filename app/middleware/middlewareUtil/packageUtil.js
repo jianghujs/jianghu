@@ -1,6 +1,6 @@
 'use strict';
 
-const { tableEnum } = require('../../constant/constant');
+const { tableObj } = require('../../constant/constant');
 const geoip = require('geoip-lite');
 
 module.exports = {
@@ -33,10 +33,14 @@ module.exports = {
       requestBody: requestBodyString,
       responseBody: responseBodyString,
       responseStatus,
-      userId: userId,
     };
 
-    await jianghuKnex(tableEnum._resource_request_log)
+    // 适配代码: 3.0 版本删除
+    if (resourceRequestLogRecordUserId === true) {
+      insertData.userId = userId;
+    }
+
+    await jianghuKnex(tableObj._resource_request_log)
       .insert(insertData);
   },
 
@@ -60,7 +64,7 @@ module.exports = {
     }
     const responseDemo = JSON.stringify(responseBodyTmp);
 
-    await jianghuKnex(tableEnum._resource).where({ pageId, actionId }).update({ requestDemo, responseDemo });
+    await jianghuKnex(tableObj._resource).where({ pageId, actionId }).update({ requestDemo, responseDemo });
   },
 };
 

@@ -1,7 +1,7 @@
 'use strict';
 // 缓存数据到数据库 _cache 表中
 
-const { tableEnum } = require('../constant/constant');
+const { tableObj } = require('../constant/constant');
 const userInfoUtil = require('../middleware/middlewareUtil/userInfoUtil');
 
 module.exports = app => {
@@ -20,8 +20,8 @@ module.exports = app => {
       const startTime = new Date().getTime();
       const { logger, jianghuKnex } = app;
 
-      const cacheList = await jianghuKnex(tableEnum._cache).select('userId');
-      const userList = await jianghuKnex(tableEnum._user).select();
+      const cacheList = await jianghuKnex(tableObj._cache).select('userId');
+      const userList = await jianghuKnex(tableObj._user).select();
       // 未登录场景
       userList.push({ userId: 'visitor' });
 
@@ -30,9 +30,9 @@ module.exports = app => {
         const { userId } = user;
         const userRuleData = await userInfoUtil.captureUserRuleData({ jianghuKnex, appType: app.config.appType, userId });
         if (cacheList.find(cache => cache.userId === userId)) {
-          await jianghuKnex(tableEnum._cache).where({ userId }).update({ userId, content: JSON.stringify(userRuleData) });
+          await jianghuKnex(tableObj._cache).where({ userId }).update({ userId, content: JSON.stringify(userRuleData) });
         } else {
-          await jianghuKnex(tableEnum._cache).insert({ userId, content: JSON.stringify(userRuleData) });
+          await jianghuKnex(tableObj._cache).insert({ userId, content: JSON.stringify(userRuleData) });
         }
       }
 

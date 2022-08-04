@@ -1,7 +1,7 @@
 'use strict';
 
 const {
-  resourceTypeEnum,
+  resourceTypeObj,
   socketResponse,
   resourcePath,
   socketRequest: socketRequestBodyBuild,
@@ -58,12 +58,12 @@ async function socketRequest({ socket, app, body }, next) {
 
   let resultData;
   switch (resourceType) {
-    case resourceTypeEnum.socketSql:
-    case resourceTypeEnum.sql:
+    case resourceTypeObj.socketSql:
+    case resourceTypeObj.sql:
       resultData = await sqlResource({ jianghuKnex, ctx });
       break;
-    case resourceTypeEnum.service:
-    case resourceTypeEnum.socketService:
+    case resourceTypeObj.service:
+    case resourceTypeObj.socketService:
       resultData = await serviceResource({ ctx });
       break;
     default:

@@ -2,7 +2,7 @@
 
 const validateUtil = require('../common/validateUtil');
 const { errorInfoEnum, BizError } = require('../constant/error');
-const { tableEnum } = require('../constant/constant');
+const { tableObj } = require('../constant/constant');
 
 const validateSchemaEnum = Object.freeze({
   resourceRequestBody: {
@@ -47,7 +47,7 @@ module.exports = async ctx => {
   const resourceId = `${pageId}.${actionId}`;
 
   // 1. 捕获 package resource
-  ctx.packageResource = await jianghuKnex(tableEnum._resource)
+  ctx.packageResource = await jianghuKnex(tableObj._resource)
     .where({ pageId, actionId })
     .first();
   if (!ctx.packageResource) {

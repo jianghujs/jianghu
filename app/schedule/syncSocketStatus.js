@@ -1,7 +1,7 @@
 'use strict';
 // 定时同步 userSession 中的 socketStatus 字段
 
-const { duoxingSocketStatusEnum, tableEnum } = require('../constant/constant');
+const { duoxingSocketStatusObj, tableObj } = require('../constant/constant');
 
 module.exports = app => {
   return {
@@ -44,12 +44,12 @@ module.exports = app => {
       });
 
       // 获取对应的 user session
-      let userSessions = await knex(tableEnum._user_session)
+      let userSessions = await knex(tableObj._user_session)
         .whereIn('deviceId', deviceIds)
         .select();
       // 获取数据库中在线的 user session
-      const onlineUserSessions = await knex(tableEnum._user_session)
-        .where('socketStatus', duoxingSocketStatusEnum.online)
+      const onlineUserSessions = await knex(tableObj._user_session)
+        .where('socketStatus', duoxingSocketStatusObj.online)
         .select();
       userSessions = [ ...userSessions, ...onlineUserSessions ];
 
@@ -58,8 +58,8 @@ module.exports = app => {
         const realStatus = onlineSocketIds.includes(
           `${userSession.deviceId}::${userSession.userId}`
         )
-          ? duoxingSocketStatusEnum.online
-          : duoxingSocketStatusEnum.offline;
+          ? duoxingSocketStatusObj.online
+          : duoxingSocketStatusObj.offline;
         if (userSession.socketStatus !== realStatus) {
           logger.info(
             '[syncSocketStatus.js] user session 在线状态异常，修复状态',
@@ -70,7 +70,7 @@ module.exports = app => {
               realStatus,
             }
           );
-          const updateRes = await knex(tableEnum._user_session)
+          const updateRes = await knex(tableObj._user_session)
             .where('id', '=', userSession.id)
             .update('socketStatus', realStatus);
           if (updateRes) {

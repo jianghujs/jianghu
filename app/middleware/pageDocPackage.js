@@ -1,7 +1,7 @@
 'use strict';
 
 
-const { tableEnum } = require('../constant/constant');
+const { tableObj } = require('../constant/constant');
 module.exports = () => {
   return async (ctx, next) => {
     const { logger, jianghuKnex } = ctx.app;
@@ -15,7 +15,7 @@ module.exports = () => {
       pageId = 'manual';
     }
 
-    ctx.packagePage = await jianghuKnex(tableEnum._page).where({ pageId }).first();
+    ctx.packagePage = await jianghuKnex(tableObj._page).where({ pageId }).first();
     if (!ctx.packagePage) {
       logger.error(`[pageDoc not found error], url: ${ctx.request.url}`);
       ctx.redirect(ctx.app.config.helpPage);
