@@ -25,13 +25,10 @@ module.exports = appInfo => {
     },
     knex: {
       client: {
-        dialect: 'mysql2',
+        dialect: 'sqlite',
+        useNullAsDefault: true,
         connection: {
-          host: '0.0.0.0',
-          port: 3306,
-          user: 'root',
-          password: '123456',
-          database: 'jianghu',
+          filename: path.join(process.cwd(), 'jianghu.db'),
         },
         pool: { min: 0, max: 5 },
         acquireConnectionTimeout: 30000,
