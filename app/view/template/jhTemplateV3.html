@@ -24,7 +24,17 @@
   <script src="/<$ ctx.app.config.appId $>/public/js/lib/axios.min.js"></script>
   <script src="/<$ ctx.app.config.appId $>/public/js/lib/vue.js"></script>
   <script src="/<$ ctx.app.config.appId $>/public/js/lib/vuetify.min.js"></script>
+  <style>
+    body .v-application .primary {
+      background-color: <$ ctx.app.config.primaryColor $> !important;
+      border-color: <$ ctx.app.config.primaryColor $> !important;
+    }
 
+    body .v-application .primary--text {
+      color: <$ ctx.app.config.primaryColor $> !important;
+      caret-color: <$ ctx.app.config.primaryColor $> !important;
+    }
+  </style>
   {% include 'common/jianghuAxios.html' %}
   {% include 'common/globalCSSV3.html' %}
 
