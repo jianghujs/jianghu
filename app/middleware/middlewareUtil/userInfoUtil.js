@@ -81,8 +81,7 @@ module.exports = {
   },
 
   async getUserRuleDataFromCache(jianghuKnex, userId) {
-    userId = userId || 'visitor';
-    const cache = await jianghuKnex(tableEnum._cache).where(userId).first();
+    const cache = await jianghuKnex(tableEnum._cache).where({ userId: userId || 'visitor' }).first();
     if (cache.content) {
       return JSON.parse(cache.content);
     }
