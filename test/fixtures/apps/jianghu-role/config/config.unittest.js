@@ -8,16 +8,12 @@ const { middleware, middlewareMatch } = require(path.join(process.cwd(), 'config
 
 module.exports = appInfo => {
   assert(appInfo);
-  const appId = 'jianghu';
   return {
-    appId,
+    appId: 'jianghu',
     debug: true,
     jiangHuConfig: {
       enableSocket: true,
     },
-    indexPage: `/${appId}/page/manual`,
-    loginPage: `/${appId}/page/login`,
-    helpPage: `/${appId}/page/help`,
     logger: {
       outputJSON: true,
       consoleLevel: 'DEBUG',
@@ -29,13 +25,13 @@ module.exports = appInfo => {
     },
     knex: {
       client: {
-        dialect: 'oracledb',
+        dialect: 'mysql2',
         connection: {
+          host: '0.0.0.0',
+          port: 3306,
           user: 'root',
           password: '123456',
-          connectString: 'localhost:1521/XE',
-          stmtCacheSize: 0,
-          fetchAsString: [ 'number', 'clob' ],
+          database: 'jianghu',
         },
         pool: { min: 0, max: 5 },
         acquireConnectionTimeout: 30000,

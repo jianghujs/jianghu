@@ -25,14 +25,13 @@ module.exports = appInfo => {
     },
     knex: {
       client: {
-        dialect: 'oracledb',
+        dialect: 'mysql2',
         connection: {
-          user: 'ROOT',
+          host: '0.0.0.0',
+          port: 3306,
+          user: 'root',
           password: '123456',
-          connectString: 'localhost:1521/XE',
-          stmtCacheSize: 0,
-          fetchAsString: [ 'number', 'clob' ],
-
+          database: 'jianghu',
         },
         pool: { min: 0, max: 5 },
         acquireConnectionTimeout: 30000,
