@@ -49,7 +49,7 @@ class ResourceController extends Controller {
         ctx.body = httpResponse.success({
           packageId,
           // TODO: ...resultData, resultData 为兼容代码
-          appData: { resultData, appId, pageId, actionId },
+          appData: { ...resultData, resultData, appId, pageId, actionId },
         });
         break;
       case resourceTypeObj.service:
@@ -57,7 +57,7 @@ class ResourceController extends Controller {
         ctx.body = httpResponse.success({
           packageId,
           // TODO: ...resultData, resultData 为兼容代码
-          appData: { resultData, appId, pageId, actionId },
+          appData: { ...resultData, resultData, appId, pageId, actionId },
         });
         break;
       default:
