@@ -152,7 +152,7 @@
         <div class="d-flex" :style="{'flex-wrap': isMobile ? 'wrap' : 'nowrap'}" :class="{'px-12': !isMobile, 'px-4': isMobile}">
           <div>
             <div class="appTitle pt-5" style="font-size: 18px; font-weight: bold"><slot name='breadcrumbsTitle'>{{breadcrumbs[1].fullText}}</slot></div>
-            <slot name='breadcrumbsList'>
+            <slot name='breadcrumbsList' :isMobile="isMobile">
               <v-breadcrumbs
                 class="pb-4 pt-0 pl-0"
                 :items="breadcrumbs"
@@ -160,9 +160,9 @@
               ></v-breadcrumbs>
             </slot>
           </div>
-          <slot name="topRightWidget"></slot>
+          <slot name="topRightWidget" :isMobile="isMobile"></slot>
           <div style="flex: 1" class="outSideMain" :class="{'pt-0': isMobile, 'pt-2': !isMobile}" >
-            <slot name='serverSearch'></slot>
+            <slot name='serverSearch' :isMobile="isMobile"></slot>
           </div>
         </div>
         <div style="flex: 1" :class="{'px-12': !isMobile, 'pt-4': fullScreen}">
