@@ -11,7 +11,7 @@ const mime = require('mime');
 const path = require('path');
 const crypto = require('crypto');
 const {
-  tableEnum,
+  tableObj,
 } = require('../constant/constant');
 const fileUtil = require('../common/fileUtil');
 const actionDataScheme = Object.freeze({
@@ -195,7 +195,7 @@ class FileService extends Service {
       binarySize,
       fileType,
     };
-    await jianghuKnex(tableEnum._file, this.ctx).jhInsert(file);
+    await jianghuKnex(tableObj._file, this.ctx).jhInsert(file);
     file.downloadBasePath = downloadBasePath;
     file.downloadTip = 'https://xxx.xxx.xxx/${downloadBasePath}${downloadPath}';
     return file;

@@ -8,12 +8,16 @@ const { middleware, middlewareMatch } = require(path.join(process.cwd(), 'config
 
 module.exports = appInfo => {
   assert(appInfo);
+  const appId = 'jianghu';
   return {
-    appId: 'jianghu',
+    appId,
     debug: true,
     jiangHuConfig: {
       enableSocket: true,
     },
+    indexPage: `/${appId}/page/manual`,
+    loginPage: `/${appId}/page/login`,
+    helpPage: `/${appId}/page/help`,
     logger: {
       outputJSON: true,
       consoleLevel: 'DEBUG',

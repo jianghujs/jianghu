@@ -3,7 +3,7 @@
 const validateUtil = require('../common/validateUtil');
 const packageUtil = require('./middlewareUtil/packageUtil');
 const { errorInfoEnum, BizError } = require('../constant/error');
-const { tableEnum } = require('../constant/constant');
+const { tableObj } = require('../constant/constant');
 
 const validateSchemaEnum = Object.freeze({
   resourceRequestBody: {
@@ -54,7 +54,7 @@ module.exports = options => {
     const resourceId = `${pageId}.${actionId}`;
 
     // 1. 捕获 package resource
-    ctx.packageResource = await jianghuKnex(tableEnum._resource).where({ pageId, actionId }).first();
+    ctx.packageResource = await jianghuKnex(tableObj._resource).where({ pageId, actionId }).first();
     if (!ctx.packageResource) throw new BizError(errorInfoEnum.resource_not_found);
     ctx.packageResource.resourceId = resourceId;
     ctx.packageResource.resourceHook = JSON.parse(ctx.packageResource.resourceHook || '{}');

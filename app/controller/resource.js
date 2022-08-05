@@ -2,7 +2,7 @@
 
 const { Controller } = require('egg');
 const { BizError, errorInfoEnum } = require('../constant/error');
-const { tableEnum, resourceTypeEnum, httpResponse } = require('../constant/constant');
+const { tableObj, resourceTypeObj, httpResponse } = require('../constant/constant');
 const _ = require('lodash');
 const { sqlResource, serviceResource } = require('./controllerUtil/resourceUtil');
 
@@ -25,7 +25,7 @@ class ResourceController extends Controller {
     // packageId 唯一性校验
     if (packageIdCheck) {
       const resourceActivity = await jianghuKnex(
-        tableEnum._resource_request_log
+        tableObj._resource_request_log
       )
         .where({ packageId })
         .first();
@@ -34,7 +34,6 @@ class ResourceController extends Controller {
       }
     }
 
-    // TODO: base64场景 appData太大了
     if (ignoreListOfResourceRequestLog.indexOf(resourceId) === -1) {
       app.logger.debug('[resource.js httpRequest body]', {
         packageId,
@@ -45,7 +44,7 @@ class ResourceController extends Controller {
 
     let resultData;
     switch (resourceType) {
-      case resourceTypeEnum.sql:
+      case resourceTypeObj.sql:
         resultData = await sqlResource({ jianghuKnex, ctx });
         ctx.body = httpResponse.success({
           packageId,
@@ -53,7 +52,7 @@ class ResourceController extends Controller {
           appData: { ...resultData, resultData, appId, pageId, actionId },
         });
         break;
-      case resourceTypeEnum.service:
+      case resourceTypeObj.service:
         resultData = await serviceResource({ ctx });
         ctx.body = httpResponse.success({
           packageId,

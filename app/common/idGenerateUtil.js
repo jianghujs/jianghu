@@ -18,7 +18,7 @@ module.exports.timestamp_6number = () => {
 };
 
 module.exports.randomString = length => {
-  const charList = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+  const charList = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz123456789';
   const charListLength = charList.length;
   let string = '';
   for (let i = 0; i < length; i++) string += charList.charAt(Math.floor(Math.random() * charListLength));

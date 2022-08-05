@@ -3,7 +3,7 @@
 // ========================================常用 require start===========================================
 const Service = require('egg').Service;
 const { BizError, errorInfoEnum } = require('../constant/error');
-const { tableEnum, userStatusEnum } = require('../constant/constant');
+const { tableObj, userStatusObj } = require('../constant/constant');
 const validateUtil = require('../common/validateUtil');
 const idGenerateUtil = require('../common/idGenerateUtil');
 const geoip = require('geoip-lite');
@@ -57,15 +57,15 @@ class UserService extends Service {
       deviceId,
       needSetCookies = true,
     } = actionData;
-    const user = await jianghuKnex(tableEnum._view01_user)
+    const user = await jianghuKnex(tableObj._view01_user)
       .where({ userId })
       .first();
     if (!user || !user.userId || user.userId !== userId) {
       throw new BizError(errorInfoEnum.user_not_exist);
     }
     const { userStatus } = user;
-    if (userStatus !== userStatusEnum.active) {
-      if (userStatus === userStatusEnum.banned) {
+    if (userStatus !== userStatusObj.active) {
+      if (userStatus === userStatusObj.banned) {
         throw new BizError(errorInfoEnum.user_banned);
       }
       throw new BizError(errorInfoEnum.user_status_error);
@@ -79,7 +79,7 @@ class UserService extends Service {
     // 存session 的目的是为了
     //   1. 系统可以根据这个判断是否是自己生成的token
     //   2. 有时候系统升级需要 用户重新登陆/重新登陆，这时候可以通过清理旧session达到目的
-    const userSession = await jianghuKnex(tableEnum._user_session)
+    const userSession = await jianghuKnex(tableObj._user_session)
       .where({ userId, deviceId })
       .first();
 
@@ -92,11 +92,11 @@ class UserService extends Service {
     }
 
     if (userSession && userSession.id) {
-      await jianghuKnex(tableEnum._user_session, this.ctx)
+      await jianghuKnex(tableObj._user_session, this.ctx)
         .where({ id: userSession.id })
         .jhUpdate({ authToken, deviceType, userAgent, userIp, userIpRegion });
     } else {
-      await jianghuKnex(tableEnum._user_session, this.ctx).jhInsert({
+      await jianghuKnex(tableObj._user_session, this.ctx).jhInsert({
         userId,
         deviceId,
         userAgent,
@@ -133,19 +133,19 @@ class UserService extends Service {
     if (needSetCookies) {
       this.ctx.cookies.set(`${appId}_authToken`, null);
     }
-    const user = await jianghuKnex(tableEnum._view01_user)
+    const user = await jianghuKnex(tableObj._view01_user)
       .where({ userId })
       .first();
     if (!user || !userId) {
       throw new BizError({ ...errorInfoEnum.user_not_exist });
     }
-    const userSession = await jianghuKnex(tableEnum._user_session)
+    const userSession = await jianghuKnex(tableObj._user_session)
       .where({ userId, deviceId })
       .first();
     if (!userSession) {
       throw new BizError({ ...errorInfoEnum.request_token_invalid });
     }
-    await jianghuKnex(tableEnum._user_session, this.ctx)
+    await jianghuKnex(tableObj._user_session, this.ctx)
       .where({ id: userSession.id })
       .jhUpdate({ authToken: '' });
     if (needSetCookies) {
@@ -161,7 +161,7 @@ class UserService extends Service {
     const { userId } = user;
     const { jianghuKnex } = this.app;
     if (userId) {
-      userInfo.socketList = await jianghuKnex(tableEnum._user_session)
+      userInfo.socketList = await jianghuKnex(tableObj._user_session)
         .where({ userId, socketStatus: 'online' })
         .select('userId', 'deviceId', 'socketStatus');
     }
@@ -179,7 +179,7 @@ class UserService extends Service {
         user: { userId },
       },
     } = this.ctx;
-    const user = await jianghuKnex(tableEnum._user).where({ userId }).first();
+    const user = await jianghuKnex(tableObj._user).where({ userId }).first();
     // 旧密码检查
     const passwordMd5 = md5(`${oldPassword}_${user.md5Salt}`);
     if (passwordMd5 !== user.password) {
@@ -193,12 +193,12 @@ class UserService extends Service {
     // 修改数据库中密码
     const newMd5Salt = idGenerateUtil.uuid(12);
     const newPasswordMd5 = md5(`${newPassword}_${newMd5Salt}`);
-    await jianghuKnex(tableEnum._user, this.ctx).where({ userId }).jhUpdate({
+    await jianghuKnex(tableObj._user, this.ctx).where({ userId }).jhUpdate({
       password: newPasswordMd5,
       clearTextPassword: newPassword,
       md5Salt: newMd5Salt,
     });
-    await jianghuKnex(tableEnum._user_session, this.ctx).where({ userId }).jhUpdate({ authToken: '' });
+    await jianghuKnex(tableObj._user_session, this.ctx).where({ userId }).jhUpdate({ authToken: '' });
     return {};
   }
 }

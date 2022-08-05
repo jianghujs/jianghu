@@ -1,6 +1,6 @@
 'use strict';
 
-const { userStatusEnum, tableEnum } = require('../constant/constant');
+const { userStatusObj, tableObj } = require('../constant/constant');
 const { BizError, errorInfoEnum } = require('../constant/error');
 
 module.exports = option => {
@@ -14,7 +14,7 @@ module.exports = option => {
     // 对于 public page ====》不需要做 用户状态的校验
     // public: { user: "*", group: "public", role: "*" }
     const allUserGroupRolePageList = await jianghuKnex(
-      tableEnum._user_group_role_page
+      tableObj._user_group_role_page
     ).select();
     const isNotPublic = !allUserGroupRolePageList.find(
       rule =>
@@ -26,10 +26,10 @@ module.exports = option => {
     // 2 判断用户状态
     if (isNotPublic && isLoginUser) {
       const { userStatus } = user;
-      if (userStatus === userStatusEnum.banned) {
+      if (userStatus === userStatusObj.banned) {
         throw new BizError(errorInfoEnum.user_banned);
       }
-      if (userStatus !== userStatusEnum.active) {
+      if (userStatus !== userStatusObj.active) {
         throw new BizError(errorInfoEnum.user_status_error);
       }
     }

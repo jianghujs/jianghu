@@ -5,16 +5,16 @@ const _ = require('lodash');
 
 module.exports.resourcePath = 'resource';
 
-module.exports.bodyStatusEnum = Object.freeze({
+module.exports.bodyStatusObj = Object.freeze({
   success: 'success', fail: 'fail',
 });
 
-module.exports.resourceTypeEnum = Object.freeze({
+module.exports.resourceTypeObj = Object.freeze({
   service: 'service', auth: 'auth', sql: 'sql',
   socketService: 'socketService', socketSql: 'socketSql',
 });
 
-module.exports.sqlActionEnum = Object.freeze({
+module.exports.sqlActionObj = Object.freeze({
   insert: 'insert', delete: 'delete', update: 'update', select: 'select',
 });
 
@@ -22,13 +22,13 @@ module.exports.httpResponse = Object.freeze({
   success: ({ packageId, appData }) => resourcePackageBuild({
     packageId,
     packageType: 'httpResponse',
-    status: this.bodyStatusEnum.success,
+    status: this.bodyStatusObj.success,
     appData,
   }),
   fail: ({ packageId, appData }) => resourcePackageBuild({
     packageId,
     packageType: 'httpResponse',
-    status: this.bodyStatusEnum.fail,
+    status: this.bodyStatusObj.fail,
     appData,
   }),
 });
@@ -38,14 +38,14 @@ module.exports.socketResponse = Object.freeze({
     resourcePackageBuild({
       packageId,
       packageType: "socketResponse",
-      status: this.bodyStatusEnum.success,
+      status: this.bodyStatusObj.success,
       appData,
     }),
   fail: ({ packageId, appData }) =>
     resourcePackageBuild({
       packageId,
       packageType: "socketResponse",
-      status: this.bodyStatusEnum.fail,
+      status: this.bodyStatusObj.fail,
       appData,
     }),
 });
@@ -78,13 +78,12 @@ function resourcePackageBuild({ packageId, packageType, status, appData }) {
   };
 }
 
-
-
-module.exports.duoxingSocketStatusEnum = Object.freeze({
+module.exports.duoxingSocketStatusObj = Object.freeze({
   online: 'online',
   offline: 'offline',
 });
-module.exports.noticeTypeEnum = Object.freeze({
+
+module.exports.noticeTypeObj = Object.freeze({
   // group
   createGroup: 'createGroup',
   destroyGroup: 'destroyGroup',
@@ -122,7 +121,7 @@ module.exports.socketToClient = {
   }),
 };
 
-module.exports.tableEnum = Object.freeze({
+module.exports.tableObj = Object.freeze({
   // ========================江湖表============================
   _cache: '_cache',
   _constant: '_constant',
@@ -148,7 +147,7 @@ module.exports.tableEnum = Object.freeze({
   // ========================高级 View============================
 });
 
-module.exports.userStatusEnum = Object.freeze({
+module.exports.userStatusObj = Object.freeze({
   active: 'active',
   banned: 'banned',
 });

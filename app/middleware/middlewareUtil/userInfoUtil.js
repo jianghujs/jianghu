@@ -1,6 +1,6 @@
 'use strict';
 
-const { tableEnum } = require('../../constant/constant');
+const { tableObj } = require('../../constant/constant');
 const _ = require('lodash');
 const dayjs = require('dayjs');
 
@@ -19,12 +19,12 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
       operationAt: dayjs().format(),
     };
   } else {
-    userSession = await jianghuKnex(tableEnum._user_session)
+    userSession = await jianghuKnex(tableObj._user_session)
       .where({ authToken })
       .first();
   }
   if (userSession && userSession.userId) {
-    const userResult = await jianghuKnex(tableEnum._view01_user)
+    const userResult = await jianghuKnex(tableObj._view01_user)
       .where({ userId: userSession.userId })
       .first();
     if (userResult) {
@@ -81,7 +81,7 @@ module.exports = {
   },
 
   async getUserRuleDataFromCache(jianghuKnex, userId) {
-    const cache = await jianghuKnex(tableEnum._cache).where({ userId: userId || 'visitor' }).first();
+    const cache = await jianghuKnex(tableObj._cache).where({ userId: userId || 'visitor' }).first();
     if (cache.content) {
       return JSON.parse(cache.content);
     }
@@ -101,12 +101,12 @@ module.exports = {
     if (userId) {
       // Tip: resource指定groupId后 ===> 只能取当前的groupId ===> params: { groupId }
       userGroupRoleList = groupId
-        ? await jianghuKnex(tableEnum._user_group_role)
+        ? await jianghuKnex(tableObj._user_group_role)
           .where({ userId, groupId })
           .select()
-        : await jianghuKnex(`${tableEnum._user_group_role} as a`)
-          .innerJoin(`${tableEnum._group} as b`, 'b.groupId', 'a.groupId')
-          .innerJoin(`${tableEnum._role} as c`, 'c.roleId', 'a.roleId')
+        : await jianghuKnex(`${tableObj._user_group_role} as a`)
+          .innerJoin(`${tableObj._group} as b`, 'b.groupId', 'a.groupId')
+          .innerJoin(`${tableObj._role} as c`, 'c.roleId', 'a.roleId')
           .where({ 'a.userId': userId })
           .select(
             'a.*',
@@ -145,7 +145,7 @@ module.exports = {
     if (!userId) {
       return [];
     }
-    return await jianghuKnex(tableEnum._view_user_app)
+    return await jianghuKnex(tableObj._view_user_app)
       .where({ userId })
       .select();
   },
@@ -193,13 +193,13 @@ module.exports = {
     groupIdList,
     roleIdList,
   }) {
-    const allResourceList = await jianghuKnex(tableEnum._resource).select();
+    const allResourceList = await jianghuKnex(tableObj._resource).select();
     allResourceList.forEach(resource => {
       const { pageId, actionId } = resource;
       resource.resourceId = `${pageId}.${actionId}`;
     });
     const allUserGroupRoleResourceList = await jianghuKnex(
-      tableEnum._user_group_role_resource
+      tableObj._user_group_role_resource
     ).select();
     const allowResourceList = this.computeAllowList(
       'resource',
@@ -225,9 +225,9 @@ module.exports = {
     groupIdList,
     roleIdList,
   }) {
-    const allPageList = await jianghuKnex(tableEnum._page).select();
+    const allPageList = await jianghuKnex(tableObj._page).select();
     const allUserGroupRolePageList = await jianghuKnex(
-      tableEnum._user_group_role_page
+      tableObj._user_group_role_page
     ).select();
     const allowPageList = this.computeAllowList(
       'page',

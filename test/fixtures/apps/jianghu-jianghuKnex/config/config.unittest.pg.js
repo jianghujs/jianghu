@@ -25,11 +25,11 @@ module.exports = appInfo => {
     },
     knex: {
       client: {
-        dialect: 'mysql2',
+        dialect: 'postgresql',
         connection: {
           host: '0.0.0.0',
-          port: 3306,
-          user: 'root',
+          port: 5432,
+          user: 'postgres',
           password: '123456',
           database: 'jianghu',
         },

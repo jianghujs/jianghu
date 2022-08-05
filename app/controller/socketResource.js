@@ -1,7 +1,7 @@
 'use strict';
 
 const {
-  resourceTypeEnum,
+  resourceTypeObj,
   socketResponse,
   resourcePath,
   socketRequest: socketRequestBodyBuild,
@@ -15,7 +15,6 @@ const socketPackage = require('../middleware/socketPackage');
 const socketPackageRecord = require('../middleware/socketPackageRecord');
 const socketUserInfo = require('../middleware/socketUserInfo');
 const socketAuthorization = require('../middleware/socketAuthorization');
-const syncSocketStatus = require('../schedule/syncSocketStatus');
 const socketResourceBeforeHook = require('../middleware/socketResourceBeforeHook');
 const socketResourceAfterHook = require('../middleware/socketResourceAfterHook');
 
@@ -58,12 +57,12 @@ async function socketRequest({ socket, app, body }, next) {
 
   let resultData;
   switch (resourceType) {
-    case resourceTypeEnum.socketSql:
-    case resourceTypeEnum.sql:
+    case resourceTypeObj.socketSql:
+    case resourceTypeObj.sql:
       resultData = await sqlResource({ jianghuKnex, ctx });
       break;
-    case resourceTypeEnum.service:
-    case resourceTypeEnum.socketService:
+    case resourceTypeObj.service:
+    case resourceTypeObj.socketService:
       resultData = await serviceResource({ ctx });
       break;
     default:

@@ -1,6 +1,6 @@
 "use strict";
 
-const { tableEnum } = require("../constant/constant");
+const { tableObj } = require("../constant/constant");
 const { BizError, errorInfoEnum } = require("../constant/error");
 
 module.exports = () => {
@@ -11,7 +11,7 @@ module.exports = () => {
     const body = ctx.request.body;
     const { pageId } = body.appData.actionData;
 
-    ctx.packagePage = await jianghuKnex(tableEnum._page)
+    ctx.packagePage = await jianghuKnex(tableObj._page)
       .where({ pageId })
       .first();
 
