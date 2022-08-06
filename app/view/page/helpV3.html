@@ -1,0 +1,53 @@
+{% extends 'template/jhTemplateV3.html'%}
+
+{% block vue_template %}
+
+<jh-layout-v3>
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -80%)">
+    <div style="font-size: 100px; font-weight: bold; color: #CCCCCC">ERROR</div>
+    <div v-if="error.errorCode">
+      <h2>123123123123123{{ error.errorCode }} : {{ error.errorReason }}</h2>
+      <hr/>
+      <h2>12312313123123{{ error.errorReasonSupplement }}</h2>
+    </div>
+    <div v-else style="text-align: center">
+      <h2>亲，你似乎迷路了？</h2>
+    </div>
+  </div>
+</jh-layout-v3>
+
+{% endblock %}
+
+{% block vue_body %}
+
+<script type="module">
+new Vue({
+  el: '#app',
+  template: '#app-template',
+  vuetify: new Vuetify(),
+  data: () => ({
+    error: {
+      errorCode: null,
+      errorReason: null,
+      errorReasonSupplement: null,
+    }
+  }),
+  async created() {
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('errorCode')) {
+      this.error.errorCode = urlParams.get('errorCode');
+    }
+    if (urlParams.get('errorReason')) {
+      this.error.errorReason = urlParams.get('errorReason');
+    }
+    if (urlParams.get('errorReasonSupplement')) {
+      this.error.errorReasonSupplement = urlParams.get('errorReasonSupplement');
+    }
+  },
+  methods: {}
+})
+</script>
+
+<style scoped>
+</style>
+{% endblock %}

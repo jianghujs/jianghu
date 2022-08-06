@@ -15,17 +15,20 @@
           xs="10"
           md="3"
       >
-        <div style="text-align: center; font-size: 23px; font-weight: bold;" class="mb-0">
-          <$ ctx.app.config.appTitle $>
+        <div class="mb-0 loginTitle">
+          登录
         </div>
-        <div style="text-align: center; font-size: 18px; color: #bbc4d3" class="mb-12">
-          - 登录 -
+        <div class="mb-12 loginLabel">
+          <span></span>
+          <span><$ ctx.app.config.appTitle $></span>
+          <span></span>
         </div>
         <v-form>
           <v-text-field
+              class="loginInput"
               v-model="userId"
-              prefix="账号:"
-              outlined
+              prefix=" 账号："
+              filled single-line
               color="success"
               prepend-inner-icon="mdi-account-circle"
               background-color="#ffffff"
@@ -36,11 +39,11 @@
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :type="showPassword ? 'text' : 'password'"
               @click:append="showPassword = !showPassword"
-              prefix="密码:"
+              prefix=" 密码："
               color="success"
               data-type="password"
               @keyup.enter.exact="login"
-              outlined
+              filled single-line
               prepend-inner-icon="mdi-lock-question"
               background-color="#ffffff"
           />
@@ -55,7 +58,7 @@
           <v-spacer></v-spacer>
         </v-card-actions>
         <v-card-actions class="pa-0" >
-          <v-btn large block color="success" type="submit" @click="login">登入</v-btn>
+          <v-btn large block color="success" type="submit" @click="login" style="font-size: 18px">登入</v-btn>
         </v-card-actions>
       </v-col>
       <v-col cols="12" xs="1"></v-col>
@@ -279,5 +282,44 @@ new Vue({
   }
 });
 </script>
-
+<style>
+.loginInput input:-webkit-autofill {
+  /*覆盖背景颜色*/
+  background-color: transparent!important;
+}
+.loginInput input[type=text]:focus, .loginInput input[type=password]:focus {
+  -webkit-box-shadow: 0 0 0 1000px white inset;
+  background-color: transparent!important;
+}
+.loginTitle {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 900;
+  color: #c8ced9;
+  letter-spacing: 5px;
+  transform: translateX(5px) scaleY(0.9);
+}
+.loginLabel {
+  position: relative;
+  width: 100%;
+  color: #00b0ff;
+  display: flex;
+  justify-content: center;
+}
+.loginLabel span {
+  display: inline-block;
+}
+.loginLabel span:nth-child(2) {
+  padding: 0 10px;
+  color: #49495b;
+  font-weight: bold;
+}
+.loginLabel span:first-child,
+.loginLabel span:last-child {
+  flex: 1;
+  height: 1px;
+  margin-top: 10px;
+  background-color: #e1e3e7;
+}
+</style>
 {% endblock %}
