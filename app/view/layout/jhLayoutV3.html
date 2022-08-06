@@ -151,7 +151,7 @@
       <v-main class="d-flex flex-column">
         <div class="d-flex" :style="{'flex-wrap': isMobile ? 'wrap' : 'nowrap'}" :class="{'px-12': !isMobile, 'px-4': isMobile}">
           <div>
-            <div class="appTitle pt-5" style="font-size: 18px; font-weight: bold"><slot name='breadcrumbsTitle'>{{breadcrumbs[1].fullText}}</slot></div>
+            <div class="appTitle pt-5" style="font-size: 18px; font-weight: bold"><slot name='breadcrumbsTitle' :isMobile="isMobile">{{breadcrumbs[1].fullText}}</slot></div>
             <slot name='breadcrumbsList' :isMobile="isMobile">
               <v-breadcrumbs
                 class="pb-4 pt-0 pl-0"
