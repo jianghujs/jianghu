@@ -57,7 +57,7 @@ module.exports = {
     const groupId = isGroupIdRequired ? actionData.groupId : '';
 
     // 如果有缓存，则直接返回缓存
-    if (config.jiangHuConfig.enableUserInfoCache && !isGroupIdRequired) {
+    if (userId && config.jiangHuConfig.enableUserInfoCache && !isGroupIdRequired) {
       const otherUserRuleData = await this.getUserRuleDataFromCache(
         jianghuKnex,
         userId
@@ -81,7 +81,8 @@ module.exports = {
   },
 
   async getUserRuleDataFromCache(jianghuKnex, userId) {
-    const cache = await jianghuKnex(tableObj._cache).where({ userId: userId || 'visitor' }).first();
+    // const cache = await jianghuKnex(tableObj._cache).where({ userId: userId || 'visitor' }).first();
+    const cache = await jianghuKnex(tableObj._cache).where({ userId }).first();
     if (cache.content) {
       return JSON.parse(cache.content);
     }

@@ -23,7 +23,7 @@ module.exports = app => {
       const cacheList = await jianghuKnex(tableObj._cache).select('userId');
       const userList = await jianghuKnex(tableObj._user).select();
       // 未登录场景
-      userList.push({ userId: 'visitor' });
+      // userList.push({ userId: 'visitor' });
 
       // 生成每个用户的缓存
       for (const user of userList) {
