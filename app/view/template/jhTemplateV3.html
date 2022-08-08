@@ -25,14 +25,17 @@
   <script src="/<$ ctx.app.config.appId $>/public/js/lib/vue.js"></script>
   <script src="/<$ ctx.app.config.appId $>/public/js/lib/vuetify.min.js"></script>
   <style>
+    body {
+      --cPrimaryColor: <$ ctx.app.config.primaryColor $>;
+    }
     body .v-application .primary {
-      background-color: <$ ctx.app.config.primaryColor $> !important;
-      border-color: <$ ctx.app.config.primaryColor $> !important;
+      background-color: var(--cPrimaryColor) !important;
+      border-color: var(--cPrimaryColor) !important;
     }
 
     body .v-application .primary--text {
-      color: <$ ctx.app.config.primaryColor $> !important;
-      caret-color: <$ ctx.app.config.primaryColor $> !important;
+      color: var(--cPrimaryColor) !important;
+      caret-color: var(--cPrimaryColor) !important;
     }
   </style>
   {% include 'common/jianghuAxios.html' %}
