@@ -185,7 +185,7 @@ describe('test/app/middleware/middlewareUtil/userInfoUtil.test.js', () => {
 
 
       assert.deepEqual(this.whereStub.callCount, 1);
-      assert.deepEqual(this.whereStub.getCall(0).args[0], expUserId);
+      assert.deepEqual(this.whereStub.getCall(0).args[0], { userId: expUserId });
       assert.deepEqual(this.firstStub.callCount, 1);
       assert.deepEqual(result, expContent);
     });

@@ -53,16 +53,20 @@ describe('test/app/schedule/syncDataToCache.test.js', () => {
       const expCacheList = [{
         userId: expUserId,
       }];
-      const expUserList = [{
-        userId: expUserId,
-      }];
+      const expUserList = [
+        {
+          userId: expUserId,
+        }, {
+          userId: 'test2',
+        },
+      ];
       const expUserRuleData = {};
       const expUpdateInfo = {
         userId: expUserId,
         content: JSON.stringify(expUserRuleData),
       };
       const expInsertData = {
-        userId: 'visitor',
+        userId: 'test2',
         content: JSON.stringify(expUserRuleData),
       };
 
