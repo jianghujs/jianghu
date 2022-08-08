@@ -700,6 +700,59 @@ body .v-overlay {
 .v-icon.mdi-close{
   font-size: 18px;
 }
+
+// begin 编辑器样式覆盖
+body #editorMdContainer pre {
+  font-size: 14px !important;
+}
+body #baseinfo_diff_body pre {
+  font-size: 14px !important;
+}
+body #baseinfo_diff_body .CodeMirror-merge {
+  height: 100%;
+}
+body #baseinfo_diff_body .CodeMirror-merge .CodeMirror {
+  height: 100%;
+}
+body #diff_body pre {
+  font-size: 14px !important;
+}
+body #diff_body .CodeMirror-merge {
+  height: 100%;
+}
+body #diff_body .CodeMirror-merge .CodeMirror {
+  height: 100%;
+}
+
+body .editormd-menu > li > a > .fa{
+  font-size: 14px;
+}
+
+body .cm-s-default .cm-header{
+  color: #4caf50 !important;
+}
+body .cm-s-default .cm-variable-2{
+  color: #3F4254 !important;
+}
+body .cm-s-default .cm-link{
+  color: #1B5E20 !important;
+}
+body .cm-s-default .cm-string{
+  color: #607D8B !important;
+}
+body .cm-s-default .cm-comment{
+  color: #795548 !important;
+}
+body .cm-s-default .cm-quote{
+  color: #33691E !important;
+}
+body .cm-s-default .cm-variable-3, .cm-s-default .cm-type{
+  color: #006064 !important;
+}
+body .cm-s-default .cm-attribute, .cm-s-default .cm-def{
+  color: #3F51B5 !important;
+}
+// end 编辑器样式覆盖
 // 自适应
 @media (min-width: 1264px) {
   .container {
