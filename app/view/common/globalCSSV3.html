@@ -409,7 +409,7 @@ table > thead > tr > th.fixed:nth-child(1)
   position: sticky !important;
   position: -webkit-sticky !important;
   left: 0;
-  z-index: 2!important;
+  z-index: 10!important;
   background: white;
   -webkit-box-shadow: -1px 0px 3px -1px rgba(0, 0, 0, 0.19);
   -moz-box-shadow: -1px 0px 3px -1px rgba(0, 0, 0, 0.19);
@@ -424,7 +424,7 @@ table > thead > tr > th.fixed:nth-child(2)
   position: sticky !important;
   position: -webkit-sticky !important;
   left: 100px;
-  z-index: 2;
+  z-index: 10;
   background: white;
   -webkit-box-shadow: -1px 0px 3px -1px rgba(0, 0, 0, 0.19);
   -moz-box-shadow: -1px 0px 3px -1px rgba(0, 0, 0, 0.19);
@@ -439,7 +439,7 @@ table > thead > tr > th.fixed:nth-last-child(1)
   position: sticky !important;
   position: -webkit-sticky !important;
   right: 0;
-  z-index: 3;
+  z-index: 10;
   background: white;
   border: none;
   box-shadow: none;
@@ -484,10 +484,10 @@ th:not(.v-picker th) {
   background-color: #333333!important;
 }
 .v-data-table--fixed-header>.v-data-table__wrapper>table>thead>tr>th.fixed {
-  z-index: 2!important;
+  z-index: 12!important;
 }
 .v-data-table--fixed-header>.v-data-table__wrapper>table>thead>tr>th {
-  z-index: 1!important;
+  z-index: 11!important;
 }
 .v-application .align-center.text-start {
   text-align: center!important;
@@ -528,7 +528,7 @@ th:not(.v-picker th) {
   position: sticky !important;
   position: -webkit-sticky !important;
   left: 0;
-  z-index: 3;
+  z-index: 10;
   background: white;
 }
 
@@ -538,7 +538,7 @@ th:not(.v-picker th) {
   position: sticky !important;
   position: -webkit-sticky !important;
   left: 64px;
-  z-index: 4!important;
+  z-index: 10!important;
   border-right: 1px solid #EEEEEE;
 }
 .v-menu__content {
@@ -672,6 +672,12 @@ body .v-text-field--full-width.v-input--dense .v-label--active {
   background: #ffffff;
   padding: 1px 5px;
   border-radius: 30px;
+}
+body .v-navigation-drawer--temporary {
+  z-index: 101!important;
+}
+body .v-overlay {
+  z-index: 100!important;
 }
 .v-text-field.v-input--is-focused.v-input--dense:not(.v-text-field--outlined) .v-text-field__prefix {
   color: inherit;

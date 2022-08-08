@@ -6,9 +6,9 @@
   <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -80%)">
     <div style="font-size: 100px; font-weight: bold; color: #CCCCCC">ERROR</div>
     <div v-if="error.errorCode">
-      <h2>123123123123123{{ error.errorCode }} : {{ error.errorReason }}</h2>
+      <h2>{{ error.errorCode }} : {{ error.errorReason }}</h2>
       <hr/>
-      <h2>12312313123123{{ error.errorReasonSupplement }}</h2>
+      <h2>{{ error.errorReasonSupplement }}</h2>
     </div>
     <div v-else style="text-align: center">
       <h2>亲，你似乎迷路了？</h2>
