@@ -108,7 +108,7 @@
     backdrop: true,
 
     /**
-     * Show the button on the top-right of the viewer.
+     * Show the button on the top-right of the articleViewer.
      * @type {boolean}
      */
     button: true,
@@ -132,13 +132,13 @@
     toolbar: true,
 
     /**
-     * Custom class name(s) to add to the viewer's root element.
+     * Custom class name(s) to add to the articleViewer's root element.
      * @type {string}
      */
     className: '',
 
     /**
-     * Define where to put the viewer in modal mode.
+     * Define where to put the articleViewer in modal mode.
      * @type {string | Element}
      */
     container: 'body',
@@ -192,13 +192,13 @@
     loop: true,
 
     /**
-     * Min width of the viewer in inline mode.
+     * Min width of the articleViewer in inline mode.
      * @type {number}
      */
     minWidth: 200,
 
     /**
-     * Min height of the viewer in inline mode.
+     * Min height of the articleViewer in inline mode.
      * @type {number}
      */
     minHeight: 100,
@@ -265,13 +265,13 @@
     transition: true,
 
     /**
-     * Define the CSS `z-index` value of viewer in modal mode.
+     * Define the CSS `z-index` value of articleViewer in modal mode.
      * @type {number}
      */
     zIndex: 2015,
 
     /**
-     * Define the CSS `z-index` value of viewer in inline mode.
+     * Define the CSS `z-index` value of articleViewer in inline mode.
      * @type {number}
      */
     zIndexInline: 0,
@@ -315,7 +315,7 @@
     zoomed: null
   };
 
-  var TEMPLATE = '<div class="viewer-container" touch-action="none">' + '<div class="viewer-canvas"></div>' + '<div class="viewer-footer">' + '<div class="viewer-title"></div>' + '<div class="viewer-toolbar"></div>' + '<div class="viewer-navbar">' + '<ul class="viewer-list"></ul>' + '</div>' + '</div>' + '<div class="viewer-tooltip"></div>' + '<div role="button" class="viewer-button" data-viewer-action="mix"></div>' + '<div class="viewer-player"></div>' + '</div>';
+  var TEMPLATE = '<div class="articleViewer-container" touch-action="none">' + '<div class="articleViewer-canvas"></div>' + '<div class="articleViewer-footer">' + '<div class="articleViewer-title"></div>' + '<div class="articleViewer-toolbar"></div>' + '<div class="articleViewer-navbar">' + '<ul class="articleViewer-list"></ul>' + '</div>' + '</div>' + '<div class="articleViewer-tooltip"></div>' + '<div role="button" class="articleViewer-button" data-articleViewer-action="mix"></div>' + '<div class="articleViewer-player"></div>' + '</div>';
 
   var IS_BROWSER = typeof window !== 'undefined' && typeof window.document !== 'undefined';
   var WINDOW = IS_BROWSER ? window : {};
@@ -1056,7 +1056,7 @@
           img.alt = alt;
           img.setAttribute('data-index', index);
           img.setAttribute('data-original-url', url || src);
-          img.setAttribute('data-viewer-action', 'view');
+          img.setAttribute('data-articleViewer-action', 'view');
           img.setAttribute('role', 'button');
           item.appendChild(img);
           list.appendChild(item);
@@ -1702,8 +1702,8 @@
   };
 
   var methods = {
-    /** Show the viewer (only available in modal mode)
-     * @param {boolean} [immediate=false] - Indicates if show the viewer immediately or not.
+    /** Show the articleViewer (only available in modal mode)
+     * @param {boolean} [immediate=false] - Indicates if show the articleViewer immediately or not.
      * @returns {Viewer} this
      */
     show: function show() {
@@ -1768,8 +1768,8 @@
     },
 
     /**
-     * Hide the viewer (only available in modal mode)
-     * @param {boolean} [immediate=false] - Indicates if hide the viewer immediately or not.
+     * Hide the articleViewer (only available in modal mode)
+     * @param {boolean} [immediate=false] - Indicates if hide the articleViewer immediately or not.
      * @returns {Viewer} this
      */
     hide: function hide() {
@@ -2512,11 +2512,11 @@
 
       return this;
     },
-    // Update viewer when images changed
+    // Update articleViewer when images changed
     update: function update() {
       var element = this.element,
           options = this.options,
-          isImg = this.isImg; // Destroy viewer if the target image was deleted
+          isImg = this.isImg; // Destroy articleViewer if the target image was deleted
 
       if (isImg && !element.parentNode) {
         return this.destroy();
@@ -2586,7 +2586,7 @@
 
       return this;
     },
-    // Destroy the viewer
+    // Destroy the articleViewer
     destroy: function destroy() {
       var element = this.element,
           options = this.options;
@@ -2882,7 +2882,7 @@
                 abort: function abort() {
                   clearTimeout(timeout);
                 }
-              }; // build asynchronously to keep `this.viewer` is accessible in `ready` event handler.
+              }; // build asynchronously to keep `this.articleViewer` is accessible in `ready` event handler.
 
               timeout = setTimeout(function () {
                 _this.delaying = false;
@@ -3085,8 +3085,8 @@
         }
       }
       /**
-       * Get the no conflict viewer class.
-       * @returns {Viewer} The viewer class.
+       * Get the no conflict articleViewer class.
+       * @returns {Viewer} The articleViewer class.
        */
 
     }], [{
