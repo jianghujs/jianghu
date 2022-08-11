@@ -5,61 +5,36 @@
 <v-app>
 <v-main>
   <v-container fluid class="d-flex flex-column justify-center" style="height: 100vh;">
-    <v-row
-        align="center"
-        justify="center"
-    >
+    <v-row align="center" justify="center">
       <v-col cols="12" xs="1"></v-col>
-      <v-col
-          cols="12"
-          xs="10"
-          md="3"
-      >
-        <div class="mb-0 loginTitle">
-          登录
-        </div>
-        <div class="mb-12 loginLabel">
-          <span></span>
-          <span><$ ctx.app.config.appTitle $></span>
-          <span></span>
-        </div>
-        <v-form>
-          <v-text-field
-              class="loginInput"
-              v-model="userId"
-              prefix=" 账号："
-              filled single-line
-              color="success"
-              prepend-inner-icon="mdi-account-circle"
-              background-color="#ffffff"
-          />
-
-          <v-text-field
-              v-model="password"
-              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="showPassword ? 'text' : 'password'"
-              @click:append="showPassword = !showPassword"
-              prefix=" 密码："
-              color="success"
-              data-type="password"
-              @keyup.enter.exact="login"
-              filled single-line
-              prepend-inner-icon="mdi-lock-question"
-              background-color="#ffffff"
-          />
-
-        </v-form>
-        <v-card-actions class="pa-0" >
-          <v-checkbox
-              v-model="remember"
-              color="success"
-              :label="`记住密码`"
-          />
-          <v-spacer></v-spacer>
-        </v-card-actions>
-        <v-card-actions class="pa-0" >
-          <v-btn large block color="success" type="submit" @click="login" style="font-size: 18px">登入</v-btn>
-        </v-card-actions>
+      <v-col cols="12" xs="12" sm="12" xs="12" md="5" xl="5">
+        <v-card class="py-10 px-15">
+          <v-card-text>
+            <div class="mb-10 text-center" style="color:#181C32;font-size:22px;font-weight:700;">
+              <$ ctx.app.config.appTitle $>
+            </div>
+            <v-form>
+              <input class="mb-5 d-block custom-input" 
+              v-model="userId" placeholder="用户名"/>
+              <input 
+                class="mb-5 d-block custom-input"
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                @click:append="showPassword = !showPassword"
+                data-type="password"
+                @keyup.enter.exact="login"
+                placeholder="密码" 
+              />
+            </v-form>
+            <v-checkbox
+                v-model="remember"
+                color="success"
+                :label="`记住密码`"
+                class="mb-5"
+            />
+            <v-btn block large color="success" type="submit" @click="login">登录</v-btn>
+          </v-card-text>
+        </v-card>
       </v-col>
       <v-col cols="12" xs="1"></v-col>
     </v-row>
@@ -282,44 +257,18 @@ new Vue({
   }
 });
 </script>
-<style>
-.loginInput input:-webkit-autofill {
-  /*覆盖背景颜色*/
-  background-color: transparent!important;
-}
-.loginInput input[type=text]:focus, .loginInput input[type=password]:focus {
-  -webkit-box-shadow: 0 0 0 1000px white inset;
-  background-color: transparent!important;
-}
-.loginTitle {
-  text-align: center;
-  font-size: 40px;
-  font-weight: 900;
-  color: #c8ced9;
-  letter-spacing: 5px;
-  transform: translateX(5px) scaleY(0.9);
-}
-.loginLabel {
-  position: relative;
-  width: 100%;
-  color: #00b0ff;
-  display: flex;
-  justify-content: center;
-}
-.loginLabel span {
-  display: inline-block;
-}
-.loginLabel span:nth-child(2) {
-  padding: 0 10px;
-  color: #49495b;
-  font-weight: bold;
-}
-.loginLabel span:first-child,
-.loginLabel span:last-child {
-  flex: 1;
-  height: 1px;
-  margin-top: 10px;
-  background-color: #e1e3e7;
-}
+<style scoped>
+  .custom-input{
+    border: 1px solid #E4E6EF;
+    width: 100%;
+    height: 40px;
+    border-radius: 6px;
+    padding: 0 12px;
+    color: #5E6278 !important;
+    outline: none;
+  }
+  .custom-input:focus, .custom-input:focus-visible, input:focus-visible{
+    border: 1px solid #B5B5C3 !important;
+  }
 </style>
 {% endblock %}
