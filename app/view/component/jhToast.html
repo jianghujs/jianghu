@@ -63,7 +63,7 @@
     },
     methods: {
       showAndNotify(paramObj) {
-        const { message } = paramObj;
+        let { message } = paramObj;
         // 限制消息长度
         if (message && message.length > 100) {
           message = message.slice(0, 100) + '...';
