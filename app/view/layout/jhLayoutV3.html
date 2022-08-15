@@ -300,12 +300,14 @@ Vue.component("jh-layout-v3", {
           .filter(page => page.pageType === 'showInMenu' || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && currentPageId === page.pageId))
           .map((page) => {
             if(currentPageId === page.pageId) {
-              this.breadcrumbs[1].text = page.pageName.split('-')[0];
+              // this.breadcrumbs[1].text = page.pageName.split('-')[0];
+              this.breadcrumbs[1].text = page.pageType === 'dynamicInMenu' ? `${page.pageName}【${title}】` : page.pageName;
               this.breadcrumbs[1].fullText = page.pageName;
               this.breadcrumbs[1].href = `/${window.appInfo.appId}/page/${page.pageId}`;
             }
             return {
               path: `/${window.appInfo.appId}/page/${page.pageId}`,
+              pageId: page.pageId,
               title: page.pageName.split('-')[0],
               sort: parseInt(page.sort)
             };
