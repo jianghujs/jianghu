@@ -144,8 +144,8 @@ class FileService extends Service {
       chunkSize,
       fileDirectory,
       fileDesc,
-      fileType,
     } = actionData;
+    let { fileType } = actionData;
     let filenameStorage = actionData.filenameStorage;
     const fileId = `${Date.now()}_${_.random(100000, 999999)}`;
     if (!filenameStorage) { filenameStorage = `${fileId}_${filename}`; }
@@ -187,6 +187,7 @@ class FileService extends Service {
     // const binarySize = fileUtil.formatByteSize(fileStates.size);
     // 文件大小/KB
     const binarySize = (fileStates.size / 1024).toFixed(2);
+    fileType = fileType || mime.getType(filename);  
     const file = {
       fileId,
       fileDirectory,
