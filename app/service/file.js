@@ -184,7 +184,9 @@ class FileService extends Service {
 
     const downloadPath = `/${fileDirectory}/${filenameStorage}`;
     const fileStates = await fileUtil.stat(filePath);
-    const binarySize = fileUtil.formatByteSize(fileStates.size);
+    // const binarySize = fileUtil.formatByteSize(fileStates.size);
+    // 文件大小/KB
+    const binarySize = (fileStates.size / 1024).toFixed(2);
     const file = {
       fileId,
       fileDirectory,
