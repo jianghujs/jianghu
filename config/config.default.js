@@ -16,6 +16,7 @@ module.exports = appInfo => {
     appTitle: "第一个应用",
     appLogo: `${appId}/public/img/logo.png`,
     appType: "single", // single: 单应用; multiApp: 多应用
+    primaryColor: '#1867c0',
     keys: `${appId}_1638108566009`,
     appDirectoryLink: "/",
     indexPage: `/${appId}/page/manual`,
