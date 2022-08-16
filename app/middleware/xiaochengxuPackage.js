@@ -57,7 +57,7 @@ module.exports = async ctx => {
     .where({ pageId, actionId })
     .first();
   if (!ctx.packageResource) {
-    throw new BizError(errorInfoEnum.resource_not_found);
+    throw new BizError({ ...errorInfoEnum.resource_not_found, errorReasonSupplement: resourceId });
   }
   ctx.packageResource.resourceId = resourceId;
   ctx.packageResource.resourceHook = JSON.parse(
