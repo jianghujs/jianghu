@@ -35,6 +35,13 @@ module.exports = appInfo => {
       // /appId/upload 下的文件在鉴权通过之后，设置 max-age，默认 30 天缓存
       // @see downloadUserInfo 中间件
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
+      jianghuConfigDataIgnoreIdList: { 
+        _constant: [],
+        _page: [],
+        _resource: [],
+        _test_case: [],
+        _ui: [],
+      },
       // Tip: 兼容配置, 下一个大版本删除
       compatibleConfig: {
         // true =====》 ALTER TABLE `_resource_request_log` ADD COLUMN `userId` varchar(255) NULL COMMENT '用户ID' AFTER `userAgent`;
