@@ -1,15 +1,14 @@
 <!--uiAction.html start-->
 <!-- 注入 ui action 数据到页面中 -->
 <script>
-  const excudeTimeout = async (timeout) => {
-    await new Promise((resolve, reject) => {
-      setTimeout(()=> {
-        resolve();
-      }, timeout)
-    });
-  }
   (function () {
-  
+    const excudeTimeout = async (timeout) => {
+      await new Promise((resolve, reject) => {
+        setTimeout(()=> {
+          resolve();
+        }, timeout)
+      });
+    }
     const uiActionList = <$ uiActionList | dump | safe $>;
     const uiActionMap = {};
     uiActionList.forEach(({uiActionId, uiActionConfig}) => {
