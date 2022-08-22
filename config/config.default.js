@@ -22,6 +22,7 @@ module.exports = appInfo => {
     indexPage: `/${appId}/page/manual`,
     loginPage: `/${appId}/page/login`,
     helpPage: `/${appId}/page/help`,
+    // TODO: { ...jiangHuConfig, ...jianghuConfig };
     jiangHuConfig: {
       enableSocket: false,
       packageIdCheck: false,
