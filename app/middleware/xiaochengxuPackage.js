@@ -23,9 +23,8 @@ const validateSchemaEnum = Object.freeze({
       },
       appData: {
         type: 'object',
-        required: [ 'appId', 'pageId', 'actionId' ],
+        required: [ 'pageId', 'actionId' ],
         properties: {
-          appId: { type: 'string' },
           pageId: { type: 'string' },
           actionId: { type: 'string' },
           needResponse: { type: 'boolean' },

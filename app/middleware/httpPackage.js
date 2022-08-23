@@ -15,9 +15,8 @@ const validateSchemaEnum = Object.freeze({
       packageType: { type: 'string', enum: [ 'httpRequest' ] },
       appData: {
         type: 'object',
-        required: [ 'appId', 'pageId', 'actionId' ],
+        required: [ 'pageId', 'actionId' ],
         properties: {
-          appId: { type: 'string' },
           pageId: { type: 'string' },
           actionId: { type: 'string' },
           authToken: { anyOf: [{ type: 'string' }, { type: 'null' }] },
