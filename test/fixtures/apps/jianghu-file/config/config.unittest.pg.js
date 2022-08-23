@@ -14,7 +14,7 @@ module.exports = appInfo => {
   return {
     appId,
     debug: true,
-    jiangHuConfig: {
+    jianghuConfig: {
       enableSocket: true,
     },
     uploadDir,

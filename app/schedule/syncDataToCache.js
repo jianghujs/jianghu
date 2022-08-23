@@ -8,13 +8,13 @@ module.exports = app => {
   return {
     schedule: {
       immediate: true, // 应用启动后触发
-      interval: app.config.jiangHuConfig.userInfoCacheRefreshInterval || '10s',
+      interval: app.config.jianghuConfig.userInfoCacheRefreshInterval || '10s',
       type: 'worker', // worker: 只有一个worker执行
-      disable: !app.config.jiangHuConfig.enableUserInfoCache,
+      disable: !app.config.jianghuConfig.enableUserInfoCache,
     },
     // 定时任务的入口
     async task(ctx) {
-      if (!ctx.app.config.jiangHuConfig.enableUserInfoCache) {
+      if (!ctx.app.config.jianghuConfig.enableUserInfoCache) {
         return;
       }
       const startTime = new Date().getTime();

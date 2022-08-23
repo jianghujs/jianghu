@@ -8,7 +8,7 @@ module.exports = async ctx => {
   const { packageResource } = ctx;
   const { resourceId } = packageResource;
   const { jianghuKnex, config, logger } = ctx.app;
-  const { jiangHuConfig } = config;
+  const { jianghuConfig } = config;
 
   // 记录 request resource; 这里的错误不能影响主业务 所以 try catch一下
   try {
@@ -16,7 +16,7 @@ module.exports = async ctx => {
     await packageUtil.saveRequestLogForResource(ctx);
 
     // 3. 更新 _resource.requestDemo & _resource.responseDemo
-    if (jiangHuConfig.updateRequestDemoAndResponseDemo) {
+    if (jianghuConfig.updateRequestDemoAndResponseDemo) {
       await packageUtil.updateRequestDemoAndResponseDemo(ctx);
     }
   } catch (err) {

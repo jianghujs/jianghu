@@ -47,7 +47,7 @@ module.exports = options => {
 
 
     const { jianghuKnex, config, logger } = ctx.app;
-    const { jiangHuConfig } = config;
+    const { jianghuConfig } = config;
     const { pageId, actionId } = body.appData;
 
     const resourceId = `${pageId}.${actionId}`;
@@ -67,7 +67,7 @@ module.exports = options => {
       await packageUtil.saveRequestLogForResource(ctx);
 
       // 3. 更新 _resource.requestDemo & _resource.responseDemo
-      if (jiangHuConfig.updateRequestDemoAndResponseDemo) {
+      if (jianghuConfig.updateRequestDemoAndResponseDemo) {
         await packageUtil.updateRequestDemoAndResponseDemo(ctx);
       }
     } catch (err) {

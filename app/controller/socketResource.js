@@ -23,7 +23,7 @@ async function socketRequest({ socket, app, body }, next) {
   const { jianghuKnex, config } = app;
   const {
     appId,
-    jiangHuConfig: { packageIdCheck },
+    jianghuConfig: { packageIdCheck },
   } = config;
 
   const ctx = app.createAnonymousContext();

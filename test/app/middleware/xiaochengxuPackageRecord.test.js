@@ -87,7 +87,7 @@ describe('test/app/middleware/xiaochengxuPackageRecord.test.js', () => {
       };
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
-      this.ctx.app.config.jiangHuConfig = {
+      this.ctx.app.config.jianghuConfig = {
         updateRequestDemoAndResponseDemo: true,
       };
 

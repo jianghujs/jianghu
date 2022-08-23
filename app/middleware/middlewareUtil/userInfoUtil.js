@@ -57,7 +57,7 @@ module.exports = {
     const groupId = isGroupIdRequired ? actionData.groupId : '';
 
     // 如果有缓存，则直接返回缓存
-    if (userId && config.jiangHuConfig.enableUserInfoCache && !isGroupIdRequired) {
+    if (userId && config.jianghuConfig.enableUserInfoCache && !isGroupIdRequired) {
       const otherUserRuleData = await this.getUserRuleDataFromCache(
         jianghuKnex,
         userId

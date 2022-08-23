@@ -8,7 +8,7 @@ module.exports = options => {
   return async (ctx, next) => {
 
     const { jianghuKnex, logger, db, config } = ctx.app;
-    const { appId, appType, jiangHuConfig = {} } = config;
+    const { appId, appType, jianghuConfig = {} } = config;
 
     // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
     const mockBody = {
@@ -28,12 +28,12 @@ module.exports = options => {
       if (ctx.path.startsWith(`/${config.appId}/upload/`)) {
         await send(ctx, decodeURI(ctx.path.replace(`/${config.appId}/upload/`, '')), {
           root: config.baseDir + '/upload',
-          maxage: jiangHuConfig.uploadFileMaxAge || 0,
+          maxage: jianghuConfig.uploadFileMaxAge || 0,
         });
       } else {
         await send(ctx, decodeURI(ctx.path.replace('/upload/', '')), {
           root: config.baseDir + '/upload',
-          maxage: jiangHuConfig.uploadFileMaxAge || 0,
+          maxage: jianghuConfig.uploadFileMaxAge || 0,
         });
       }
     } else {

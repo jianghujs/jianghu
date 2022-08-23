@@ -12,7 +12,7 @@ module.exports = appInfo => {
   return {
     appId,
     debug: true,
-    jiangHuConfig: {
+    jianghuConfig: {
       enableSocket: true,
     },
     indexPage: `/${appId}/page/manual`,

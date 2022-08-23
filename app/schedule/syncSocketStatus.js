@@ -8,9 +8,9 @@ module.exports = app => {
     schedule: {
       // immediate: true, // 应用启动后触发 // 刚起来时不需要做处理，因为连接都没过来
       interval:
-        app.config.jiangHuConfig.syncSocketStatusRefreshInterval || '60s', // 推荐设置大于 socket 超时时间，否则可能导致状态不正确
+        app.config.jianghuConfig.syncSocketStatusRefreshInterval || '60s', // 推荐设置大于 socket 超时时间，否则可能导致状态不正确
       type: 'worker', // worker: 只有一个worker执行
-      disable: !app.config.jiangHuConfig.enableSyncSocketStatus,
+      disable: !app.config.jianghuConfig.enableSyncSocketStatus,
     },
     async task(ctx) {
       const startTime = new Date();

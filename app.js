@@ -29,7 +29,7 @@ class AppBootHook {
   }
 
   async willReady() {
-    if (this.app.config.jiangHuConfig.enableSocket) {
+    if (this.app.config.jianghuConfig.enableSocket) {
       await socketIOInit(this.app);
     }
   }

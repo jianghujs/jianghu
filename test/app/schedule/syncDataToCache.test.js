@@ -70,7 +70,7 @@ describe('test/app/schedule/syncDataToCache.test.js', () => {
         content: JSON.stringify(expUserRuleData),
       };
 
-      this.ctx.app.config.jiangHuConfig = {
+      this.ctx.app.config.jianghuConfig = {
         enableUserInfoCache: true,
       };
 

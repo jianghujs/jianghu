@@ -11,7 +11,7 @@ module.exports = appInfo => {
   return {
     appId: 'jianghu',
     debug: true,
-    jiangHuConfig: {
+    jianghuConfig: {
       enableSocket: true,
     },
     logger: {

@@ -70,7 +70,7 @@ describe('test/app/schedule/syncSocketStatus.test.js', () => {
         socketStatus: 'online',
       }];
 
-      this.ctx.app.config.jiangHuConfig = {
+      this.ctx.app.config.jianghuConfig = {
         enableUserInfoCache: true,
       };
       this.ctx.app.config.env = 'prod';

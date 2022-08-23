@@ -7,8 +7,8 @@ module.exports = {
 
   async saveRequestLogForResource(ctx) {
     const { app, body: responseBody, request, packageResource, userInfo } = ctx;
-    const { ignoreListOfResourceRequestLog = [] } = app.config.jiangHuConfig;
-    const { resourceRequestLogRecordUserId } = app.config.jiangHuConfig.compatibleConfig;
+    const { ignoreListOfResourceRequestLog = [] } = app.config.jianghuConfig;
+    const { resourceRequestLogRecordUserId } = app.config.jianghuConfig.compatibleConfig;
     const { resourceId } = packageResource;
     if (ignoreListOfResourceRequestLog.indexOf(resourceId) > -1) {
       return;

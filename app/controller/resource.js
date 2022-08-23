@@ -13,7 +13,7 @@ class ResourceController extends Controller {
     const {
       config: {
         appId,
-        jiangHuConfig: { packageIdCheck, ignoreListOfResourceRequestLog },
+        jianghuConfig: { packageIdCheck, ignoreListOfResourceRequestLog },
       },
       jianghuKnex,
     } = app;

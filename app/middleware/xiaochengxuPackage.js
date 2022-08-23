@@ -46,7 +46,7 @@ module.exports = async ctx => {
   }
 
   const { jianghuKnex, config, logger } = ctx.app;
-  const { jiangHuConfig } = config;
+  const { jianghuConfig } = config;
   const { pageId, actionId } = body.appData;
 
   const resourceId = `${pageId}.${actionId}`;
