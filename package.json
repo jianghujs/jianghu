@@ -1,10 +1,7 @@
 {
     "name": "@jianghujs/jianghu",
-    "version": "3.0.45",
+    "version": "3.0.46",
     "description": "Progressive Enterprise Framework, beginners will enjoy learning and using.",
-    "bin": {
-        "jianghu": "bin/jianghu.js"
-    },
     "dependencies": {
         "@socket.io/redis-adapter": "^7.1.0",
         "ajv": "^8.7.1",
@@ -17,13 +14,9 @@
         "egg-knex": "^3.0.1",
         "egg-scripts": "^2.11.0",
         "egg-static": "^2.2.0",
-        "autod": "^3.0.1",
-        "autod-egg": "^1.1.0",
-        "egg-bin": "^4.11.0",
         "egg-view-nunjucks": "^2.3.0",
         "geoip-lite": "^1.4.2",
         "ioredis": "^4.28.2",
-        "inquirer": "^7.0.0",
         "koa-send": "^5.0.1",
         "lodash": "^4.17.21",
         "md5-node": "^1.0.1",
@@ -38,6 +31,9 @@
         "@babel/core": "^7.16.0",
         "@babel/eslint-parser": "^7.16.3",
         "@vue/cli-plugin-babel": "^4.5.15",
+        "autod": "^3.0.1",
+        "autod-egg": "^1.1.0",
+        "egg-bin": "^4.11.0",
         "egg-mock": "^3.21.0",
         "eslint": "^7.3.0",
         "eslint-config-egg": "^10.0.0",
