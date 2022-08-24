@@ -83,7 +83,7 @@ module.exports = {
   async getUserRuleDataFromCache(jianghuKnex, userId) {
     // const cache = await jianghuKnex(tableObj._cache).where({ userId: userId || 'visitor' }).first();
     const cache = await jianghuKnex(tableObj._cache).where({ userId }).first();
-    if (cache.content) {
+    if (cache && cache.content) {
       return JSON.parse(cache.content);
     }
     return null;
