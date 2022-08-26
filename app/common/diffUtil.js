@@ -56,6 +56,23 @@ function diff(oldList, newList, primaryKey = 'id') {
 //   ]
 // );
 // console.log(JSON.stringify(res, null, '  '));
+// 输出
+// {
+//   "added": [
+//     { "id": 7, "name": "e" }
+//   ],
+//   "removed": [
+//     { "id": 3, "name": "c" },
+//     { "id": 4, "name": "d" },
+//     { "id": 5, "name": "e" }
+//   ],
+//   "changed": [
+//     {
+//       "old": { "id": 2, "name": "b" },
+//       "new": { "id": 2, "name": "x" }
+//     }
+//   ]
+// }
 
 // 使用场景2：对比时指定主键 key
 
@@ -75,5 +92,23 @@ function diff(oldList, newList, primaryKey = 'id') {
 //   'dataId'
 // );
 // console.log(JSON.stringify(res, null, '  '));
+// 输出
+// {
+//   "added": [
+//     { "dataId": "VII", "name": "e" }
+//   ],
+//   "removed": [
+//     { "id": 3, "dataId": "III", "name": "c" },
+//     { "id": 4, "dataId": "IV", "name": "d" },
+//     { "id": 5, "dataId": "V", "name": "e" }
+//   ],
+//   "changed": [
+//     {
+//       "old": { "id": 2, "dataId": "II", "name": "b" },
+//       "new": { "dataId": "II", "name": "x" }
+//     }
+//   ]
+// }
+
 
 module.exports = diff;
