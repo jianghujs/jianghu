@@ -1,7 +1,10 @@
 {
     "name": "@jianghujs/jianghu",
-    "version": "3.0.49",
+    "version": "3.0.51",
     "description": "Progressive Enterprise Framework, beginners will enjoy learning and using.",
+    "bin": {
+        "jianghu": "bin/jianghu.js"
+    },
     "dependencies": {
         "@socket.io/redis-adapter": "^7.1.0",
         "ajv": "^8.7.1",
