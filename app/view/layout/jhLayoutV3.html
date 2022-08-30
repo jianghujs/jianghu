@@ -301,7 +301,8 @@ Vue.component("jh-layout-v3", {
           .map((page) => {
             if(currentPageId === page.pageId) {
               // this.breadcrumbs[1].text = page.pageName.split('-')[0];
-              this.breadcrumbs[1].text = page.pageType === 'dynamicInMenu' ? `${page.pageName}【${title}】` : page.pageName;
+              const tempTitle = title ? `【${title}】` : '';
+              this.breadcrumbs[1].text = page.pageType === 'dynamicInMenu' ? `${page.pageName}${tempTitle}` : page.pageName;
               this.breadcrumbs[1].fullText = page.pageName;
               this.breadcrumbs[1].href = `/${window.appInfo.appId}/page/${page.pageId}`;
             }
