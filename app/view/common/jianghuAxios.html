@@ -231,7 +231,7 @@
     console.groupEnd();
   };
 
-  window.jianghuAxios.httpUploadByStream = async({ file, fileDirectory, fileDesc, filenameStorage, onProgress = () =>{} }) => {
+  window.jianghuAxios.httpUploadByStream = async({ file, fileDirectory, fileDesc, fileType, filenameStorage,  onProgress = () =>{} }) => {
     const filename = file.name;
 
     const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
@@ -261,21 +261,21 @@
       });
     };
 
-    const uploadDoneFunc = async ({ hash, total, chunkSize, filename, fileDirectory, fileDesc }) => {
+    const uploadDoneFunc = async ({ hash, total, chunkSize }) => {
       return await window.jianghuAxios({
         data: {
           appData: {
             pageId: 'allPage',
             actionId: 'uploadFileDone',
-            actionData: { hash, total, chunkSize, filename, filenameStorage, fileDirectory, fileDesc }
+            actionData: { hash, total, chunkSize, filename, filenameStorage, fileDirectory, fileDesc, fileType }
           }
         }
       });
     }
     
-    return await upload({file, filename, fileDirectory, fileDesc, uploadFunc, uploadDoneFunc, onProgress});
+    return await upload({file, uploadFunc, uploadDoneFunc, onProgress});
   };
-  window.jianghuAxios.socketUploadByBase64 = async({ file, fileDirectory, fileDesc , onProgress = () =>{}}) => {
+  window.jianghuAxios.socketUploadByBase64 = async({ file, fileDirectory, fileDesc, fileType, filenameStorage, onProgress = () =>{}}) => {
     const filename = file.name;
     const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
       const fileBase64 = await new Promise((resolve, reject) => {
@@ -305,20 +305,20 @@
       });
     };
 
-    const uploadDoneFunc = async ({ hash, total, chunkSize, filename, fileDirectory, fileDesc }) => {
+    const uploadDoneFunc = async ({ hash, total, chunkSize }) => {
       return await window.socket.emit("resource", {
         data: {
           packageType: 'socketRequest',
           appData: {
             pageId: 'allPage',
             actionId: 'uploadFileDone',
-            actionData: { hash, total, chunkSize, filename, fileDirectory, filenameStorage, fileDesc }
+            actionData: { hash, total, chunkSize, filename, fileDirectory, filenameStorage, fileDesc, fileType }
           }
         }
       }); 
     }
     
-    return await upload({file, filename, fileDirectory, fileDesc, uploadFunc, uploadDoneFunc, onProgress});
+    return await upload({file, uploadFunc, uploadDoneFunc, onProgress});
   }
 
   window.jianghuAxios.httpDownloadByStream = async({ downloadPath, filename, onProgress = () => {}}) => {
@@ -401,7 +401,7 @@
     return base64;    
   }
 
-  async function upload({ file, filename, fileDirectory, fileDesc, uploadFunc, uploadDoneFunc, onProgress = () => {}}) {
+  async function upload({ file, uploadFunc, uploadDoneFunc, onProgress = () => {}}) {
     const { hash, total, chunkSize } = await getChunkInfo(file);
     
     let loaded = 0;
@@ -412,7 +412,7 @@
       }
     });
 
-    const result = await uploadDoneFunc({hash, total, chunkSize, filename, fileDirectory, fileDesc });
+    const result = await uploadDoneFunc({hash, total, chunkSize });
     onProgress(total+2, loaded+2);
     return result;    
   }
