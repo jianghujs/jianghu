@@ -26,7 +26,7 @@
     withCredentials: false
   });
 
-  window.jianghuAxios.base64ToFile = ({ base64, name }) => { 
+  window.jianghuAxios.base64ToFile = ({ base64, name }) => {
     var arr = base64.split(','),
       mime = arr[0].match(/:(.*?);/)[1],
       bstr = atob(arr[1]),
@@ -39,7 +39,7 @@
     theBlob.lastModifiedDate = new Date();
     theBlob.name = name;
     return theBlob;
-  } 
+  }
 
   window.jianghuAxios.base64ToUint8Array = function (base64) {
     const bstr = window.atob(base64)
@@ -51,7 +51,7 @@
     return u8arr;
   }
 
-  window.jianghuAxios.fileToBase64 = async (file) => { 
+  window.jianghuAxios.fileToBase64 = async (file) => {
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -63,9 +63,9 @@
       }
     })
     return base64;
-  }   
+  }
 
-  window.jianghuAxios.downloadBufferToChrome = ({ buffer, filename }) => { 
+  window.jianghuAxios.downloadBufferToChrome = ({ buffer, filename }) => {
     let url = window.URL.createObjectURL(new Blob( [buffer], {type: "arraybuffer"}) )
     const link = document.createElement('a');
     link.style.display = 'none';
@@ -76,7 +76,7 @@
     document.body.removeChild(link);
   }
 
-  window.jianghuAxios.downloadBase64ToChrome = ({ base64, filename }) => { 
+  window.jianghuAxios.downloadBase64ToChrome = ({ base64, filename }) => {
     var arr = base64.split(','),
       mime = arr[0].match(/:(.*?);/)[1],
       bstr = atob(arr[1]),
@@ -97,7 +97,7 @@
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }    
+  }
 
   /**
    * desc: 请求拦截器 ==> 数据填充
@@ -232,7 +232,7 @@
   };
 
   window.jianghuAxios.httpUploadByStream = async({ file, fileDirectory, fileDesc, fileType, filenameStorage,  onProgress = () =>{} }) => {
-    const filename = file.name;
+    const filename = file.name.replace(/ /g, '').replace(/\([^\)]*\)/g,"");
 
     const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
       const forms = new FormData();
@@ -272,11 +272,12 @@
         }
       });
     }
-    
+
     return await upload({file, uploadFunc, uploadDoneFunc, onProgress});
   };
   window.jianghuAxios.socketUploadByBase64 = async({ file, fileDirectory, fileDesc, fileType, filenameStorage, onProgress = () =>{}}) => {
-    const filename = file.name;
+    const filename = file.name.replace(/ /g, '').replace(/\([^\)]*\)/g,"");
+
     const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
       const fileBase64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -315,9 +316,8 @@
             actionData: { hash, total, chunkSize, filename, fileDirectory, filenameStorage, fileDesc, fileType }
           }
         }
-      }); 
+      });
     }
-    
     return await upload({file, uploadFunc, uploadDoneFunc, onProgress});
   }
 
@@ -336,7 +336,7 @@
         const arrayBuffer = oReq.response;
         resolve(arrayBuffer);
       };
-      oReq.send(null); 
+      oReq.send(null);
     })
   }
   window.jianghuAxios.socketDownloadByBase64 = async({ downloadPath, filename, onProgress = () => {}}) => {
@@ -369,7 +369,7 @@
       }
       return {base64: allFileBase64, buffer: mergedArray.buffer};
     }
-    
+
     const chunkInfo = (await window.socket.emit("resource", {
       data: {
         packageType: 'socketRequest',
@@ -381,15 +381,15 @@
       }
     })).data.appData;
     const { total, chunkSize, hash, fileSize } = chunkInfo;
-    let loaded = 0; 
-    const {base64, buffer} = await downloadFunc({ fileSize, total, chunkSize, hash, downloadPath, filename, 
+    let loaded = 0;
+    const {base64, buffer} = await downloadFunc({ fileSize, total, chunkSize, hash, downloadPath, filename,
       success: () => {
         loaded++;
         onProgress(total, loaded);
         if (loaded === total) {
           return true;
         }
-      }  
+      }
     });
     const spark = new SparkMD5.ArrayBuffer()
     spark.append(buffer)
@@ -397,15 +397,15 @@
     if (download_hash != hash) {
       throw new BizError({ errorCode: 'download_fail', errorReason: "文件下载失败!请重试." })
     }
-    
-    return base64;    
+
+    return base64;
   }
 
   async function upload({ file, uploadFunc, uploadDoneFunc, onProgress = () => {}}) {
     const { hash, total, chunkSize } = await getChunkInfo(file);
-    
+
     let loaded = 0;
-    await uploadFileChunkListByStream({ file, total, chunkSize, hash, uploadFunc, 
+    await uploadFileChunkListByStream({ file, total, chunkSize, hash, uploadFunc,
       success: () => {
         loaded++;
         onProgress(total+2, loaded);
@@ -414,14 +414,14 @@
 
     const result = await uploadDoneFunc({hash, total, chunkSize });
     onProgress(total+2, loaded+2);
-    return result;    
+    return result;
   }
 
   async function uploadFileChunkListByStream({ total, chunkSize, file, hash, uploadFunc, success }) {
     const requestArr = [];
     const loaded = 0;
     const dataArr = []
-    const filename = file.name;
+    const filename = file.name.replace(/ /g, '').replace(/\([^\)]*\)/g,"");
     for (let i = 0; i < total; i++) {
       // 构建需要上传的分片数据
       const start = i * chunkSize;
@@ -447,7 +447,7 @@
               const {indexString, chunFile} = item;
               const result = await uploadFunc({chunFile, chunkSize, indexString, hash, total});
               success();
-              resolve(result);  
+              resolve(result);
               break;
             } catch (err) {
               console.error(`重试机制, ${filename}第${item.index}分片 第${time}次上传失败;`, err);
@@ -461,7 +461,7 @@
       })
       await Promise.all(requestArr)
     }
-  
+
     return true;
   }
 
@@ -479,7 +479,7 @@
 
       let currentChunk = 0;
       const spark = new SparkMD5.ArrayBuffer();
-      const fileReader = new FileReader();      
+      const fileReader = new FileReader();
       fileReader.onerror = function (err) {
         reject(err);
       };
