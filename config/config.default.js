@@ -25,7 +25,7 @@ module.exports = appInfo => {
     jianghuConfig: {
       enableHtmlErrorLogRecord: false,
       htmlErrorLogRecordInterval: 60000,
-      enableResourceLogRecord: false,
+      enableResourceLogRecord: true,
       ignoreListOfResourceLogRecord: [ 'user.passwordLogin' ],
       enableSocket: false,
       updateRequestDemoAndResponseDemo: false,
