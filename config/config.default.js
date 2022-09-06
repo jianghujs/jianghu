@@ -8,7 +8,7 @@ const fs = require('fs');
 
 module.exports = appInfo => {
   assert(appInfo);
-  const appId = 'defaultAppId';
+  const appId = appInfo.name || 'defaultAppId';
 
   const config = {
     appId,
@@ -23,8 +23,11 @@ module.exports = appInfo => {
     loginPage: `/${appId}/page/login`,
     helpPage: `/${appId}/page/help`,
     jianghuConfig: {
+      enableHtmlErrorLogRecord: false,
+      htmlErrorLogRecordInterval: 60000,
+      enableResourceLogRecord: false,
+      ignoreListOfResourceLogRecord: [ 'user.passwordLogin' ],
       enableSocket: false,
-      packageIdCheck: false,
       updateRequestDemoAndResponseDemo: false,
       enableUserInfoCache: false,
       userInfoCacheRefreshInterval: "10s",
@@ -108,6 +111,19 @@ module.exports = appInfo => {
     },
     customLogger: {
       knex: { consoleLevel: "WARN" },
+      // https://www.eggjs.org/zh-CN/core/logger
+      htmlLogger: {
+        file: path.join(appInfo.baseDir, `logs/${appId}.html.log`),
+        contextFormatter(meta) {
+          return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
+        },
+      },
+      resourceLogger: {
+        file: path.join(appInfo.baseDir, `logs/${appId}.resource.log`),
+        contextFormatter(meta) {
+          return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
+        },
+      },
     },
     onerror: {
       async json(err, ctx) {

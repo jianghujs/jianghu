@@ -21,10 +21,7 @@ const socketResourceAfterHook = require('../middleware/socketResourceAfterHook')
 async function socketRequest({ socket, app, body }, next) {
   const { packageId, packageType, appData } = body;
   const { jianghuKnex, config } = app;
-  const {
-    appId,
-    jianghuConfig: { packageIdCheck },
-  } = config;
+  const { appId } = config;
 
   const ctx = app.createAnonymousContext();
   ctx.jianghuSocket = socket;
@@ -37,16 +34,6 @@ async function socketRequest({ socket, app, body }, next) {
 
   const { packageResource } = ctx;
   const { resourceType, resourceId, pageId, actionId } = packageResource;
-
-  // packageId 唯一性校验
-  if (packageIdCheck) {
-    const resourceActivity = await jianghuKnex(tableEnum._resource_request_log)
-      .where({ packageId })
-      .first();
-    if (resourceActivity || !packageId) {
-      throw new BizError(errorInfoEnum.request_repeated);
-    }
-  }
 
   // TODO: base64场景 appData太大了
   app.logger.debug('[socketResource.js socketRequest body]', {

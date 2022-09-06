@@ -7,10 +7,10 @@ module.exports = {
 
   async saveRequestLogForResource(ctx) {
     const { app, body: responseBody, request, packageResource, userInfo } = ctx;
-    const { ignoreListOfResourceRequestLog = [] } = app.config.jianghuConfig;
-    const { resourceRequestLogRecordUserId } = app.config.jianghuConfig.compatibleConfig;
+    const { ignoreListOfResourceLogRecord, enableResourceLogRecord } = app.config.jianghuConfig;
     const { resourceId } = packageResource;
-    if (ignoreListOfResourceRequestLog.indexOf(resourceId) > -1) {
+    // Tip: 敏感resource不打日志
+    if (ignoreListOfResourceLogRecord.indexOf(resourceId) > -1) {
       return;
     }
 
@@ -20,28 +20,33 @@ module.exports = {
     const { jianghuKnex } = app;
     const { packageId } = requestBody;
     const { status: responseStatus } = responseBody;
-    const responseBodyString = JSON.stringify(responseBody);
+    let responseBodyString = JSON.stringify(responseBody);
     const userAgent = requestBody.appData.userAgent || '';
     const geo = geoip.lookup(userIp);
     let userIpRegion = '';
     if (geo) { userIpRegion = `${geo.country}|${geo.region}|${geo.timezone}|${geo.city}|${geo.ll}|${geo.range}`; }
-    const requestBodyString = JSON.stringify(requestBody);
+    let requestBodyString = JSON.stringify(requestBody);
 
+    // 大文本
+    if (requestBodyString.length > 8144) {
+      requestBodyString = "请求文本太大!";
+    }
+    if (requestBodyString.length > 8144) {
+      responseBodyString = "响应文本太大!";
+    }
     const insertData = {
-      packageId, resourceId, deviceId,
+      packageId, resourceId, deviceId, userId,
       userIp, userAgent, userIpRegion,
       requestBody: requestBodyString,
       responseBody: responseBodyString,
       responseStatus,
     };
 
-    // 适配代码: 3.0 版本删除
-    if (resourceRequestLogRecordUserId === true) {
-      insertData.userId = userId;
+    if (enableResourceLogRecord === true) {
+      app.getLogger('resourceLogger').info(insertData);
     }
-
-    await jianghuKnex(tableObj._resource_request_log)
-      .insert(insertData);
+    // await jianghuKnex(tableObj._resource_request_log)
+    //   .insert(insertData);
   },
 
   async updateRequestDemoAndResponseDemo(ctx) {

@@ -10,37 +10,11 @@ class ResourceController extends Controller {
 
   async httpRequest() {
     const { ctx, app } = this;
-    const {
-      config: {
-        appId,
-        jianghuConfig: { packageIdCheck, ignoreListOfResourceRequestLog },
-      },
-      jianghuKnex,
-    } = app;
+    const { config: { appId }, jianghuKnex } = app;
     const { body } = ctx.request;
     const { packageId, appData = {} } = body;
     const { packageResource } = ctx;
     const { pageId, actionId, resourceType, resourceId } = packageResource;
-
-    // packageId 唯一性校验
-    if (packageIdCheck) {
-      const resourceActivity = await jianghuKnex(
-        tableObj._resource_request_log
-      )
-        .where({ packageId })
-        .first();
-      if (resourceActivity || !packageId) {
-        throw new BizError(errorInfoEnum.request_repeated);
-      }
-    }
-
-    if (ignoreListOfResourceRequestLog.indexOf(resourceId) === -1) {
-      app.logger.debug('[resource.js httpRequest body]', {
-        packageId,
-        resourceId,
-        appData,
-      });
-    }
 
     let resultData;
     switch (resourceType) {
