@@ -1,6 +1,6 @@
 {
     "name": "@jianghujs/jianghu",
-    "version": "3.0.58",
+    "version": "3.0.59",
     "description": "Progressive Enterprise Framework, beginners will enjoy learning and using.",
     "bin": {
         "jianghu": "bin/jianghu.js"
