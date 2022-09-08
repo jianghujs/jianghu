@@ -55,14 +55,14 @@ class TableSegment {
         return {
           name: column.columnName,
           // 处理 null 字段
-          sql: `coalesce(${column.columnName},'<null>')`,
+          sql: `coalesce(\`${column.columnName}\`,'<null>')`,
         };
       }
       return {
         name: column.columnName,
         // 处理 null 字段
         // 处理非 char 字段
-        sql: `coalesce(cast(${column.columnName} as char),'<null>')`,
+        sql: `coalesce(cast(\`${column.columnName}\` as char),'<null>')`,
       };
     });
   }
