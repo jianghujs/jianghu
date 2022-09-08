@@ -127,12 +127,12 @@ class TableSegment {
 // TableDiffer
 class TableDiffer {
   constructor({
-    sourceTableSegment,
-    targetTableSegment,
+    oldTableSegment,
+    newTableSegment,
     splitCount = 2,
     stopThreshold = 100 }) {
-    this.sourceTableSegment = sourceTableSegment;
-    this.targetTableSegment = targetTableSegment;
+    this.oldTableSegment = oldTableSegment;
+    this.newTableSegment = newTableSegment;
     this.splitCount = splitCount;
     this.stopThreshold = stopThreshold;
   }
@@ -146,21 +146,21 @@ class TableDiffer {
     };
     // 需要处理 min max 不对齐的情况
     // 获取两段数据重合部分的 min max
-    const midMinId = Math.max(this.sourceTableSegment.minId, this.targetTableSegment.minId);
-    const midMaxId = Math.min(this.sourceTableSegment.maxId, this.targetTableSegment.maxId);
+    const midMinId = Math.max(this.oldTableSegment.minId, this.newTableSegment.minId);
+    const midMaxId = Math.min(this.oldTableSegment.maxId, this.newTableSegment.maxId);
     // 左段
-    if (this.sourceTableSegment.minId !== this.targetTableSegment.minId) {
-      const realMinId = Math.min(this.sourceTableSegment.minId, this.targetTableSegment.minId);
+    if (this.oldTableSegment.minId !== this.newTableSegment.minId) {
+      const realMinId = Math.min(this.oldTableSegment.minId, this.newTableSegment.minId);
       console.log('计算左段', { left: realMinId, right: midMinId - 1 });
-      await this.fetchAndDiff(this.sourceTableSegment.cutSegment(realMinId, midMinId - 1), this.targetTableSegment.cutSegment(realMinId, midMinId - 1));
+      await this.fetchAndDiff(this.oldTableSegment.cutSegment(realMinId, midMinId - 1), this.newTableSegment.cutSegment(realMinId, midMinId - 1));
     }
     // 中间重复段，递归
-    await this.recursiveDiff(this.sourceTableSegment.cutSegment(midMinId, midMaxId), this.targetTableSegment.cutSegment(midMinId, midMaxId));
+    await this.recursiveDiff(this.oldTableSegment.cutSegment(midMinId, midMaxId), this.newTableSegment.cutSegment(midMinId, midMaxId));
     // 右段
-    if (this.sourceTableSegment.maxId !== this.targetTableSegment.maxId) {
-      const realMaxId = Math.max(this.sourceTableSegment.maxId, this.targetTableSegment.maxId);
+    if (this.oldTableSegment.maxId !== this.newTableSegment.maxId) {
+      const realMaxId = Math.max(this.oldTableSegment.maxId, this.newTableSegment.maxId);
       console.log('计算右段', { left: midMaxId + 1, right: realMaxId });
-      await this.fetchAndDiff(this.sourceTableSegment.cutSegment(midMaxId + 1, realMaxId), this.targetTableSegment.cutSegment(midMaxId + 1, realMaxId));
+      await this.fetchAndDiff(this.oldTableSegment.cutSegment(midMaxId + 1, realMaxId), this.newTableSegment.cutSegment(midMaxId + 1, realMaxId));
     }
     return this.diffResult;
   }
@@ -200,32 +200,32 @@ class TableDiffer {
 }
 
 async function hyperDiff({
-  sourceDatabaseConnectionConfig,
-  sourceTable,
-  targetDatabaseConnectionConfig,
-  targetTable,
+  oldDatabaseConnectionConfig,
+  oldTable,
+  newDatabaseConnectionConfig,
+  newTable,
   ignoreColumns,
   splitCount = 2,
   stopThreshold = 100,
 }) {
 
-  const sourceTableSegment = new TableSegment({
-    databaseConnectionConfig: sourceDatabaseConnectionConfig,
-    table: sourceTable,
+  const oldTableSegment = new TableSegment({
+    databaseConnectionConfig: oldDatabaseConnectionConfig,
+    table: oldTable,
     ignoreColumns,
   });
-  const targetTableSegment = new TableSegment({
-    databaseConnectionConfig: targetDatabaseConnectionConfig,
-    table: targetTable,
+  const newTableSegment = new TableSegment({
+    databaseConnectionConfig: newDatabaseConnectionConfig,
+    table: newTable,
     ignoreColumns,
   });
 
   await Promise.all([
-    sourceTableSegment.init(),
-    targetTableSegment.init(),
+    oldTableSegment.init(),
+    newTableSegment.init(),
   ]);
 
-  const differ = new TableDiffer({ sourceTableSegment, targetTableSegment, splitCount, stopThreshold });
+  const differ = new TableDiffer({ oldTableSegment, newTableSegment, splitCount, stopThreshold });
   const result = await differ.run();
   return result;
 }
@@ -233,22 +233,22 @@ async function hyperDiff({
 // async function test() {
 
 //   const result = await hyperDiff({
-//     sourceDatabaseConnectionConfig: {
+//     oldDatabaseConnectionConfig: {
 //       host: '127.0.0.1',
 //       port: 3306,
 //       user: 'root',
 //       password: '123456',
 //       database: 'aa',
 //     },
-//     sourceTable: 'student',
-//     targetDatabaseConnectionConfig: {
+//     oldTable: 'student',
+//     newDatabaseConnectionConfig: {
 //       host: '127.0.0.1',
 //       port: 3306,
 //       user: 'root',
 //       password: '123456',
 //       database: 'aa',
 //     },
-//     targetTable: 'student_copy1',
+//     newTable: 'student_copy1',
 //     splitCount: 2,
 //     stopThreshold: 10,
 //     ignoreColumns: [
