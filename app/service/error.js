@@ -17,8 +17,8 @@ const actionDataScheme = Object.freeze({
           additionalProperties: true,
           required: [ 'errorTime', 'errorMessage' ],
           properties: {
-            userId: { anyOf: [{ type: 'string' }, { type: 'number' }] },
-            deviceId: { anyOf: [{ type: 'string' }, { type: 'number' }] },
+            userId: { anyOf: [{ type: 'null' }, { type: 'string' }, { type: 'number' }] },
+            deviceId: { anyOf: [{ type: 'null' }, { type: 'string' }, { type: 'number' }] },
             errorTime: { anyOf: [{ type: 'string' }] },
             errorMessage: { anyOf: [{ type: 'string' }, { type: 'number' }] },
           },
