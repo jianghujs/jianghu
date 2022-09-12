@@ -129,6 +129,9 @@
         this.showLoading = false;
         this.showSnackbar = true;
       },
+      dismiss() {
+        this.showSnackbar = false;
+      },
       async notify(paramObj) {
         let message = null;
         // 注意: typeof(paramObj)=='string' 是为了适配老版本
