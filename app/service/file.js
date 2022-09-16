@@ -10,9 +10,6 @@ const mime = require('mime');
 // ========================================常用 require end=============================================
 const path = require('path');
 const crypto = require('crypto');
-const {
-  tableObj,
-} = require('../constant/constant');
 const fileUtil = require('../common/fileUtil');
 const actionDataScheme = Object.freeze({
   getChunkInfo: {
@@ -34,7 +31,6 @@ const actionDataScheme = Object.freeze({
       filename: { anyOf: [{ type: 'string' }, { type: 'number' }] },
       fileDirectory: { type: 'string' },
       fileDesc: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-      fileType: { anyOf: [{ type: 'string' }, { type: 'null' }] },
     },
   },
   uploadFileChunkByStream: {
@@ -145,7 +141,6 @@ class FileService extends Service {
       fileDirectory,
       fileDesc,
     } = actionData;
-    let { fileType } = actionData;
     let filenameStorage = actionData.filenameStorage;
     const fileId = `${Date.now()}_${_.random(100000, 999999)}`;
     if (!filenameStorage) { filenameStorage = `${fileId}_${filename}`; }
@@ -187,7 +182,7 @@ class FileService extends Service {
     // const binarySize = fileUtil.formatByteSize(fileStates.size);
     // 文件大小/KB
     const binarySize = (fileStates.size / 1024).toFixed(2);
-    fileType = fileType || mime.getType(filename);  
+    const fileType = mime.getType(filename);  
     const file = {
       fileId,
       fileDirectory,
@@ -198,7 +193,6 @@ class FileService extends Service {
       binarySize,
       fileType,
     };
-    await jianghuKnex(tableObj._file, this.ctx).jhInsert(file);
     file.downloadBasePath = downloadBasePath;
     file.downloadTip = 'https://xxx.xxx.xxx/${downloadBasePath}${downloadPath}';
     return file;

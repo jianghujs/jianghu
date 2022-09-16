@@ -231,7 +231,7 @@
     console.groupEnd();
   };
 
-  window.jianghuAxios.httpUploadByStream = async({ file, fileDirectory, fileDesc, fileType, filenameStorage,  onProgress = () =>{} }) => {
+  window.jianghuAxios.httpUploadByStream = async({ file, fileDirectory, fileDesc, filenameStorage,  onProgress = () =>{} }) => {
     const filename = file.name.replace(/ /g, '').replace(/\([^\)]*\)/g,"");
 
     const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
@@ -267,7 +267,7 @@
           appData: {
             pageId: 'allPage',
             actionId: 'uploadFileDone',
-            actionData: { hash, total, chunkSize, filename, filenameStorage, fileDirectory, fileDesc, fileType }
+            actionData: { hash, total, chunkSize, filename, filenameStorage, fileDirectory, fileDesc }
           }
         }
       });
@@ -275,7 +275,7 @@
 
     return await upload({file, uploadFunc, uploadDoneFunc, onProgress});
   };
-  window.jianghuAxios.socketUploadByBase64 = async({ file, fileDirectory, fileDesc, fileType, filenameStorage, onProgress = () =>{}}) => {
+  window.jianghuAxios.socketUploadByBase64 = async({ file, fileDirectory, fileDesc, filenameStorage, onProgress = () =>{}}) => {
     const filename = file.name.replace(/ /g, '').replace(/\([^\)]*\)/g,"");
 
     const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
@@ -313,7 +313,7 @@
           appData: {
             pageId: 'allPage',
             actionId: 'uploadFileDone',
-            actionData: { hash, total, chunkSize, filename, fileDirectory, filenameStorage, fileDesc, fileType }
+            actionData: { hash, total, chunkSize, filename, fileDirectory, filenameStorage, fileDesc }
           }
         }
       });
@@ -498,11 +498,11 @@
           loadNext();
         } else {
           const hash = spark.end();
-          resolve({
-            total: chunksNum,
-            hash,
-            chunkSize
-          });
+          if (chunksNum === 0) {
+            resolve({ total: 1, hash, chunkSize });
+          } else {
+            resolve({ total: chunksNum, hash, chunkSize });
+          }
         }
       };
 
