@@ -227,6 +227,10 @@ async function hyperDiff({
 
   const differ = new TableDiffer({ oldTableSegment, newTableSegment, splitCount, stopThreshold });
   const result = await differ.run();
+
+  await oldTableSegment.knex.destroy();
+  await newTableSegment.knex.destroy();
+
   return result;
 }
 
