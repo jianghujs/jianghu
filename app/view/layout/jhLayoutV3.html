@@ -297,7 +297,7 @@ Vue.component("jh-layout-v3", {
       // || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && currentPageId === page.pageId)
       this.inMenuList = _
           .chain(this.userInfo.allowPageList)
-          .filter(page => page.pageType === 'showInMenu' || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && currentPageId === page.pageId))
+          .filter(page => page.pageType === 'showInMenu' || page.pageType === 'link' || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && currentPageId === page.pageId))
           .map((page) => {
             if(currentPageId === page.pageId) {
               // this.breadcrumbs[1].text = page.pageName.split('-')[0];
@@ -307,7 +307,7 @@ Vue.component("jh-layout-v3", {
               this.breadcrumbs[1].href = `/${window.appInfo.appId}/page/${page.pageId}`;
             }
             return {
-              path: `/${window.appInfo.appId}/page/${page.pageId}`,
+              path: page.pageType === 'link' ? page.pageFile : `/${window.appInfo.appId}/page/${page.pageId}`,
               pageId: page.pageId,
               title: page.pageName.split('-')[0],
               sort: parseInt(page.sort)
