@@ -66,7 +66,7 @@ async function socketRequest({ socket, app, body }, next) {
     const responseBody = socketResponse.success({
       packageId,
       // TODO: ...resultData, resultData 为兼容代码
-      appData: { resultData, appId, pageId, actionId },
+      appData: { ...resultData, resultData, appId, pageId, actionId },
     });
     socket.emit(resourcePath, responseBody);
   }
