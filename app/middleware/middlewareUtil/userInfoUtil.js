@@ -238,9 +238,7 @@ module.exports = {
       groupIdList,
       roleIdList
     );
-    return allowPageList.map(page => {
-      return page;
-    });
+    return allowPageList;
   },
   /**
    * 计算用户有权限的数据项
