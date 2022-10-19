@@ -28,7 +28,8 @@ class PageController extends Controller {
     const targetHtml = packagePage.pageFile || `${packagePage.pageId}.html`;
     await ctx.render(`page/${targetHtml}`, {
       ...ctx.hookResult,
-      uiActionList
+      uiActionList,
+      passcode: packagePage.passcode
     });
   }
 }
