@@ -12,8 +12,9 @@ class PageController extends Controller {
 
   async page() {
     const { ctx } = this;
-    const { packagePage } = ctx;
+    const { packagePage, userInfo } = ctx;
     const { jianghuKnex, logger } = this.app;
+    const { userId, username, deviceId, deviceType } = userInfo.user;
     const uiActionList = await jianghuKnex(tableObj._ui).whereIn('pageId', [ packagePage.pageId, 'allPage' ]).select();
     // Tip: 为了避免 uiActionConfig json 异常, 这里 format一下
     uiActionList.forEach(item => {
@@ -31,6 +32,7 @@ class PageController extends Controller {
       uiActionList,
       page: { passcode: packagePage.passcode }
     });
+    this.app.getLogger('pageLogger').info({ pageId: packagePage.pageId, userId, username, deviceId, deviceType });
   }
 }
 

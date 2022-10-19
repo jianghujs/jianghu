@@ -124,6 +124,12 @@ module.exports = appInfo => {
           return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
         },
       },
+      pageLogger: {
+        file: path.join(appInfo.baseDir, `logs/${appId}.page.log`),
+        contextFormatter(meta) {
+          return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
+        },
+      },
     },
     onerror: {
       async json(err, ctx) {
