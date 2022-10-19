@@ -29,7 +29,7 @@ class PageController extends Controller {
     await ctx.render(`page/${targetHtml}`, {
       ...ctx.hookResult,
       uiActionList,
-      passcode: packagePage.passcode
+      page: { passcode: packagePage.passcode }
     });
   }
 }
