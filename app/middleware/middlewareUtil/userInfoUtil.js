@@ -239,13 +239,7 @@ module.exports = {
       roleIdList
     );
     return allowPageList.map(page => {
-      return {
-        pageId: page.pageId,
-        pageName: page.pageName,
-        pageFile: page.pageFile,
-        pageType: page.pageType,
-        sort: page.sort,
-      };
+      return page;
     });
   },
   /**
