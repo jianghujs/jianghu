@@ -32,7 +32,7 @@ class PageController extends Controller {
       uiActionList,
       page: { passcode: packagePage.passcode }
     });
-    this.app.getLogger('pageLogger').info({ pageId: packagePage.pageId, userId, username, deviceId, deviceType });
+    this.app.getLogger('pageLogger').info({ pageId: packagePage.pageId, pageName: packagePage.pageName, userId, username, deviceId, deviceType });
   }
 }
 

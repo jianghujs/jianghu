@@ -109,6 +109,14 @@ module.exports = appInfo => {
         return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
       },
     },
+    filesRotateBySize: [
+      path.join(appInfo.baseDir, `logs/${appId}.page.log`),
+      path.join(appInfo.baseDir, `logs/${appId}.page.json.log`),
+
+      path.join(appInfo.baseDir, `logs/${appId}.html.log`),
+      path.join(appInfo.baseDir, `logs/${appId}.html.json.log`),
+    ],
+    maxFileSize: 10 * 1024 * 1024, // 10M
     customLogger: {
       knex: { consoleLevel: "WARN" },
       // https://www.eggjs.org/zh-CN/core/logger
