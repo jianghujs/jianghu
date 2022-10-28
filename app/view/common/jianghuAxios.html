@@ -326,19 +326,28 @@
     const url = `/${window.appInfo.appId}/upload/${encodeURI(downloadPath)}`;
     oReq.open("GET", url, true);
     oReq.responseType = "arraybuffer";
-    oReq.onprogress = function (event) {
-      if (event.lengthComputable) {
-        onProgress(event.total, event.loaded);
-      }
-    }
     return new Promise((resolve, reject) => {
+      oReq.onprogress = function (event) {
+        if (oReq.status === 404) {
+          reject(new BizError({errorCode: 'file_download_error', errorReason: '文件不存在'}));
+          return;
+        } else if (oReq.status !== 200) {
+          reject(new BizError({errorCode: 'file_download_error', errorReason: '文件下载失败' }));
+          return;
+        }
+        if (event.lengthComputable) {
+          onProgress(event.total, event.loaded);
+        }
+      }
+
       oReq.onload = function (oEvent) {
         const arrayBuffer = oReq.response;
         resolve(arrayBuffer);
-      };
+      }
       oReq.send(null);
     })
   }
+  
   window.jianghuAxios.socketDownloadByBase64 = async({ downloadPath, filename, onProgress = () => {}}) => {
     const downloadFunc = async function ({ fileSize, total, chunkSize, hash, downloadPath, filename, success = () => {}}) {
       let allFileBase64 = "";

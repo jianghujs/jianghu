@@ -166,7 +166,11 @@ class FileService extends Service {
     });
 
     // 将分片文件 merge 成一个文件
-    await fileUtil.streamMerge(chunksPathList, filePath, chunkSize);
+    if(chunks.length === 1) {
+      await fileUtil.rename(chunksPathList[0], filePath);
+    } else {
+      await fileUtil.streamMerge(chunksPathList, filePath, chunkSize);
+    }
     await fileUtil.deleteFileAndDirByPath(chunksPath);
     // check md5是否一致
     const buffer = await fileUtil.readFile(filePath);

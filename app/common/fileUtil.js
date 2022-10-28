@@ -14,6 +14,7 @@ const stat = util.promisify(fs.stat);
 const readFile = util.promisify(fs.readFile);
 const open = util.promisify(fs.open);
 const read = util.promisify(fs.read);
+const rename = util.promisify(fs.rename);
 const writeFile = util.promisify(fs.writeFile);
 const copyFile = util.promisify(fs.copyFile);
 const Promise = require('bluebird');
@@ -411,6 +412,7 @@ module.exports = {
   exists,
   stat,
   read,
+  rename,
   readFile,
   readdir,
   writeFile,
