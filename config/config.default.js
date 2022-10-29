@@ -160,6 +160,7 @@ module.exports = appInfo => {
           errorCode === "request_token_invalid" ||
           errorCode === "request_user_not_exist" ||
           errorCode === "request_token_expired" ||
+          errorCode === "request_app_forbidden" ||
           errorCode === "user_banned"
         ) {
           ctx.cookies.set(`${ctx.app.config.appId}_authToken`, null);
