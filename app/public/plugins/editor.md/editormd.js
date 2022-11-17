@@ -3227,23 +3227,6 @@
         "Ctrl-6": "h6",
         "Ctrl-B": "bold",  // if this is string ==  editormd.toolbarHandlers.xxxx
         "Ctrl-D": "datetime",
-
-        "Ctrl-E": function () { // emoji
-            var cm = this.cm;
-            var cursor = cm.getCursor();
-            var selection = cm.getSelection();
-
-            if (!this.settings.emoji) {
-                alert("Error: settings.emoji == false");
-                return;
-            }
-
-            cm.replaceSelection(":" + selection + ":");
-
-            if (selection === "") {
-                cm.setCursor(cursor.line, cursor.ch + 1);
-            }
-        },
         "Ctrl-Alt-G": "goto-line",
         "Ctrl-H": "hr",
         "Ctrl-I": "italic",
