@@ -277,6 +277,9 @@ async function sqlResource({ jianghuKnex, ctx }) {
 
   // 1. where 构建：前后端合并
   const whereCondition = await buildWhereCondition(jianghuKnex, ctx, requestBody);
+  if ([ 'delete', 'jhDelete', 'update', 'jhUpdate' ].includes(operation) && !whereCondition) {
+    throw new BizError(errorInfoEnum.resource_sql_exception_of_update_and_delete)
+  }
 
   // 2. 翻页场景需要 count 计算
   let count;
