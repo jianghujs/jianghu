@@ -66,7 +66,7 @@ async function socketRequest({ socket, app, body }, next) {
     const responseBody = socketResponse.success({
       packageId,
       // TODO: ...resultData, resultData 为兼容代码
-      appData: { ...resultData, resultData, appId, pageId, actionId },
+      appData: { resultData, appId, pageId, actionId },
     });
     socket.emit(resourcePath, responseBody);
   }
@@ -85,20 +85,6 @@ async function socketIOInit(app) {
     socketIO.use(async function(socket, next) {
       try {
         const body = socket.handshake.auth;
-        const { appData: { actionData: { socketId } } } = body;
-
-        if (socketId) {
-          // 建立连接时把其它同名 socket 下线
-          const allSockets = await socketIO.fetchSockets();
-          const oldList = allSockets.filter(s => s.id === socketId);
-          if (oldList.length > 0) {
-            for (const old of oldList) {
-              logger.info('[disconnect old same name socket]', old.id);
-              await old.disconnect();
-            }
-          }
-        }
-
         await socketRequest({ socket, app, body }, next);
       } catch (error) {
         logger.error('[第一次建立连接失败]', error);

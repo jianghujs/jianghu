@@ -83,6 +83,10 @@ const errorInfoEnum = Object.freeze({
     errorCode: 'resource_sql_unique_check_fail',
     errorReason: '数据已存在! 请勿重复操作。',
   },
+  resource_sql_exception_of_update_and_delete: {
+    errorCode: 'resource_sql_exception_of_update_and_delete',
+    errorReason: 'Sql操作异常! 请追加where条件。',
+  },
   resource_service_not_found: {
     errorCode: 'resource_service_not_found',
     errorReason: '接口不存在',

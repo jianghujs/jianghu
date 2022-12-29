@@ -109,6 +109,18 @@ module.exports = appInfo => {
         return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
       },
     },
+    logrotator: {
+      filesRotateBySize: [
+        path.join(appInfo.baseDir, `logs/${appId}.page.log`),
+        path.join(appInfo.baseDir, `logs/${appId}.page.json.log`),
+  
+        path.join(appInfo.baseDir, `logs/${appId}.html.log`),
+        path.join(appInfo.baseDir, `logs/${appId}.html.json.log`),
+      ],
+      maxFileSize: 10 * 1024 * 1024, // 10M
+      maxFiles: 20, // 最大文件个数
+      maxDays: 20, // 最大天数 
+    },
     customLogger: {
       knex: { consoleLevel: "WARN" },
       // https://www.eggjs.org/zh-CN/core/logger
@@ -120,6 +132,12 @@ module.exports = appInfo => {
       },
       resourceLogger: {
         file: path.join(appInfo.baseDir, `logs/${appId}.resource.log`),
+        contextFormatter(meta) {
+          return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
+        },
+      },
+      pageLogger: {
+        file: path.join(appInfo.baseDir, `logs/${appId}.page.log`),
         contextFormatter(meta) {
           return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
         },
@@ -142,6 +160,7 @@ module.exports = appInfo => {
           errorCode === "request_token_invalid" ||
           errorCode === "request_user_not_exist" ||
           errorCode === "request_token_expired" ||
+          errorCode === "request_app_forbidden" ||
           errorCode === "user_banned"
         ) {
           ctx.cookies.set(`${ctx.app.config.appId}_authToken`, null);
