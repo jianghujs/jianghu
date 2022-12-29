@@ -91,7 +91,15 @@
           this.message = message;
         }
         this.color = 'primary';
-        this.timer = 12000;
+        if(paramObj.hasOwnProperty('time')) {
+          this.timer = paramObj.time;
+        } else {
+          if (this.message.includes('%')) {
+            this.timer = this.message.includes('100') ? 3000 : -1;
+          } else {
+            this.timer = 3000;
+          }
+        }
         this.icon = 'mdi-check';
         this.showLoading = true;
         this.showSnackbar = true;
