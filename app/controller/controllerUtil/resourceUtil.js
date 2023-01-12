@@ -3,7 +3,7 @@
 const { BizError, errorInfoEnum } = require('../../constant/error');
 const _ = require('lodash');
 const validateUtil = require('../../common/validateUtil');
-const commonUtil = require("../../common/commonUtil");
+const commonUtil = require('../../common/commonUtil');
 
 function validate(ctx, body) {
   const { resourceData, appDataSchema } = ctx.packageResource;
@@ -13,24 +13,29 @@ function validate(ctx, body) {
 
   if (
     ![
-      "select",
-      "insert",
-      "update",
-      "delete",
-      "jhInsert",
-      "jhUpdate",
-      "jhDelete",
+      'select',
+      'insert',
+      'update',
+      'delete',
+      'jhInsert',
+      'jhUpdate',
+      'jhDelete',
     ].includes(operation)
   ) {
     throw new BizError(errorInfoEnum.resource_sql_operation_invalid);
   }
 
   if (!_.isEmpty(appDataSchema)) {
-    validateUtil.validate(appDataSchema, appData, "appData");
+    validateUtil.validate(appDataSchema, appData, 'appData');
   }
 
   // 创建 or 更新时不能指定 主键id ===> 避免无操作
   delete actionData.id;
+}
+
+async function getFieldsAfterExclude(jianghuKnex, table, excludeFields) {
+  const fieldDescs = await jianghuKnex.raw(`desc ${table}`);
+  return fieldDescs[0].map(o => o.Field).filter(field => !excludeFields.includes(field));
 }
 
 /**
@@ -46,8 +51,8 @@ async function buildWhereCondition(jianghuKnex, ctx, requestBody) {
   const { userId } = userInfo || {};
 
   // insert 不需要 where 语句
-  if (resourceData.operation === "insert") {
-    return "";
+  if (resourceData.operation === 'insert') {
+    return '';
   }
 
   // 服务端部分，主要来自 resource 数据的 resourceData
@@ -59,7 +64,7 @@ async function buildWhereCondition(jianghuKnex, ctx, requestBody) {
       .first();
   }
   const backendResourceData = accessControl
-    ? JSON.parse(accessControl.resourceData || "{}")
+    ? JSON.parse(accessControl.resourceData || '{}')
     : resourceData;
   backendResourceData.table = resourceData.table;
   backendResourceData.operation = resourceData.operation;
@@ -90,12 +95,12 @@ async function buildWhereConditionFromResourceData(
   userInfo
 ) {
   if (!resourceData) {
-    return "";
+    return '';
   }
 
   const backendAppData = {};
   // 如：{ "where": { "field1": "ctx.someData" } }
-  ["where", "whereLike", "whereIn"].forEach((appDataKey) => {
+  [ 'where', 'whereLike', 'whereIn' ].forEach(appDataKey => {
     const expressionObject = resourceData[appDataKey];
     if (!expressionObject) {
       return;
@@ -109,7 +114,7 @@ async function buildWhereConditionFromResourceData(
   });
 
   // 如：{ "whereOptions": "ctx.someList" }
-  ["whereOptions", "whereOrOptions"].forEach((appDataKey) => {
+  [ 'whereOptions', 'whereOrOptions' ].forEach(appDataKey => {
     const expressionObject = resourceData[appDataKey];
     if (!expressionObject) {
       return;
@@ -147,38 +152,38 @@ async function buildWhereConditionFromAppData({
   whereIn = {},
   whereOptions = [],
   whereOrOptions = [],
-  whereKnex = "",
+  whereKnex = '',
   limit,
   offset,
   orderBy = [],
 }) {
   // where
-  let wherePart = "";
+  let wherePart = '';
   if (!_.isEmpty(where)) {
     wherePart = `.where(${JSON.stringify(where)})`;
   }
 
   // whereLike
-  let whereLikePart = "";
+  let whereLikePart = '';
   if (!_.isEmpty(whereLike)) {
     for (const key in whereLike) {
-      const value = whereLike[key] || "";
+      const value = whereLike[key] || '';
       whereLikePart = whereLikePart + `.where('${key}', 'like', '%${value}%')`;
     }
   }
 
   // whereIn
-  let whereInPart = "";
+  let whereInPart = '';
   if (!_.isEmpty(whereIn)) {
-    Object.entries(whereIn).forEach(([key, value]) => {
+    Object.entries(whereIn).forEach(([ key, value ]) => {
       whereInPart += `.whereIn('${key}', ${JSON.stringify(value)})`;
     });
   }
 
   // whereOptions： [['name', '=', 'zhangshan'],['level', '>', 3],['a', 100]]
-  let whereOptionsPart = "";
+  let whereOptionsPart = '';
   if (!_.isEmpty(whereOptions)) {
-    whereOptions.forEach((whereOption) => {
+    whereOptions.forEach(whereOption => {
       if (whereOption.length === 3) {
         whereOptionsPart += `.where('${whereOption[0]}', '${whereOption[1]}', '${whereOption[2]}')`;
       } else if (whereOption.length === 2) {
@@ -191,10 +196,10 @@ async function buildWhereConditionFromAppData({
 
   // whereOrOptions，相当于 and ( statement1 or statement2 )
   //  [['name', '=', 'zhangshan'],['level', '>', 3],['a', 100]]
-  let whereOrOptionsPart = "";
+  let whereOrOptionsPart = '';
   if (!_.isEmpty(whereOrOptions)) {
-    whereOrOptionsPart += ".where(function() { this";
-    whereOrOptions.forEach((whereOrOption) => {
+    whereOrOptionsPart += '.where(function() { this';
+    whereOrOptions.forEach(whereOrOption => {
       if (whereOrOption.length === 3) {
         whereOrOptionsPart += `.orWhere('${whereOrOption[0]}', '${whereOrOption[1]}', '${whereOrOption[2]}')`;
       } else if (whereOrOption.length === 2) {
@@ -203,11 +208,11 @@ async function buildWhereConditionFromAppData({
         throw new BizError(errorInfoEnum.resource_sql_where_options_invalid);
       }
     });
-    whereOrOptionsPart += "})";
+    whereOrOptionsPart += '})';
   }
 
   // limit offset
-  let limitAndOffset = "";
+  let limitAndOffset = '';
   if (limit) {
     limitAndOffset += `.limit(${limit})`;
   }
@@ -216,7 +221,7 @@ async function buildWhereConditionFromAppData({
   }
 
   // orderBy：.orderBy([{ column: 'email' }, { column: 'age', order: 'desc' }])
-  let orderByPart = "";
+  let orderByPart = '';
   if (!_.isEmpty(orderBy)) {
     orderByPart = `.orderBy(${JSON.stringify(orderBy)})`;
   }
@@ -258,6 +263,8 @@ async function runKnexFunction(knexFunctionString, args = {}) {
  * - .orderBy([{ column: 'email' }, { column: 'age', order: 'desc' }])
  * fields 要查询的字段，不传表示查询所有字段 (fields 字段暂时只能配在 resource 表中)
  * - ["id", ...]
+ * excludeFields 排除不展示的字段
+ * - ["secret", ...]
  *
  * @param root0
  * @param root0.jianghuKnex
@@ -269,16 +276,21 @@ async function sqlResource({ jianghuKnex, ctx }) {
   const appData = requestBody.appData || {};
   const actionData = appData.actionData || {};
   const { resourceData } = ctx.packageResource;
-  const { table, operation, fields } = resourceData;
+  const { table, operation, excludeFields } = resourceData;
+  let { fields } = resourceData;
   const { limit } = appData;
 
   // 校验并处理数据
   validate(ctx, requestBody);
 
+  if (!fields && excludeFields) {
+    fields = await getFieldsAfterExclude(jianghuKnex, table, excludeFields);
+  }
+
   // 1. where 构建：前后端合并
   const whereCondition = await buildWhereCondition(jianghuKnex, ctx, requestBody);
   if ([ 'delete', 'jhDelete', 'update', 'jhUpdate' ].includes(operation) && !whereCondition) {
-    throw new BizError(errorInfoEnum.resource_sql_exception_of_update_and_delete)
+    throw new BizError(errorInfoEnum.resource_sql_exception_of_update_and_delete);
   }
 
   // 2. 翻页场景需要 count 计算
