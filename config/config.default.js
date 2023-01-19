@@ -35,6 +35,13 @@ module.exports = appInfo => {
       syncSocketStatusRefreshInterval: "60s",
       ignoreListOfResourceRequestLog: ['allPage.getConstantList', 
         'allPage.httpUploadByStream', 'allPage.httpUploadByBase64', 'allPage.httpDownloadByBase64'],
+      // 自动清理旧日志，保留 N 天内的日志
+      autoClearOldLogFile: false,
+      autoClearOldLogBeforeDays: 7,
+      autoClearOldLogFilePrefixList: [
+        'common-error', 'egg-web', 'egg-schedule', 'egg-knex', 'egg-agent', '_resource_request_log',
+        `${appId}.html`, `${appId}.resource`, `${appId}-web`, `${appId}.html`,
+      ],
       // /appId/upload 下的文件在鉴权通过之后，设置 max-age，默认 30 天缓存
       // @see downloadUserInfo 中间件
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
