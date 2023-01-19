@@ -33,9 +33,9 @@ function validate(ctx, body) {
   delete actionData.id;
 }
 
-async function getFieldsAfterExclude(jianghuKnex, table, excludeFields) {
+async function getFieldListAfterExcluded(jianghuKnex, table, excludedFieldList) {
   const fieldDescs = await jianghuKnex.raw(`desc ${table}`);
-  return fieldDescs[0].map(o => o.Field).filter(field => !excludeFields.includes(field));
+  return fieldDescs[0].map(o => o.Field).filter(field => !excludedFieldList.includes(field));
 }
 
 /**
@@ -250,8 +250,8 @@ async function runKnexFunction(knexFunctionString, args = {}) {
  * 执行 sql resource
  *
  * actionData 数据参数
- * where jianghuKnex 查询条件
- * whereLike 模糊查询
+ * where 基础 kv 结构查询条件，相当于 where k=v
+ * whereLike 模糊查询，相当于 where k like v
  * whereOrOptions or查询
  * whereOptions jianghuKnex 原生的 where 三元查询
  * - [['name', '=', 'zhangshan'],['level', '>', 3]]
@@ -261,10 +261,11 @@ async function runKnexFunction(knexFunctionString, args = {}) {
  * - .limit(10).offset(30)
  * orderBy 排序
  * - .orderBy([{ column: 'email' }, { column: 'age', order: 'desc' }])
- * fields 要查询的字段，不传表示查询所有字段 (fields 字段暂时只能配在 resource 表中)
+ * fieldList 要查询的字段，不传表示查询所有字段 (只能配在 resource 表中)
  * - ["id", ...]
- * excludeFields 排除不展示的字段
+ * excludedFieldList 不查询的字段
  * - ["secret", ...]
+ * rawSql 原始查询
  *
  * @param root0
  * @param root0.jianghuKnex
@@ -276,15 +277,20 @@ async function sqlResource({ jianghuKnex, ctx }) {
   const appData = requestBody.appData || {};
   const actionData = appData.actionData || {};
   const { resourceData } = ctx.packageResource;
-  const { table, operation, excludeFields } = resourceData;
-  let { fields } = resourceData;
+  const { table, operation, excludedFieldList, rawSql } = resourceData;
+  let { fieldList } = resourceData;
   const { limit } = appData;
+
+  if (rawSql) {
+    const rows = await jianghuKnex.raw(rawSql);
+    return { rows: rows[0], count: rows[0].length };
+  }
 
   // 校验并处理数据
   validate(ctx, requestBody);
 
-  if (!fields && excludeFields) {
-    fields = await getFieldsAfterExclude(jianghuKnex, table, excludeFields);
+  if (!fieldList && excludedFieldList) {
+    fieldList = await getFieldListAfterExcluded(jianghuKnex, table, excludedFieldList);
   }
 
   // 1. where 构建：前后端合并
@@ -307,11 +313,11 @@ async function sqlResource({ jianghuKnex, ctx }) {
   let rows = null;
   await jianghuKnex.transaction(async trx => {
     let knexArgs = [ 'select', 'delete', 'jhDelete' ].includes(operation) ? '' : 'actionData';
-    if (operation === 'select' && !_.isEmpty(fields)) {
-      knexArgs = 'fields';
+    if (operation === 'select' && !_.isEmpty(fieldList)) {
+      knexArgs = 'fieldList';
     }
     const knexCommandCountString = `return await trx('${table}', ctx)${whereCondition}.${operation}(${knexArgs});`;
-    rows = await runKnexFunction(knexCommandCountString, { trx, actionData, fields, ctx });
+    rows = await runKnexFunction(knexCommandCountString, { trx, actionData, fieldList, ctx });
   });
 
   return { rows, count };
