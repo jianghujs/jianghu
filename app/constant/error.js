@@ -79,6 +79,10 @@ const errorInfoEnum = Object.freeze({
     errorCode: 'resource_sql_where_options_invalid',
     errorReason: '无效的 whereOptions 参数',
   },
+  resource_sql_need_condition: {
+    errorCode: 'resource_sql_need_condition',
+    errorReason: '更新或删除数据需要提供数据条件',
+  },
   resource_sql_unique_check_fail: {
     errorCode: 'resource_sql_unique_check_fail',
     errorReason: '数据已存在! 请勿重复操作。',

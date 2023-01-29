@@ -25,6 +25,20 @@ function validate(ctx, body) {
     throw new BizError(errorInfoEnum.resource_sql_operation_invalid);
   }
 
+  // 如果是更新或删除，需要指定条件
+  if ([ 'update', 'delete', 'jhUpdate', 'jhDelete' ].includes(operation)) {
+    let hasCondition = false;
+    for (const conditionKey of [ 'where', 'whereLike', 'whereOrOption', 'whereOption', 'whereIn', 'whereKnex', 'rawSql' ]) {
+      if (resourceData[conditionKey]) {
+        hasCondition = true;
+        break;
+      }
+    }
+    if (!hasCondition) {
+      throw new BizError(errorInfoEnum.resource_sql_need_condition);
+    }
+  }
+
   if (!_.isEmpty(appDataSchema)) {
     validateUtil.validate(appDataSchema, appData, 'appData');
   }

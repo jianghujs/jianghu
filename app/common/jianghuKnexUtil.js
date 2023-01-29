@@ -192,11 +192,14 @@ function buildJianghuKnexFunc(knex) {
       const idsResult = await target.select('id');
       const ids = idsResult.map(item => item.id);
 
+      // 根据ids查询最新新数据 并 备份最新数据 到 _record_history
+      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation: 'jhUpdate:before' });
+
       // 执行操作
       const result = await knex(table).whereIn('id', ids).update({ ...params, operation, operationByUserId, operationByUser, operationAt });
 
       // 根据ids查询最新新数据 并 备份最新数据 到 _record_history
-      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation });
+      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation: 'jhUpdate:after' });
 
       return result;
     };
