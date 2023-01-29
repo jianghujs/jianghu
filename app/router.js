@@ -14,8 +14,6 @@ module.exports = app => {
   router.get(`/${appId}/page/:pageName`, controller.page.page);
   router.get(`/${appId}/page/:pageName/*`, controller.page.page);
   router.get(`/${appId}/pageDoc`, controller.pageDoc.index);
-  router.get(`/${appId}/pageDoc/_sidebar.md`, controller.pageDoc.sidebar);
-  router.get(`/${appId}/pageDoc/:pageDocFileName`, controller.pageDoc.page);
   router.post(`/${appId}/resource`, controller.resource.httpRequest);
 };
 

@@ -6,7 +6,7 @@ module.exports.middleware = [
   // /page/*
   'pagePackage', 'pageUserInfo', 'pageAuthorization', 'pageHook',
   // /pageDoc/*
-  'pageDocPackage', 'pageDocUserInfo', 'pageDocAuthorization',
+  'pageDocUserInfo',
   // /resource/*
   'httpPackage', 'httpUserInfo', 'httpAuthorization', 'httpResourceHook' ];
 
@@ -39,25 +39,11 @@ module.exports.middlewareMatch = {
         && ctx.request.path.startsWith(`/${ctx.app.config.appId}/page/`);
     },
   },
-  pageDocPackage: {
-    match(ctx) {
-      // url 格式符合 /appId/page/pageId 或 /appId/pageDoc/pageId.md
-      return (ctx.request.method === 'GET' || ctx.request.method === 'HEAD')
-        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/pageDoc/`);
-    },
-  },
   pageDocUserInfo: {
     match(ctx) {
       // url 格式符合 /appId/page/pageId 或 /appId/pageDoc/pageId.md
       return (ctx.request.method === 'GET' || ctx.request.method === 'HEAD')
-        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/pageDoc/`);
-    },
-  },
-  pageDocAuthorization: {
-    match(ctx) {
-      // url 格式符合 /appId/page/pageId 或 /appId/pageDoc/pageId.md
-      return (ctx.request.method === 'GET' || ctx.request.method === 'HEAD')
-        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/pageDoc/`);
+        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/pageDoc`);
     },
   },
   downloadUserInfo: {

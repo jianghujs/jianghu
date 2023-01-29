@@ -2,43 +2,226 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css" />
+  <link rel="stylesheet" href="/<$ ctx.app.config.appId $>/public/css/docsify/vue.min.css" />
+  <link href="/<$ ctx.app.config.appId $>/public/plugins/docsify/vue.min.css" rel="stylesheet">
+
+  <style>
+    .content {
+      padding-top: 0
+    }
+
+    /* doc */
+    .markdown-section {
+      max-width: 90%;
+      padding: 0 0 40px;
+    }
+
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .markdown-section h5,
+    .markdown-section h6 {
+      position: relative;
+      font-weight: 600;
+      line-height: 1.5;
+      outline: none;
+    }
+
+    .markdown-section h1 {
+      margin: 0 0 3rem;
+      font-size: 25px;
+      line-height: 1.4;
+      letter-spacing: -.02em;
+    }
+
+    .markdown-section h2 {
+      margin: 0.5rem 0 0.5rem;
+      padding-top: 1.8rem;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+
+    .markdown-section h3 {
+      font-size: 16px;
+      letter-spacing: -.01em;
+      margin: 3rem 0 1.25rem;
+    }
+
+    .markdown-section p,
+    .markdown-section ul,
+    .markdown-section ol,
+    .markdown-section summary,
+    .markdown-section table {
+      margin-bottom: 1.2em;
+      color: #5E6278;
+    }
+
+    .markdown-section ul {
+      padding-left: 1.25rem;
+    }
+
+    .markdown-section li {
+      position: relative;
+      margin: 1px 0;
+    }
+
+    .markdown-section a {
+      font-weight: 500;
+      color: #42b883;
+      transition: color .25s;
+      text-decoration-style: dotted;
+    }
+
+    .markdown-section>blockquote {
+      margin: 28px 0;
+      padding: 20px 24px 12px 42px;
+      border-radius: 8px;
+      overflow-x: auto;
+      transition: color .5s, background-color .5s;
+      position: relative;
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 500;
+      color: #0000008c;
+      background-color: #f9f9f9;
+    }
+
+    .markdown-section>blockquote[class="default"] {
+      border: 1px solid #42b883;
+    }
+
+    .markdown-section>blockquote p {
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #213547;
+      transition: color .5s;
+    }
+
+    .markdown-section>blockquote[class="default"]:before {
+      color: #42b883;
+    }
+
+    .markdown-section>blockquote:before {
+      content: "\24d8";
+      position: absolute;
+      font-weight: 600;
+      font-size: 15px;
+      top: 20px;
+      left: 17px;
+    }
+
+    .markdown-section pre {
+      border-radius: 6px;
+    }
+
+    .markdown-section .anchor:hover {
+      text-decoration: none;
+    }
+
+    .markdown-section blockquote {
+      border-left: none;
+    }
+
+    /* table */
+    .markdown-section td,
+    .markdown-section th {
+      border: 1px solid rgba(0, 0, 0, .06);
+      padding: 3px 8px;
+    }
+
+    /* copy */
+    .docsify-copy-code-button {
+      font-size: 12px !important;
+      border-radius: 4px !important;
+      background-color: #999 !important;
+      top: 8px !important;
+      right: 8px !important;
+    }
+
+    /* 翻页 */
+    .pagination-item-title {
+      font-size: 1.1em !important;
+    }
+
+    .docsify-pagination-container {
+      border-top: 1px solid rgba(0, 0, 0, .06) !important;
+    }
+
+    /* 侧边栏 */
+    .sidebar {
+      border-right: 1px solid rgba(0, 0, 0, .06);
+    }
+
+    /* 搜索 */
+    .search {
+      border-bottom: 1px solid rgba(0, 0, 0, .06) !important;
+      padding: 6px 10px !important;
+    }
+
+    .search input:focus {
+      box-shadow: none !important;
+      border-radius: 6px;
+    }
+
+    .search input::placeholder {
+      font-size: 13px;
+    }
+
+    /* 文章列表 */
+    .sidebar ul {
+      margin: 0 0 0 20px;
+    }
+
+    .sidebar li {
+      margin: 0;
+    }
+
+    .sidebar-nav>ul>li>a {
+      font-weight: 500 !important;
+    }
+
+    .sidebar ul li a:hover {
+      text-decoration: none;
+    }
+
+    .sidebar ul li.active>a {
+      font-weight: normal;
+    }
+  </style>
 </head>
+
 <body>
-<div id="app"></div>
-<script>
-  window.$docsify = {
-    // 读取相对路径
-    relativePath: true,
-    // 加载 _sidebar.md 作为目录
-    loadSidebar: true,
-    // 左栏目录只展示一层
-    subMaxLevel: 1,
-    // 首页读取 manual.md 文件
-    homepage: 'manual.md',
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      // 读取相对路径
+      relativePath: true,
+      // 加载 _sidebar.md 作为目录
+      loadSidebar: true,
+      // 左栏目录只展示一层
+      subMaxLevel: 3,
+      // 首页读取 manual.md 文件
+      homepage: '/',
 
-    // 搜索功能
-    search: {
-      maxAge: 3600,
-      depth: 4,
-    },
-
-    // 生成目录
-    toc: {
-      tocMaxLevel: 3,
-      target: 'h2, h3, h4, h5, h6'
-    },
-  }
-</script>
-<script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-<script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/docsify-plugin-toc/dist/docsify-plugin-toc.min.js"></script>
+      // 搜索功能
+      search: {
+        maxAge: 3600,
+        depth: 4,
+      },
+    }
+  </script>
+  <script src="/<$ ctx.app.config.appId $>/public/plugins/docsify/docsify.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/plugins/docsify/search.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/plugins/docsify/emoji.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/plugins/docsify/docsify-copy-code.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/plugins/docsify/docsify-pagination.min.js"></script>
 </body>
+
 </html>
