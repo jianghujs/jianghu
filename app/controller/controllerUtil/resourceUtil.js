@@ -29,7 +29,7 @@ function validate(ctx, body) {
   if ([ 'update', 'delete', 'jhUpdate', 'jhDelete' ].includes(operation)) {
     let hasCondition = false;
     for (const conditionKey of [ 'where', 'whereLike', 'whereOrOption', 'whereOption', 'whereIn', 'whereKnex', 'rawSql' ]) {
-      if (resourceData[conditionKey]) {
+      if (resourceData[conditionKey] || appData[conditionKey]) {
         hasCondition = true;
         break;
       }
@@ -88,8 +88,11 @@ async function buildWhereCondition(jianghuKnex, ctx, requestBody) {
     userInfo
   );
 
-  // 前端部分，来自前端传过来的 actionData，不支持 whereKnex
+  // 前端部分，来自前端传过来的 actionData，不支持部分参数
   delete appData.whereKnex;
+  delete appData.fieldList;
+  delete appData.excludedFieldList;
+  delete appData.rawSql;
   const frontendWhere = await buildWhereConditionFromAppData(appData);
 
   return backendWhere + frontendWhere;
@@ -135,8 +138,8 @@ async function buildWhereConditionFromResourceData(
     }
     const valueObject = [];
     _.forEach(expressionObject, (value, key) => {
-      // eslint-disable-next-line no-eval
       const evalString = value[value.length - 1];
+      // eslint-disable-next-line no-eval
       value[value.length - 1] = commonUtil.eval({ evalString, ctx, userInfo });
       valueObject.push(value);
     });

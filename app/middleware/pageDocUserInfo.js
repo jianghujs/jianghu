@@ -9,7 +9,7 @@ module.exports = options => {
   return async (ctx, next) => {
 
     const { jianghuKnex, logger, db, config } = ctx.app;
-    const { appId, appType } = config;
+    const { appId, appType, appTitle } = config;
 
     // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
     const mockBody = {
@@ -27,6 +27,10 @@ module.exports = options => {
     if (ctx.userInfo && ctx.userInfo.user && Object.keys(ctx.userInfo.user).length) {
       // md 文件中，对资源链接做特殊处理，将 ![](./xxx) 转成 ![]()
       if (ctx.path.endsWith('.md') && !ctx.path.endsWith('_sidebar.md')) {
+        if (ctx.path.endsWith('/README.md') && !fs.existsSync(config.baseDir + '/app/view/pageDoc/README.md')) {
+          // README.md 如果没有配置，则展示默认的内容
+          ctx.body = '# ' + appTitle;
+        }
         const filePath = ctx.path.replace(`/${config.appId}/pageDoc/`, '');
         const content = fs.readFileSync(config.baseDir + '/app/view/pageDoc/' + filePath);
         ctx.body = content.toString().replace(/]\(\.\/([^)]+?)(?<!\.md)\)/g, `](${ctx.request.origin}/${config.appId}/pageDoc/$1)`);
@@ -34,7 +38,7 @@ module.exports = options => {
       }
 
       // 兼容 /upload 开头的配置
-      if (ctx.path.startsWith(`/${config.appId}/pageDoc/`)) {
+      if (ctx.path.startsWith(`/${config.appId}/pageDoc/`) && ctx.path !== `/${config.appId}/pageDoc/`) {
         await send(ctx, decodeURI(ctx.path.replace(`/${config.appId}/pageDoc/`, '')), {
           root: config.baseDir + '/app/view/pageDoc',
         });
