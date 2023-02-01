@@ -1,0 +1,273 @@
+<!--jhMenu.html >>>>>>>>>>>>> -->
+<script type="text/html" id="jhMenu">
+<div>
+<!-- 手机端左边抽屉菜单 >>>>>>>>>>>>> -->
+<v-navigation-drawer
+    v-model="mobileMenuDrawer"
+    app
+    clipped
+    v-if="isMobile"
+    style="z-index: 99999"
+    class="pageNavBar"
+>
+  <v-btn fab color="success" class="elevation-0" x-small dark style="position: absolute; right: 15px; top: 15px; z-index: 10" @click="mobileMenuDrawer = !mobileMenuDrawer">
+    <v-icon>mdi-arrow-left</v-icon>
+  </v-btn>
+  <v-list>
+    <v-list-item-group
+        v-model="selectedItem"
+        color="success"
+    >
+      <v-list-item
+          disabled
+          class="pa-2"
+          style="color: #333333"
+      >
+        <v-list-item-content>
+          <v-list-item-title style="font-size: 18px!important; font-weight: bold">
+            {{ appTitle }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
+          v-for="item in inMenuList"
+          class="pa-2"
+          :key="item.path"
+          @click="openUrl(item.path, item.query)"
+      >
+        <v-list-item-content>
+          <v-list-item-title style="font-size: 14px;">
+            {{ item.title }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list-item-group>
+  </v-list>
+</v-navigation-drawer>
+<!-- <<<<<<<<<<<<< 手机端左边抽屉菜单 -->
+<!-- 页面头部 >>>>>>>>>>>>> -->
+<v-app-bar
+    app
+    clipped-left
+    height="60"
+    class="pageHeader px-8"
+    style="z-index: 50;"
+    flat
+>
+  <!--手机端左侧菜单开启按钮-->
+  <v-app-bar-nav-icon color="success" @click.stop="mobileMenuDrawer = !mobileMenuDrawer" v-if="isMobile"></v-app-bar-nav-icon>
+  <!--页面标题-->
+  <v-toolbar-title ref="toolbarTitle" class="mr-8 pa-0 align-center" style="font-size: 14px; flex: none">
+    <span class="title" style="font-size: 18px!important; font-weight: 700">{{ appTitle }}</span>
+  </v-toolbar-title>
+  <!--pc端菜单 >>>>>>>>>>>>>-->
+  <v-tabs
+      v-model="selectedItem"
+      v-if="!isMobile"
+      show-arrows
+      slider-size="0"
+      color="success"
+      :style="{maxWidth: tabsMaxWidth}"
+  >
+    <template v-for="item in inMenuList">
+      <v-tab
+          class="px-5 headerTab"
+          active-class="headerTabActive"
+          :key="item.path"
+          @click="openUrl(item.path, item.query)"
+      >
+        {{ item.title }}
+      </v-tab>
+      <v-divider
+          style="max-height: 35px;min-height: 35px;align-self: center;"
+          v-if="item.path.includes('operationManual')"
+          vertical
+      ></v-divider>
+    </template>
+  </v-tabs>
+  <!--<<<<<<<<<<<<<pc端菜单-->
+  <div style="white-space: nowrap">
+    <v-menu offset-y>
+      <template v-slot:activator="{ on }">
+        <template v-if="!isMobile">
+          <v-btn disabled text class="ml-1 mr-0 pr-0 text-none" v-on="on">
+                      <span style="font-size: 13px;
+                      font-weight: 400;
+                      color: #1F272E;">{{ userInfo.user.username }}</span>
+          </v-btn>
+        </template>
+        <v-btn icon small class="ml-1" color="#1F272E" v-on="on">
+          <v-icon>mdi-account-circle</v-icon>
+        </v-btn>
+      </template>
+
+      <v-list nav dense>
+        <v-list-item class="mt-2">
+          <v-list-item-icon class="mr-1 mt-1">
+            <v-icon color="#1F272E" style="font-size: 18px;">mdi-account-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title style="font-size: 13px; color: #1F272E;font-weight: 400;">{{ userInfo.user.userId }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!--右上角下拉菜单-->
+        <v-list-item v-for="avatarMenu of inAvatarMenuList" :key="avatarMenu.path" :href="avatarMenu.path">
+          <v-list-item-icon class="mr-1 mt-1">
+            <v-icon color="#1F272E" style="font-size: 18px;">mdi-account-cog-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title style="font-size: 13px; color: #1F272E;font-weight: 400;">{{ avatarMenu.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item @click="logout">
+          <v-list-item-icon class="mr-1 mt-1">
+            <v-icon color="#1F272E" style="font-size: 18px;">mdi-logout</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title style="font-size: 13px; color: #1F272E;font-weight: 400;">登出</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+  </div>
+</v-app-bar>
+</div>
+</script>
+
+<script>
+Vue.component('jhMenu', {
+  template: "#jhMenu",
+  vueComponent: 'jhMenu',
+  vuetify: new Vuetify(),
+  data() {
+    return {
+      isMobile: window.innerWidth < 600,
+      mobileMenuDrawer: false,
+      selectedItem: -1,
+      selectItemTitle: '',
+      userInfo: window.userInfo,
+      // 用户菜单
+      inMenuList: [],
+      inAvatarMenuList: [],
+      tabsMaxWidth: 'calc(100vw - 353px)',
+      appDirectoryLink: '<$ ctx.app.config.appDirectoryLink $>',
+      appType: '<$ ctx.app.config.appType $>',
+      appTitle: '<$ ctx.app.config.appTitle $>',
+    };
+  },
+  created() {
+    this.computedMenuList();
+    this.computedAvatarMenuList();
+    this.setCurrentMenuItem();
+    this.getTabsMaxWidth();
+  },
+  methods: {
+    // 动态计算菜单栏目的最大宽度，按照实际的标题宽度计算
+    getTabsMaxWidth() {
+      this.$nextTick(() => {
+        if (this.$refs.toolbarTitle) {
+          this.tabsMaxWidth = 'calc(100vw - ' + (this.$refs.toolbarTitle.offsetWidth + 215) + 'px)';
+        }
+      })
+    },
+    // 跳转链接
+    openUrl(url, queryParams) {
+      if (queryParams) {
+        const queryStrings = Object.keys(queryParams)
+            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(queryParams[k]))
+            .join('&');
+        window.location.href = url + '?' + queryStrings;
+      } else {
+        window.location.href = url;
+      }
+    },
+    // 定位当前页面在属于哪个菜单
+    setCurrentMenuItem() {
+      // 遍历菜单 path 进行匹配
+      const index = _.findIndex(this.inMenuList, {path: location.pathname});
+      if (index > -1) {
+        // 设置标题、菜单选中
+        this.selectedItem = index + (this.isMobile ? 1 : 0);
+        this.selectItemTitle = this.inMenuList[index].title;
+        document.title = this.appTitle + (this.selectItemTitle ? " - " + this.selectItemTitle : "")
+      }
+    },
+    // 组装菜单
+    computedMenuList() {
+      const urlPathList = window.location.pathname.split('/');
+      const currentPageId = urlPathList && urlPathList[urlPathList.length - 1];
+      const appType = '<$ ctx.app.config.appType $>';
+      const urlParams = new URLSearchParams(location.search);
+      let title = urlParams.get('title');
+
+      // 处理过长的 title
+      if (title && title.length > 10) {
+        title = `${title.slice(0, 5)}...${title.slice(title.length - 4, title.length)}`
+      }
+      this.inMenuList = _
+          .chain(this.userInfo.allowPageList)
+          .filter(page => page.pageType === 'showInMenu' || page.pageType === 'link' || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && currentPageId === page.pageId))
+          .map((page) => {
+            return {
+              path: page.pageType === 'link' ? page.pageFile : `/${window.appInfo.appId}/page/${page.pageId}`,
+              pageId: page.pageId,
+              title: page.pageName.split('-')[0],
+              sort: parseInt(page.sort)
+            };
+          })
+          .orderBy(['sort'], ['asc'])
+          .value();
+
+      if (appType === 'multiApp' && this.appDirectoryLink) {
+        console.log(this.appDirectoryLink)
+        this.inMenuList.unshift({path: this.appDirectoryLink, title: '回到目录'});
+      }
+    },
+    // 组装右上角下拉菜单
+    computedAvatarMenuList() {
+      this.inAvatarMenuList = _
+          .chain(this.userInfo.allowPageList)
+          .filter(['pageType', 'showInAvatarMenu'])
+          .map((page) => {
+            return {
+              path: `/${window.appInfo.appId}/page/${page.pageId}`,
+              title: page.pageName,
+              sort: parseInt(page.sort)
+            };
+          })
+          .orderBy(['sort'], ['asc'])
+          .value();
+    },
+    // 登出
+    async logout() {
+      try {
+        await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'allPage',
+              actionId: 'logout'
+            }
+          }
+        })
+        vtoast.success('注销成功');
+        localStorage.removeItem(`${window.appInfo.appId}_authToken`);
+        setTimeout(() => {
+          location.href = `/${window.appInfo.appId}/page/login`;
+        }, 700);
+      } catch (error) {
+        vtoast.fail(error.errorReason);
+        localStorage.removeItem(`${window.appInfo.appId}_authToken`);
+        setTimeout(() => {
+          location.href = `/${window.appInfo.appId}/page/login`;
+        }, 700);
+      }
+    }
+  },
+});
+
+</script>
+<style>
+</style>
+<!-- <<<<<<<<<<<<< jhMenu.html -->

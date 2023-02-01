@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>江湖演示-初级</title>
+  <meta charset="utf-8" name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+  <link href="/<$ ctx.app.config.appId $>/public/lib/vuetify/materialdesignicons.min.css" rel="stylesheet">
+  <link href="/<$ ctx.app.config.appId $>/public/lib/vuetify/vuetify.min.css" rel="stylesheet">
+  <script src="/<$ ctx.app.config.appId $>/public/lib/axios/axios.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/vue/vue.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/vuetify/vuetify.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/lodash/lodash.min.js"></script>
+  {% include 'common/globalCSSFontV4.html' %}
+  {% include 'common/globalCSSVuetifyV4.html' %}
+  {% include 'common/globalCSSEditorV4.html' %}
+  {% include 'common/fixedTableHeightV4.html' %}
+</head>
+
+<body>
+<div id="app">
+  <v-app>
+    <!-- 菜单栏 -->
+    <v-app-bar
+        app
+        clipped-left
+        height="60"
+        class="pageHeader px-8"
+        style="z-index: 50;"
+        flat
+    >
+      <v-toolbar-title ref="toolbarTitle" class="mr-8 pa-0 align-center" style="font-size: 14px; flex: none">
+        <span class="title" style="font-size: 18px!important; font-weight: 700">江湖演示-初级</span>
+      </v-toolbar-title>
+      <v-tabs
+          v-model="menuSelectedIndex"
+          show-arrows
+          slider-size="0"
+          color="success"
+          style="max-width: calc(100vw - 280px)"
+      >
+        <template v-for="item in inMenuList">
+          <v-tab
+              class="px-5 headerTab"
+              active-class="headerTabActive"
+              :key="item.path"
+              @click="jump({ path: item.path })"
+          >
+            {{ item.title }}
+          </v-tab>
+        </template>
+      </v-tabs>
+      <v-spacer/>
+
+    </v-app-bar>
+
+    <v-main class="d-flex flex-column">
+      <div class="pageSecondBar d-flex px-8"><div>
+        <div class="appTitle pt-3" style="font-size: 18px; font-weight: 700">{{ breadcrumbs[1].fullText }}
+          <!-- 帮助页按钮 -->
+          <v-icon small>mdi-help-circle-outline</v-icon>
+        </div>
+        <v-breadcrumbs class="pb-3 pt-0 pl-0" :items="breadcrumbs" divider="-"></v-breadcrumbs>
+      </div>
+      </div>
+      <div class="pageBodyContainer px-8" style="flex: 1;">
+
+      <!-- 页面主要内容 -->
+        <v-container class="fullScreen d-flex flex-column pa-0">
+          <v-card class="rounded-lg">
+          <v-row class="ma-0 align-center flex-none pt-0 pa-4 pb-0">
+            <!--新增按钮-->
+            <v-col cols="12" xs="12" sm="4" md="4" xl="4" class="pl-0">
+              <v-btn color="success" dark small class="elevation-0 mr-2" @click="openEditDialog({ item: {} })">新增</v-btn>
+            </v-col>
+            <v-spacer></v-spacer>
+            <!--表格过滤-->
+            <v-col cols="12" xs="6" sm="4" md="3" xl="2" class="px-0 py-xs-0">
+              <v-text-field v-model="searchInput" color="success" prefix="表格过滤：" class="cus-v-input" dense filled single-line></v-text-field>
+            </v-col>
+          </v-row>
+
+          <v-data-table
+              :headers="headers"
+              :items="tableData"
+              :search="searchInput"
+              :footer-props="{ itemsPerPageOptions: [20, 40, 60, 100, -1], itemsPerPageText: '每页行数', itemsPerPageAllText: '所有'}"
+              :items-per-page="20"
+              mobile-breakpoint="0"
+              :loading="isTableLoading"
+              :class="{'zebraLine': showTableZebraLine }"
+              checkbox-color="success"
+              fixed-header
+              class="fixed-table-height elevation-0 mt-0 mb-xs-4 flex-fill d-flex flex-column">
+            <!--表格行操作按钮-->
+            <template v-slot:item.action="{ item }">
+                  <span role="button" class="success--text mr-2 font-weight-medium font-size-3" @click="openEditDialog({ item })">
+                    <v-icon size="14" class="success--text">mdi-note-edit-outline</v-icon>修改
+                  </span>
+              <span role="button" class="success--text mr-2 font-weight-medium font-size-3" @click="deleteStudent({ item })">
+                    <v-icon size="14" class="success--text">mdi-trash-can-outline</v-icon>删除
+                  </span>
+            </template>
+            <!--表格底部右侧功能按钮-->
+            <template v-slot:footer.prepend>
+              <span class="ml-2 table-search-hint-text">共{{ tableDataFromBackend.length }}条记录</span>
+              <v-menu top offset-y :close-on-content-click="false">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn v-bind="attrs" v-on="on" icon>
+                    <v-icon>mdi-menu</v-icon>
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item>
+                    <v-switch v-model="showTableZebraLine" label="显示斑马纹" dense flat></v-switch>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
+            <!--表格底部右侧分页-->
+            <template v-slot:footer.page-text="pagination">
+              <span>{{pagination.pageStart}}-{{pagination.pageStop}}</span>
+              <span class="ml-1">共{{pagination.itemsLength}}条</span>
+            </template>
+          </v-data-table>
+        </v-card>
+      </v-container>
+
+      <v-overlay app :value="isEditDrawerShow"></v-overlay>
+      <!-- 编辑抽屉 -->
+      <v-navigation-drawer v-model="isEditDrawerShow" fixed temporary right width="80%" hide-overlay
+        class="elevation-24">
+        <v-form v-model="isFormValid" v-if="isEditDrawerShow" ref="form" lazy-validation>
+          <v-row>
+            <span class="title pa-6 pl-8">{{ editItem.id ? '修改' : '新增' }}信息</span>
+          </v-row>
+          <v-row class="mt-0 px-6">
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">学生ID</span>
+              <v-text-field class="cus-v-input" dense single-line filled label="学生ID" v-model="editItem.studentId"
+                            :rules="requireRules"></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">班级ID</span>
+              <v-select class="cus-v-input" color="success" item-color="success" dense single-line filled clearable label="班级ID" v-model="editItem.classId"
+                        :items="constantCollection.classId"></v-select>
+            </v-col>
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">学生名字</span>
+              <v-text-field class="cus-v-input" dense single-line filled label="学生名字"
+                            v-model="editItem.name"></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">年级</span>
+              <v-select class="cus-v-input" color="success" item-color="success" dense single-line filled clearable label="年级" v-model="editItem.level"
+                        :items="constantCollection.level"></v-select>
+            </v-col>
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">性别</span>
+              <v-select class="cus-v-input" color="success" item-color="success" dense single-line filled clearable label="性别" v-model="editItem.gender"
+                        :items="constantCollection.gender"></v-select>
+            </v-col>
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">出生日期</span>
+              <v-menu class="cus-v-input" offset-y max-width="290">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field class="cus-v-input" dense single-line filled v-on="on" label="出生日期"
+                                v-model="editItem.dateOfBirth"></v-text-field>
+                </template>
+                <v-date-picker color="success" elevation="20" v-model="editItem.dateOfBirth"></v-date-picker>
+              </v-menu>
+            </v-col>
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">身高</span>
+              <v-text-field class="cus-v-input" dense single-line filled label="身高"
+                            v-model="editItem.bodyHeight"></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="12" md="4">
+              <span class="inputLabel">学生状态</span>
+              <v-select class="cus-v-input" color="success" item-color="success" dense single-line filled clearable label="学生状态"
+                        v-model="editItem.studentStatus"
+                        :items="constantCollection.studentStatus"></v-select>
+            </v-col>
+            <v-col cols="12" sm="12" md="12">
+              <span class="inputLabel">备注</span>
+              <v-textarea class="cus-v-input" no-resize dense single-line filled label="备注"
+                          v-model="editItem.remarks"></v-textarea>
+            </v-col>
+          </v-row>
+
+          <v-row class="justify-end mx-0 mt-8 px-6">
+            <v-btn v-if="editItem.id" color="success" small @click="updateStudent">修改</v-btn>
+            <v-btn v-if="!editItem.id" color="success" small @click="insertStudent">创建</v-btn>
+            <v-btn class="elevation-0 ml-2" small
+                   @click="isEditDrawerShow = false">取消
+            </v-btn>
+          </v-row>
+          <!--抽屉关闭按钮-->
+          <v-btn elevation="0" color="success" fab absolute top left small tile class="drawer-close-float-btn" @click="isEditDrawerShow = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-form>
+      </v-navigation-drawer>
+      </div>
+    </v-main>
+  </v-app>
+</div>
+
+<script>
+  new Vue({
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+      // 菜单相关数据
+      menuSelectedIndex: 1,
+      inMenuList: [
+        {
+          "path": `/<$ ctx.app.config.appId $>/page/manual`,
+          "title": "操作手册",
+        },
+        {
+          "path": `/<$ ctx.app.config.appId $>/page/frontendDemo01`,
+          "title": "前端对接-学习",
+        }
+      ],
+
+      // 表格相关数据
+      isFormValid: true,
+      showTableZebraLine: true,
+      requireRules: [
+        v => !!v || 'This is required',
+      ],
+      constantCollection: {
+        gender: [{"value": "male", "text": "男"}, {"value": "female", "text": "女"}],
+        classId: [
+          {"value": "2021-01级-01班", "text": "2021-01级-01班"}, {"value": "2021-01级-02班", "text": "2021-01级-02班"},
+          {"value": "2021-02级-01班", "text": "2021-02级-01班"}, {"value": "2021-02级-02班", "text": "2021-02级-02班"},
+          {"value": "2021-03级-01班", "text": "2021-03级-01班"}, {"value": "2021-03级-02班", "text": "2021-03级-02班"}
+        ],
+        level: [{"value": "01", "text": "一年级"}, {"value": "02", "text": "二年级"}, {"value": "03", "text": "三年级"}],
+        icType: [{"value": "身份证", "text": "身份证"}, {"value": "护照", "text": "护照"}],
+        enrollmentType: [{"value": "正常升学", "text": "正常升学"}, {"value": "借读", "text": "借读"}],
+        studentStatus: [{"value": "正常", "text": "正常"}, {"value": "退学", "text": "退学"}]
+      },
+      currentTableGenderType: 'all',
+      isEditDrawerShow: false,
+      searchInput: null,
+      isTableLoading: true,
+      tableDataFromBackend: [],
+      breadcrumbs: [
+        {
+          text: '首页',
+          fullText: '首页',
+          disabled: true,
+        },
+        {
+          text: '前端对接-学习',
+          fullText: '前端对接-学习',
+          disabled: true,
+          href: ''
+        },
+      ],
+      headers: [
+        {text: '操作', value: 'action', align: 'center', sortable: false, width: 150, class: 'fixed', cellClass: 'fixed'},
+        {text: "学生ID", value: "studentId", width: 120},
+        {text: "班级ID", value: "classId", width: 140},
+        {text: "学生名字", value: "name", width: 120},
+        {text: "年级", value: "level", width: 120},
+        {text: "性别", value: "gender", width: 120},
+        {text: "出生日期", value: "dateOfBirth", width: 120},
+        {text: "身高", value: "bodyHeight", width: 120},
+        {text: "学生状态", value: "studentStatus", width: 120},
+        {text: "备注", value: "remarks", width: 120},
+        {text: "操作者", value: "operationByUser", width: 120},
+        {text: "操作时间", value: "operationAt", width: 250},
+      ],
+
+      currentClickButton: {title: '新增', action: 'add'},
+      editItem: {},
+      tableButtonList: [
+        {text: '修改', buttonType: 'edit', color: 'success',},
+        {text: '删除', buttonType: 'delete', color: 'error',},
+      ],
+    },
+    computed: {
+      tableData() {
+        if (!this.currentTableGenderType || this.currentTableGenderType === 'all') {
+          return this.tableDataFromBackend;
+        }
+        return this.tableDataFromBackend.filter(({gender}) => gender === this.currentTableGenderType);
+      },
+    },
+    watch: {},
+    async created() {
+      await this.getTableData();
+    },
+    mounted() {
+    },
+    methods: {
+      /**
+       * 获取表格数据
+       */
+      async getTableData() {
+        this.isTableLoading = true;
+        const result = await axios({
+          method: 'post',
+          url: `/<$ ctx.app.config.appId $>/resource`,
+          data: {
+            packageId: '123456',
+            packageType: 'httpRequest',
+            appData: {
+              appId: '<$ ctx.app.config.appId $>',
+              pageId: 'frontendDemo01',
+              actionId: 'selectItemList',
+              userAgent: 'demo_userAgent',
+              authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+              actionData: {},
+              where: {},
+              orderBy: [{column: 'operationAt', order: 'desc'}]
+            }
+          }
+        });
+
+        this.tableDataFromBackend = result.data.appData.resultData.rows;
+        this.isTableLoading = false;
+      },
+      openEditDialog({ item }) {
+        this.editItem = item;
+        this.isEditDrawerShow = true;
+      },
+      /**
+       * 删除学生
+       */
+      async deleteStudent({ item }) {
+        const { id } = item;
+        await axios({
+          method: 'post',
+          url: `/<$ ctx.app.config.appId $>/resource`,
+          data: {
+            packageId: '123456',
+            packageType: 'httpRequest',
+            appData: {
+              appId: '<$ ctx.app.config.appId $>',
+              pageId: 'frontendDemo01',
+              actionId: 'deleteItem',
+              userAgent: 'demo_userAgent',
+              authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+              actionData: {},
+              where: { id: id }
+            }
+          }
+        });
+        await this.getTableData();
+      },
+      /**
+       * 新增学生
+       */
+      async insertStudent() {
+        if (!this.$refs.form.validate()) return false;
+        const { id, ...actionData } = this.editItem;
+        await axios({
+          method: 'post',
+          url: `/<$ ctx.app.config.appId $>/resource`,
+          data: {
+            packageId: '123456',
+            packageType: 'httpRequest',
+            appData: {
+              appId: '<$ ctx.app.config.appId $>',
+              pageId: 'frontendDemo01',
+              actionId: 'insertItem',
+              userAgent: 'demo_userAgent',
+              authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+              actionData: actionData
+            }
+          }
+        })
+        this.isEditDrawerShow = false;
+        await this.getTableData();
+      },
+      /**
+       * 保存学生
+       */
+      async updateStudent() {
+        if (!this.$refs.form.validate()) return false;
+        const { id, ...actionData } = this.editItem;
+        await axios({
+          method: 'post',
+          url: `/<$ ctx.app.config.appId $>/resource`,
+          data: {
+            packageId: '123456',
+            packageType: 'httpRequest',
+            appData: {
+              appId: '<$ ctx.app.config.appId $>',
+              pageId: 'frontendDemo01',
+              actionId: 'updateItem',
+              userAgent: 'demo_userAgent',
+              authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+              actionData: actionData,
+              where: {id}
+            }
+          }
+        })
+        this.isEditDrawerShow = false;
+        await this.getTableData();
+      },
+      jump({ path }) {
+        window.location.href = path;
+      }
+    }
+  })
+</script>
+</body>

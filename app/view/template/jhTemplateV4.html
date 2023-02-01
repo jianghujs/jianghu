@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- 设置页面默认参数 >>>>>>>>>>>>> -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title><$ ctx.app.config.appTitle $></title>
+  <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+  <!-- <<<<<<<<<<<<< 设置页面默认参数 -->
+
+  <!-- 加载第三方库样式 >>>>>>>>>>>>> -->
+  <link href="/<$ ctx.app.config.appId $>/public/lib/vuetify/materialdesignicons.min.css" rel="stylesheet">
+  <link href="/<$ ctx.app.config.appId $>/public/lib/vuetify/vuetify.min.css" rel="stylesheet">
+  <!-- <<<<<<<<<<<<< 加载第三方库样式 -->
+
+  <!-- 加载第三方库脚本 >>>>>>>>>>>>> -->
+  <script src="/<$ ctx.app.config.appId $>/public/lib/lodash/lodash.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/dayjs/dayjs.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/axios/axios.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/vue/vue.min.js"></script>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/vuetify/vuetify.min.js"></script>
+  <!-- <<<<<<<<<<<<< 加载第三方库脚本 -->
+
+  {% include 'common/globalCSSFontV4.html' %}
+  {% include 'common/globalCSSVuetifyV4.html' %}
+  {% include 'common/globalCSSEditorV4.html' %}
+
+  {% block htmlHead %}
+  {% endblock %}
+
+</head>
+
+<body>
+
+  {% block vueTemplate %}
+  {% endblock %}
+
+  <!-- 加载工具脚本 >>>>>>>>>>>>> -->
+  {% include 'utility/prepareAppInfoV4.html' %}
+  {% include 'utility/prepareUserInfoV4.html' %}
+  {% include 'utility/prepareBreadcrumbsV4.html' %}
+  {% include 'utility/jianghuAxiosV4.html' %}
+  {% include 'utility/htmlErrorCollectionV4.html' %}
+  {% include 'utility/uiActionV4.html' %}
+  <!-- <<<<<<<<<<<<< 加载工具脚本 -->
+
+  <!-- 加载全局组件 >>>>>>>>>>>>> -->
+  {% include 'component/jhToastV4.html' %}
+  {% include 'component/jhMaskV4.html' %}
+  {% include 'component/jhMenuV4.html' %}
+  {% include 'component/jhConfirmDialogV4.html' %}
+  <!-- <<<<<<<<<<<<< 加载全局组件 -->
+
+  {% block vueScript %}
+  {% endblock %}
+</body>

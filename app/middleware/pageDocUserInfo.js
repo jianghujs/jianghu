@@ -30,6 +30,7 @@ module.exports = options => {
         if (ctx.path.endsWith('/README.md') && !fs.existsSync(config.baseDir + '/app/view/pageDoc/README.md')) {
           // README.md 如果没有配置，则展示默认的内容
           ctx.body = '# ' + appTitle;
+          return;
         }
         const filePath = ctx.path.replace(`/${config.appId}/pageDoc/`, '');
         const content = fs.readFileSync(config.baseDir + '/app/view/pageDoc/' + filePath);

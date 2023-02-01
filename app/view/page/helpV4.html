@@ -1,0 +1,97 @@
+{% extends 'template/jhTemplateV4.html'%}
+
+{% block vueTemplate %}
+
+<script type="text/html" id="app-template">
+  <div>
+    <v-app id="inspire" mobile-breakpoint="sm">
+      <jhMenu />
+      <v-main class="d-flex flex-column" style="margin-top: 60px">
+        <!-- 头部内容 >>>>>>>>>>>>> -->
+        <div class="pageSecondBar d-flex px-8"><div>
+            <div class="appTitle pt-3" style="font-size: 18px; font-weight: 700">{{ breadcrumbs[1].fullText }}
+              <!-- 帮助页按钮 -->
+              <v-icon @click="isHelpPageDrawerShow = true" small>mdi-help-circle-outline</v-icon>
+            </div>
+            <v-breadcrumbs class="pb-3 pt-0 pl-0" :items="breadcrumbs" divider="-"></v-breadcrumbs>
+          </div>
+        </div>
+        <!-- <<<<<<<<<<<<< 头部内容 -->
+
+        <div class="pageBodyContainer px-8" style="flex: 1;">
+          <!-- 页面内容 >>>>>>>>>>>>> -->
+          <div v-if="error.errorCode">
+            <h2>{{ error.errorCode }} : {{ error.errorReason }}</h2>
+            <hr/>
+            <h2>{{ error.errorReasonSupplement }}</h2>
+          </div>
+          <div v-else>
+            <h2>亲，你似乎迷路了？</h2>
+          </div>
+          <!-- <<<<<<<<<<<<< 页面内容 -->
+        </div>
+
+        <!-- 帮助页抽屉 >>>>>>>>>>>>> -->
+        <v-navigation-drawer v-model="isHelpPageDrawerShow" fixed temporary right width="80%" class="elevation-24">
+          <iframe style="border: 0" :src="`/${appInfo.appId}/pageDoc?markdownPath#`" width="100%" height="100%"></iframe>
+          <v-btn elevation="0" color="success" fab absolute top left small tile class="drawer-close-float-btn" @click="isHelpPageDrawerShow = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-navigation-drawer>
+        <!-- <<<<<<<<<<<<< 帮助页抽屉 -->
+
+      </v-main>
+    </v-app>
+
+    <jhToast />
+    <jhMask />
+    <jhConfirmDialog />
+  </div>
+</script>
+
+<div id="app">
+</div>
+
+
+{% endblock %}
+
+{% block vueScript %}
+
+<script type="module">
+  new Vue({
+    el: '#app',
+    template: '#app-template',
+    vuetify: new Vuetify(),
+    data: () => ({
+      error: {
+        errorCode: null,
+        errorReason: null,
+        errorReasonSupplement: null,
+      },
+      breadcrumbs: window.breadcrumbs,
+      isHelpPageDrawerShow: false,
+    }),
+    computed: {
+      isMobile() {
+        return window.innerWidth < 600;
+      }
+    },
+    async created() {
+      const urlParams = new URLSearchParams(location.search);
+      if (urlParams.get('errorCode')) {
+        this.error.errorCode = urlParams.get('errorCode');
+      }
+      if (urlParams.get('errorReason')) {
+        this.error.errorReason = urlParams.get('errorReason');
+      }
+      if (urlParams.get('errorReasonSupplement')) {
+        this.error.errorReasonSupplement = urlParams.get('errorReasonSupplement');
+      }
+    },
+    methods: {}
+  })
+</script>
+
+<style scoped>
+</style>
+{% endblock %}

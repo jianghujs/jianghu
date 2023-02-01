@@ -1,0 +1,24 @@
+<!--resetTableMaxHeight.html >>>>>>>>>>>>> -->
+<script>
+resetTableMaxHeight = (param) => {
+  const {height = 130, className = 'fixed-table-height'} = param || {};
+  const tables = document.getElementsByClassName(className);
+  if (_.isEmpty(tables)) {
+    window.requestAnimationFrame(() => {
+      resetTableMaxHeight(param);
+    })
+  } else {
+    for (const table of tables) {
+      const bottom = parseInt(table.dataset.bottom || "0");
+      const tableHeight = window.innerHeight - table.offsetTop - height - bottom;
+      table.style.height = tableHeight + 'px';
+    }
+  }
+}
+
+window.onresize = () => {
+  resetTableMaxHeight();
+}
+resetTableMaxHeight();
+</script>
+<!-- <<<<<<<<<<<<< resetTableMaxHeight.html -->

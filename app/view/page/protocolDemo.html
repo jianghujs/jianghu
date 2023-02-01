@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    江湖演示-初级-数据传输演示
+  </title>
+  <meta charset="utf-8" name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+  <script src="/<$ ctx.app.config.appId $>/public/lib/axios/axios.min.js"></script>
+
+  <script type="text/javascript">
+
+    async function insertStudent() {
+      // Tip: studentId不能重复
+      const studentInfo = {
+        studentId: "G00003",
+        bodyHeight: "180",
+        classId: "2021-01级-02班",
+        dateOfBirth: "2022-01-25",
+        gender: "male",
+        level: "02",
+        name: "小虾米",
+        remarks: "小虾米",
+        studentStatus: "正常",
+      }
+      const result = await axios({
+        method: 'post',
+        url: `/<$ ctx.app.config.appId $>/resource`,
+        data: {
+          packageId: '123456',
+          packageType: 'httpRequest',
+          appData: {
+            pageId: 'protocolDemo',
+            actionId: 'insertItem',
+            userAgent: 'demo_userAgent',
+            authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+            actionData: studentInfo,
+          }
+        }
+      });
+
+      console.log('insertStudent', result.data);
+
+    }
+
+    async function selectStudentList() {
+      const result = await axios({
+        method: 'post',
+        url: `/<$ ctx.app.config.appId $>/resource`,
+        data: {
+          packageId: '123456',
+          packageType: 'httpRequest',
+          appData: {
+            pageId: 'protocolDemo',
+            actionId: 'selectItemList',
+            userAgent: 'demo_userAgent',
+            authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+            actionData: {},
+            where: {},
+          }
+        }
+      });
+
+      console.log('selectStudentList', result.data);
+    }
+
+    async function updateStudent() {
+      const studentInfo = {
+        level: "03",
+      }
+      const result = await axios({
+        method: 'post',
+        url: `/<$ ctx.app.config.appId $>/resource`,
+        data: {
+          packageId: '123456',
+          packageType: 'httpRequest',
+          appData: {
+            pageId: 'protocolDemo',
+            actionId: 'updateItem',
+            userAgent: 'demo_userAgent',
+            authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+            actionData: studentInfo,
+            where: {
+              studentId: "G00003",
+            },
+          }
+        }
+      });
+
+      console.log('updateStudent', result.data);
+    }
+
+    async function deleteStudent() {
+      const result = await axios({
+        method: 'post',
+        url: `/<$ ctx.app.config.appId $>/resource`,
+        data: {
+          packageId: '123456',
+          packageType: 'httpRequest',
+          appData: {
+            pageId: 'protocolDemo',
+            actionId: 'deleteItem',
+            userAgent: 'demo_userAgent',
+            authToken: localStorage.getItem(`<$ ctx.app.config.appId $>_authToken`),
+            actionData: {},
+            where: {
+              studentId: "G00003",
+            },
+          }
+        }
+      });
+
+      console.log('deleteStudent', result.data);
+    }
+
+  </script>
+</head>
+
+<p><a href="/">回到首页</a></p>
+
+<p><button onclick="insertStudent()">1. 创建一个学号 "G00003", 姓名 "小虾米" 的二年级学生</button></p>
+<p><button onclick="selectStudentList()">2. 点击获取学生列表，显示在console里</button></p>
+<p><button onclick="updateStudent()">3. 将学生 "G00003" 改为三年级(level = 3)</button></p>
+<p><button onclick="deleteStudent()">4. 删除刚才创建的学生 "G00003"</button></p>
+
+<body>
+
+</body>
