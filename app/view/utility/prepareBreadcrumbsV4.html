@@ -6,15 +6,18 @@
   const urlParams = new URLSearchParams(location.search);
   let title = urlParams.get('title');
 
-  window.breadcrumbs = [{
-    text: '首页',
-    fullText: '首页',
-    disabled: true,
-  }, {
-    text: '<$ ctx.packagePage.pageName $>' + (title ? `【${title}】` : ''),
-    fullText: '<$ ctx.packagePage.pageName $>' + (title ? `【${title}】` : ''),
-    disabled: true,
-    href: `/${window.appInfo.appId}/page/<$ ctx.packagePage.pageId $>`
-  }];
+  window.breadcrumbs = [
+    {
+      text: '首页',
+      fullText: '首页',
+      disabled: true,
+    },
+    {
+      text: '<$ ctx.packagePage.pageName $>' + (title ? `【${title}】` : ''),
+      fullText: '<$ ctx.packagePage.pageName $>' + (title ? `【${title}】` : ''),
+      disabled: true,
+      href: `/${window.appInfo.appId}/page/<$ ctx.packagePage.pageId $>`
+    }
+  ];
 
 </script>

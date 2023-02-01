@@ -1,0 +1,154 @@
+{#
+  设置 window.deviceId 数据
+#}
+<script type="text/javascript">
+
+window.deviceId = getDeviceId();
+function getDeviceId() {
+  const { osName, osVersion } = this.getOsInfo();
+  const browserMachineId = `${osName}.${osVersion}`;
+  const machineId = browserMachineId;
+  const fingerprint = this.getFingerprint();
+  const host = window.location.host;
+  const browser = this.getBrowserInfo();
+  const deviceId = `${host}_${machineId}_${fingerprint}_${browser}`;
+  return deviceId;
+}
+function getOsInfo() {
+  let userAgent = navigator.userAgent.toLowerCase();
+  let osName = 'Unknown';
+  let osVersion = 'Unknown';
+  if (userAgent.indexOf('win') > -1) {
+    osName = 'Windows';
+  } else if (userAgent.indexOf('iphone') > -1) {
+    osName = 'Iphone';
+  } else if (userAgent.indexOf('mac') > -1) {
+    osName = 'Mac';
+  } else if (userAgent.indexOf('x11') > -1 || userAgent.indexOf('unix') > -1 || userAgent.indexOf('sunname') > -1 || userAgent.indexOf('bsd') > -1) {
+    osName = 'Unix';
+  } else if (userAgent.indexOf('linux') > -1) {
+    if (userAgent.indexOf('android') > -1) {
+      osName = 'Android';
+    } else {
+      osName = 'Linux';
+    }
+  }
+
+  // 系统版本信息
+  const u = window.navigator.userAgent;
+  const osVersionFunc = {
+    'Windows': function () {
+      const v = u.replace(/^.*Windows NT ([\d.]+);.*$/, '$1')
+      const oldWindowsVersionMap = {
+        '6.4': '10',
+        '6.3': '8.1',
+        '6.2': '8',
+        '6.1': '7',
+        '6.0': 'Vista',
+        '5.2': 'XP',
+        '5.1': 'XP',
+        '5.0': '2000'
+      }
+      return oldWindowsVersionMap[v] || v
+    },
+    'Android': function () {
+      return u.replace(/^.*Android ([\d.]+);.*$/, '$1')
+    },
+    'iOS': function () {
+      return u.replace(/^.*OS ([\d_]+) like.*$/, '$1').replace(/_/g, '.')
+    },
+    'Debian': function () {
+      return u.replace(/^.*Debian\/([\d.]+).*$/, '$1')
+    },
+    'Windows Phone': function () {
+      return u.replace(/^.*Windows Phone( OS)? ([\d.]+);.*$/, '$2')
+    },
+    'Mac': function () {
+      return u.replace(/^.*Mac OS X ([\d_]+).*$/, '$1').replace(/_/g, '.')
+    },
+    'WebOS': function () {
+      return u.replace(/^.*hpwOS\/([\d.]+);.*$/, '$1')
+    }
+  }
+
+  if (osVersionFunc[osName]) {
+    osVersion = osVersionFunc[osName]()
+  }
+
+  return { osName, osVersion };
+}
+function getFingerprint() {
+  function bin2hex(s) {
+    let i, l, n, o = ''
+    s += ''
+    for (i = 0, l = s.length; i < l; i++) {
+      n = s.charCodeAt(i).toString(16)
+      o += n.length < 2 ? '0' + n : n
+    }
+    return o
+  }
+
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  const txt = window.location.host
+  ctx.textBaseline = "top"
+  ctx.font = "14px 'Arial'"
+  ctx.textBaseline = "tencent"
+  ctx.fillStyle = "#f60"
+  ctx.fillRect(125, 1, 62, 20)
+  ctx.fillStyle = "#069"
+  ctx.fillText(txt, 2, 15)
+  ctx.fillStyle = "rgba(102, 204, 0, 0.7)"
+  ctx.fillText(txt, 4, 17)
+  const b64 = canvas.toDataURL().replace("data:image/png;base64,", "")
+  const bin = atob(b64)
+  const crc = bin2hex(bin.slice(-16, -12))
+  const fingerprint = crc;
+  return fingerprint;
+}
+function getBrowserInfo() {
+  let explorer = window.navigator.userAgent;
+  explorer = explorer.toLowerCase();
+
+  //ie
+  if (explorer.indexOf("msie") >= 0) {
+    return "ie";
+  }
+  // flutterApp
+  else if (explorer.indexOf("Android") >= 0) {
+    return "Android";
+  }
+  //firefox
+  else if (explorer.indexOf("firefox") >= 0) {
+    return "firefox";
+  }
+  //Chrome
+  else if (explorer.indexOf("chrome") >= 0) {
+    return "chrome";
+  }
+  //Opera
+  else if (explorer.indexOf("opera") >= 0) {
+    return "opera";
+  }
+  //Safari
+  else if (explorer.indexOf("safari") >= 0) {
+    return "safari";
+  }
+  if (explorer.indexOf("edge") >= 0) {
+    return "edge";
+  }
+  //遨游浏览器
+  if (explorer.indexOf("maxthon") >= 0) {
+    return "maxthon";
+  }
+  //QQ浏览器
+  if (explorer.indexOf("qqbrowser") >= 0) {
+    return "qqbrowser";
+  }
+  //搜狗浏览器
+  if (explorer.indexOf("se 2.x") >= 0) {
+    return "sogou";
+  }
+  return "others";
+}
+</script>
