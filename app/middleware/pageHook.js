@@ -9,7 +9,10 @@ module.exports = () => {
       const pageHook = JSON.parse(ctx.packagePage.pageHook);
       const beforeHookList = pageHook.beforeHook || [];
       for (const { field, service, serviceFunc } of beforeHookList) {
-        ctx.hookResult[field] = await ctx.service[service][serviceFunc]();
+        const result = await ctx.service[service][serviceFunc]();
+        if (field) {
+          ctx.hookResult[field] = result;
+        }
       }
     }
 
