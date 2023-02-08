@@ -46,7 +46,19 @@ module.exports = {
     isGroupIdRequired,
     appType,
     xiaochengxuUserId = null,
+    mockBody = false
   }) {
+    if (mockBody) {
+      // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
+      body = {
+        appData: {
+          authToken: ctx.cookies.get(`${config.appId}_authToken`, {
+            httpOnly: false,
+            signed: false,
+          }),
+        },
+      };
+    }
     const { authToken, actionData = {} } = body.appData;
     // 取到 authToken 后不再需要保留在 actionData 中
     delete body.appData.authToken;

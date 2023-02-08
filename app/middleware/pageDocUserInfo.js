@@ -9,20 +9,10 @@ module.exports = options => {
   return async (ctx, next) => {
 
     const { jianghuKnex, logger, db, config } = ctx.app;
-    const { appId, appType, appTitle } = config;
-
-    // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
-    const mockBody = {
-      appData: {
-        authToken: ctx.cookies.get(`${appId}_authToken`, {
-          httpOnly: false,
-          signed: false,
-        }),
-      },
-    };
+    const { appType, appTitle } = config;
 
     // 捕获 userInfo: { user, userGroupRoleList, allowPageList, userAppList } 到 ctx.userInfo
-    ctx.userInfo = await userInfoUtil.getUserInfo({ config, body: mockBody, jianghuKnex, db, logger, appType });
+    ctx.userInfo = await userInfoUtil.getUserInfo({ config, body: null, jianghuKnex, db, logger, appType, mockBody: true });
 
     if (ctx.userInfo && ctx.userInfo.user && Object.keys(ctx.userInfo.user).length) {
       // md 文件中，对资源链接做特殊处理，将 ![](./xxx) 转成 ![]()
