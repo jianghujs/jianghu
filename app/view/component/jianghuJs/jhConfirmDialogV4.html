@@ -1,0 +1,74 @@
+<!--jhConfirmDialog.html >>>>>>>>>>>>> -->
+<script type="text/html" id="jh-confirm-dialog">
+<v-dialog
+    v-model="isConfirmDialogShown"
+    max-width="290"
+    @click:outside="confirmDialogStatus = false; isConfirmDialogShown = false">
+  <v-card>
+    <v-card-title v-if="confirmDialogContent.title">{{ confirmDialogContent.title }}</v-card-title>
+    <v-card-text v-if="confirmDialogContent.content" v-html="confirmDialogContent.content" class="pa-6 text-pre-line"></v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn v-if="isCancelBtnShown" text @click="confirmDialogStatus = false; isConfirmDialogShown = false">
+        取消
+      </v-btn>
+      <v-btn color="primary" text @click="confirmDialogStatus = true; isConfirmDialogShown = false">
+        确定
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+</script>
+
+<script>
+Vue.component("jh-confirm-dialog", {
+  template: "#jh-confirm-dialog",
+  vueComponent: 'jh-confirm-dialog',
+  mixins: [window.jianghuUiActionMixins || {}],
+  vuetify: new Vuetify(),
+  data: () => ({
+    isConfirmDialogShown: false,
+    confirmDialogContent: {title: '', action: null},
+    confirmDialogStatus: null,
+    isCancelBtnShown: true
+  }),
+  computed: {
+    isMobile() {
+      return window.innerWidth < 600;
+    },
+  },
+  destroyed() {
+    if (this.interval) {
+      clearInterval(this.interval)
+    }
+  },
+  watch: {
+    isConfirmDialogShown(v) {
+      window.dialogIsOpen = v;
+    }
+  },
+  async created() {
+    window.confirmDialog = this.confirmDialog;
+  },
+  methods: {
+    async confirmDialog({title, content, cancelBtn = true, confirmColor = 'green darken-1'}) {
+      this.confirmDialogContent.title = title;
+      this.confirmDialogContent.content = content;
+      this.isConfirmDialogShown = true;
+      this.isCancelBtnShown = cancelBtn;
+      this.confirmDialogStatus = null;
+      return new Promise((resolve) => {
+        this.interval = setInterval(() => {
+          if (this.confirmDialogStatus != null) {
+            clearInterval(this.interval);
+            resolve(this.confirmDialogStatus)
+            this.isConfirmDialogShown = false;
+            this.confirmDialogStatus = null;
+          }
+        }, 60)
+      })
+    },
+  },
+})
+</script>
+<!-- <<<<<<<<<<<<< jhConfirmDialog.html -->

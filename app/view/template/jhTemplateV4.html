@@ -26,8 +26,10 @@
   <!-- <<<<<<<<<<<<< 加载第三方库JS -->
 
   <!-- 加载定制样式 >>>>>>>>>>>>> -->
-  {% include 'common/globalCSSFontV4.html' %}
-  {% include 'common/globalCSSVuetifyV4.html' %}
+  {% include 'common/jianghuJs/globalCSSFontV4.html' %}
+  {% include 'common/jianghuJs/globalCSSVuetifyV4.html' %}
+  {% include 'common/jianghuJs/globalCSSJHV4.html' %}
+  {% include 'common/jianghuJs/globalCSSMediaV4.html' %}
   <!-- <<<<<<<<<<<<< 加载定制样式 -->
 
   {% block htmlHead %}
@@ -41,19 +43,21 @@
   {% endblock %}
 
   <!-- 加载工具脚本 >>>>>>>>>>>>> -->
-  {% include 'utility/prepareAppInfoV4.html' %}
-  {% include 'utility/prepareUserInfoV4.html' %}
-  {% include 'utility/prepareBreadcrumbsV4.html' %}
-  {% include 'utility/jianghuAxiosV4.html' %}
-  {% include 'utility/htmlErrorCollectionV4.html' %}
-  {% include 'utility/uiActionV4.html' %}
+  {% include 'utility/jianghuJs/prepareAppInfoV4.html' %}
+  {% include 'utility/jianghuJs/prepareUserInfoV4.html' %}
+  {% include 'utility/jianghuJs/jianghuAxiosV4.html' %}
+  {% include 'utility/jianghuJs/htmlErrorCollectionV4.html' %}
+  {% include 'utility/jianghuJs/jianghuDisplayTextV4.html' %}
+  {% include 'utility/jianghuJs/uiActionV4.html' %}
+  {% include 'common/jianghuJs/bugfixTableWheelEvent.html' %}
+  {% include 'common/jianghuJs/globalDrawerOutsideClick.html' %}
   <!-- <<<<<<<<<<<<< 加载工具脚本 -->
 
   <!-- 加载全局组件 >>>>>>>>>>>>> -->
-  {% include 'component/jhToastV4.html' %}
-  {% include 'component/jhMaskV4.html' %}
-  {% include 'component/jhMenuV4.html' %}
-  {% include 'component/jhConfirmDialogV4.html' %}
+  {% include 'component/jianghuJs/jhToastV4.html' %}
+  {% include 'component/jianghuJs/jhMaskV4.html' %}
+  {% include 'component/jianghuJs/jhMenuV4.html' %}
+  {% include 'component/jianghuJs/jhConfirmDialogV4.html' %}
   <!-- <<<<<<<<<<<<< 加载全局组件 -->
 
   {% block vueScript %}

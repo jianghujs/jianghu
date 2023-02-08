@@ -1,0 +1,395 @@
+<!--jhScene.html >>>>>>>>>>>>> -->
+<script type="text/html" id="jh-scene">
+<div class="jh-scene">
+<v-row class="ma-0 ml-xs-n1">
+  <!--场景列表-->
+  <v-btn small :outlined="currentSceneIndex !== index"
+         v-for="(scene, index) in sceneList"
+         :key="index"
+         @click="doUiAction('useScene', scene)"
+         :dark="currentSceneIndex === index"
+         color="grey darken-1" class="mb-2 ml-1">
+    {{ scene.name }}
+  </v-btn>
+  <!--新增场景按钮-->
+
+  <!--场景操作菜单-->
+  <v-menu offset-y v-model="isSceneOperationShown">
+    <template v-slot:activator="{on, attrs}">
+      <v-btn
+          v-bind="attrs" v-on="on"
+          small outlined
+          color="grey darken-1"
+          class="mb-2 ml-1 pa-1"
+      >
+        <v-icon right small class="mx-0">mdi-chevron-down</v-icon>
+      </v-btn>
+    </template>
+    <v-list dense class="pb-0">
+      <v-list-item @click="doUiAction('openCreateSceneDialog')">
+        <v-list-item-title class="success--text">
+          <v-icon small class="success--text">mdi-plus</v-icon>
+          <span class="success--text">新建场景</span>
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="doUiAction('openSceneListDialog')">
+        <v-list-item-title class="success--text">
+          <v-icon small class="success--text">mdi-cog-outline</v-icon>
+          <span class="success--text">场景管理</span>
+        </v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-menu>
+</v-row>
+
+<!-- 新建场景dialog >>>>>>>>>>> -->
+<v-dialog
+    v-if="!fixed"
+    v-model="isCreateSceneDialogShown"
+    persistent
+    width="360px"
+>
+  <v-card>
+    <v-card-title>
+      <v-row class="ma-0">
+        <div style="font-size: 16px;">新建场景</div>
+        <v-spacer></v-spacer>
+        <v-btn class="elevation-0" fab x-small @click="doUiAction('closeCreateSceneDialog')">
+          <v-icon dark>mdi-close</v-icon>
+        </v-btn>
+      </v-row>
+    </v-card-title>
+    <v-card-text>
+      <div class="mb-4">
+        <div class="mb-1">场景名称</div>
+        <v-text-field class="jh-v-input" :rules="validationRules.requireRules" dense filled single-line hide-details v-model="createItem.name" placeholder="场景名称，最多10个字符"></v-text-field>
+      </div>
+      <div class="mb-4">
+        <div>筛选条件</div>
+        <slot name="form" :form="createItem.form">
+          <div>未配置form slot</div>
+        </slot>
+      </div>
+    </v-card-text>
+    <v-card-action class="pb-4">
+      <v-row class="ma-0 pa-6 pt-2 justify-end">
+        <v-btn class="ml-2" @click="doUiAction('doCreateScene')" small color="success">保存</v-btn>
+        <v-btn class="ml-2" @click="doUiAction('closeCreateSceneDialog')" small>取消</v-btn>
+      </v-row>
+    </v-card-action>
+  </v-card>
+</v-dialog>
+<!-- <<<<<<<<<<<<<< 新建场景dialog -->
+
+<!-- 场景列表dialog >>>>>>>>>>>>>>> -->
+<v-dialog
+    v-model="isSceneListShown"
+    persistent
+    width="360px"
+>
+  <v-card class="scene-manage">
+    <v-card-title>
+      <v-row class="ma-0">
+        <div style="font-size: 16px;">场景管理</div>
+        <v-spacer></v-spacer>
+        <v-btn class="elevation-0" fab x-small @click="doUiAction('closeSceneListDialog')">
+          <v-icon dark>mdi-close</v-icon>
+        </v-btn>
+      </v-row>
+    </v-card-title>
+    <v-card-text class="pb-2">
+      <v-card outlined>
+        <v-list dense class="scene-list">
+          <!--场景列表数据 >>>>>>>>>>>>>> -->
+          <template v-if="sceneCustomList && sceneCustomList.length">
+            <v-list-item class="scene-item px-2" v-for="item in sceneCustomList" :key="item.value">
+              <v-list-item-content>
+                {{item.name}}
+              </v-list-item-content>
+              <v-list-item-icon @click.stop="doUiAction('doDeleteScene', item)">
+                <v-icon size="22">mdi-delete</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </template>
+          <!--<<<<<<<<<<<<<<< 场景列表数据 -->
+          <template v-else>
+            <div class="text-center grey--text" style="line-height: 100px;">暂无自定义场景</div>
+          </template>
+        </v-list>
+      </v-card>
+    </v-card-text>
+    <v-card-action class="pb-4">
+      <v-row class="ma-0 pa-6 pt-2 justify-end">
+        <v-btn class="ml-2" @click="doUiAction('changeToCreateDialog')" small color="success">新建场景</v-btn>
+        <v-btn class="ml-2" @click="doUiAction('closeSceneListDialog')" small>取消</v-btn>
+      </v-row>
+    </v-card-action>
+  </v-card>
+</v-dialog>
+<!-- <<<<<<<<<<<<<<< 场景列表dialog -->
+</div>
+</script>
+
+<script>
+Vue.component('jh-scene', {
+  template: "#jh-scene",
+  vueComponent: 'jh-scene',
+  vuetify: new Vuetify(),
+  props: {
+    initFormData: {
+      type: Object,
+      default: function () {
+        return {};
+      }
+    },
+    // 当前页面PageId
+    pageId: {
+      type: String,
+      default: location.href.split('/').pop()
+    },
+    currentSceneId: {
+      type: String,
+      default: null
+    }
+  },
+  data() {
+    return {
+      isMobile: window.innerWidth < 500,
+      validationRules: {
+        requireRules: [
+          v => !!v || 'This is required',
+        ],
+      },
+
+      // 全部场景列表
+      sceneList: [],
+      // 自定义场景列表
+      sceneCustomList: [],
+      // 当前场景索引
+      currentSceneIndex: -1,
+      // 场景操作数据
+      deleteItem: {
+        form: {}
+      },
+      createItem: {
+        form: {}
+      },
+      // 新建场景弹窗
+      isCreateSceneDialogShown: false,
+      // 场景操作菜单
+      isSceneOperationShown: false,
+      // 场景管理弹窗
+      isSceneListShown: false,
+    };
+  },
+  computed: {
+    sceneKey() {
+      return this.pageId + '_' + window.userInfo.userId;
+    },
+    fixed() {
+      return this.pageId === 'sceneSearchFixed';
+    }
+  },
+  watch: {
+    currentSceneId(newId, oldId) {
+      if (newId != null) {
+        this.currentSceneIndex = this.sceneList.findIndex(item => item.id === newId);
+      } else {
+        this.currentSceneIndex = null;
+      }
+    }
+  },
+  created() {
+    this.doUiAction('getSceneList');
+  },
+  methods: {
+    async doUiAction(uiActionId, uiActionData) {
+      switch (uiActionId) {
+        case 'getSceneList':
+          await this.getSceneList();
+          await this.useDefaultScene();
+          break;
+        case 'useScene':
+          await this.useScene(uiActionData);
+          break;
+        case 'changeToCreateDialog':
+          await this.closeSceneListDialog();
+          await this.prepareCreateSceneData();
+          await this.openCreateSceneDialog();
+          break;
+        case 'openCreateSceneDialog':
+          await this.prepareCreateSceneData();
+          await this.openCreateSceneDialog();
+          break;
+        case 'doCreateScene':
+          await this.prepareValidate();
+          await this.doCreateScene();
+          await this.closeCreateSceneDialog();
+          await this.getSceneList();
+          await this.userNewCreateScene();
+          break;
+        case 'closeCreateSceneDialog':
+          await this.closeCreateSceneDialog();
+          break;
+        case 'openSceneListDialog':
+          await this.openSceneListDialog();
+          break;
+        case 'closeSceneListDialog':
+          await this.closeSceneListDialog();
+          break;
+        case 'doDeleteScene':
+          await this.prepareDeleteItemData(uiActionData);
+          await this.checkCurrentScene();
+          await this.doDeleteScene();
+          await this.getSceneList();
+          break;
+        default:
+          console.error("[doUiAction] uiActionId not find", {uiActionId});
+          break;
+      }
+    },
+
+    /**
+     * 获取UUID
+     * @returns {string}
+     */
+    getUUID(prefix) {
+      var s = [];
+      var hexDigits = "0123456789abcdef";
+      for (var i = 0; i < 10; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+      }
+      s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+      var uuid = s.join("");
+      return prefix + '-' + uuid;
+    },
+
+    // 场景列表
+    async getSceneList() {
+      let sceneData = JSON.parse(localStorage.getItem('sceneData') || '{}');
+      this.sceneList = sceneData[this.sceneKey] || [];
+      this.sceneCustomList = this.sceneList.filter(item => !item.system);
+    },
+
+    // 使用默认场景
+    async useDefaultScene() {
+      let defaultScene = this.sceneList.find(item => item.default === true);
+      if (defaultScene) {
+        this.currentSceneIndex = this.sceneList.findIndex(item => item.default === true);
+        this.useScene(defaultScene);
+      }
+    },
+
+    // 使用场景
+    async useScene(funObj) {
+      this.$emit('useScene', funObj);
+    },
+
+    // =================================添加场景 start ======================================
+    // 准备添加场景数据
+    async prepareCreateSceneData() {
+      this.createItem = {
+        form: _.cloneDeep(this.initFormData),
+        id: this.getUUID('scene')
+      };
+    },
+
+    // 打开场景添加弹框
+    async openCreateSceneDialog() {
+      this.isCreateSceneDialogShown = true;
+    },
+
+    // 验证新场景名称
+    prepareValidate() {
+      const newSceneName = this.createItem.name;
+      const nameExist = this.sceneList.some(item => item.name === newSceneName);
+      if (nameExist) {
+        window.vtoast.fail({message: '场景名称重复了'})
+        throw new Error("场景名称重复")
+      }
+    },
+
+    // 添加场景
+    async doCreateScene() {
+      let sceneData = JSON.parse(localStorage.getItem('sceneData') || '{}');
+      let sceneList = sceneData[this.sceneKey] || [];
+      const newScene = {...this.createItem};
+      sceneList.push(newScene);
+      sceneData[this.sceneKey] = sceneList;
+      localStorage.setItem('sceneData', JSON.stringify(sceneData));
+    },
+    // 添加完成，直接使用新添加的场景
+    async userNewCreateScene() {
+      const currentSceneIndex = this.sceneList.find(item => item.id === this.createItem.id);
+      this.doUiAction('useScene', currentSceneIndex);
+    },
+
+    // 关闭场景添加弹框
+    async closeCreateSceneDialog() {
+      this.isCreateSceneDialogShown = false;
+    },
+
+    // =================================场景删除 >>>>>>>>>> ======================================
+    // 准备场景管理数据
+    async prepareDeleteItemData(funObj) {
+      this.deleteItem = _.cloneDeep(funObj);
+    },
+    // 检查并重置当前选中场景
+    async checkCurrentScene() {
+      // 未定位任何场景，重新定位到默认场景
+      if (this.currentSceneIndex === -1) {
+        this.useDefaultScene();
+        return;
+      }
+      const currentScene = this.sceneList[this.currentSceneIndex];
+      // 当前定位场景已不存在了，重新定位到默认场景
+      if (!currentScene) {
+        this.useDefaultScene();
+        return;
+      }
+      // 当前场景是待删除的，重新定位到默认场景
+      if (currentScene.id === this.deleteItem.id) {
+        this.useDefaultScene();
+      }
+    },
+
+    // 打开场景管理弹框
+    async openSceneListDialog() {
+      this.isSceneListShown = true;
+    },
+
+    // 关闭场景管理弹框
+    async closeSceneListDialog() {
+      this.isSceneListShown = false;
+    },
+
+    // 删除场景
+    async doDeleteScene() {
+      let sceneData = JSON.parse(localStorage.getItem('sceneData') || '{}');
+      let sceneList = sceneData[this.sceneKey] || [];
+      sceneData[this.sceneKey] = sceneList.filter(item => item.id !== this.deleteItem.id);
+      localStorage.setItem('sceneData', JSON.stringify(sceneData));
+    },
+    // =================================场景管理 <<<<<<<<<<<< ======================================
+  },
+});
+
+</script>
+<style>
+.jh-scene {
+  display: inline-block;
+}
+
+.v-application--is-ltr .jh-scene .v-btn-toggle > .v-btn.v-btn {
+  border-left-width: 1px !important;
+  margin-left: 2px;
+}
+
+.scene-manage .scene-item:not(:last-child) {
+  border-bottom: 1px solid #EEEEEE;
+}
+
+
+</style>
+<!-- <<<<<<<<<<<<< jhScene.html -->
