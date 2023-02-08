@@ -1,7 +1,7 @@
 'use strict';
 
 const { BizError, errorInfoEnum } = require('../constant/error');
-const { userStatusObj, tableObj } = require('../constant/constant');
+const { userStatusObj } = require('../constant/constant');
 
 module.exports = async ctx => {
 
@@ -15,9 +15,7 @@ module.exports = async ctx => {
   const { isGroupIdRequired } = ctx.packageResource.resourceData;
   // 对于 public 的 resource ====》不需要做 用户状态的校验
   // public: { user: "*", group: "public", role: "*" }
-  const allUserGroupRoleResourceList = await jianghuKnex(
-    tableObj._user_group_role_resource
-  ).select();
+  const allUserGroupRoleResourceList = await jianghuKnex('_user_group_role_resource').select();
   const isNotPublic = !allUserGroupRoleResourceList.find(
     rule =>
       rule.group === 'public' &&

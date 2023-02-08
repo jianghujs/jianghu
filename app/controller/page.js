@@ -1,7 +1,6 @@
 'use strict';
 
 const Controller = require('egg').Controller;
-const { tableObj } = require('../constant/constant');
 
 class PageController extends Controller {
   async index() {
@@ -15,7 +14,7 @@ class PageController extends Controller {
     const { packagePage, userInfo } = ctx;
     const { jianghuKnex, logger } = this.app;
     const { userId, username, deviceId, deviceType } = userInfo.user || {};
-    const uiActionList = await jianghuKnex(tableObj._ui).whereIn('pageId', [ packagePage.pageId, 'allPage' ]).select();
+    const uiActionList = await jianghuKnex('_ui').whereIn('pageId', [ packagePage.pageId, 'allPage' ]).select();
     // Tip: 为了避免 uiActionConfig json 异常, 这里 format一下
     uiActionList.forEach(item => {
       const { pageId, uiActionId, uiActionConfig} = item;

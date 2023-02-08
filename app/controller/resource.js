@@ -2,7 +2,7 @@
 
 const { Controller } = require('egg');
 const { BizError, errorInfoEnum } = require('../constant/error');
-const { tableObj, resourceTypeObj, httpResponse } = require('../constant/constant');
+const { resourceTypeObj, httpResponse } = require('../constant/constant');
 const _ = require('lodash');
 const { sqlResource, serviceResource } = require('./controllerUtil/resourceUtil');
 

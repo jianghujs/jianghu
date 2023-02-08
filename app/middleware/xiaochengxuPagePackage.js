@@ -11,7 +11,7 @@ module.exports = () => {
     const body = ctx.request.body;
     const { pageId } = body.appData.actionData;
 
-    ctx.packagePage = await jianghuKnex(tableObj._page)
+    ctx.packagePage = await jianghuKnex('_page')
       .where({ pageId })
       .first();
 
