@@ -344,8 +344,13 @@ async function serviceResource({ ctx }) {
   const requestBody = ctx.request.body;
   const appData = requestBody.appData || {};
   const actionData = appData.actionData || {};
-  const { packageResource: { resourceData } } = ctx;
+  const { packageResource: { resourceData, appDataSchema } } = ctx;
   const { service, serviceFunction } = resourceData;
+
+  // 校验 appDataSchema
+  if (!_.isEmpty(appDataSchema)) {
+    validateUtil.validate(appDataSchema, appData, 'appData');
+  }
 
   const serviceTmp = ctx.service[service];
   if (!serviceTmp) {

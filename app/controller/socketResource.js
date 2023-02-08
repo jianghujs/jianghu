@@ -65,7 +65,6 @@ async function socketRequest({ socket, app, body }, next) {
   if (packageType === 'socketRequest') {
     const responseBody = socketResponse.success({
       packageId,
-      // TODO: ...resultData, resultData 为兼容代码
       appData: { resultData, appId, pageId, actionId },
     });
     socket.emit(resourcePath, responseBody);

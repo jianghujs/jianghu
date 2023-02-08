@@ -23,7 +23,7 @@ class PageController extends Controller {
         item.uiActionConfig = JSON.parse(uiActionConfig || '{}');
       } catch (err) {
         item.uiActionConfig = { errorReason: 'uiActionConfig JSON.parse异常' }
-        logger.error('[page.js] _ui.uiActionConfig JSON.parse异常', { pageId, uiActionId })
+        logger.error('[page.js] _ui.uiActionConfig JSON.parse异常', { pageId, uiActionId, err })
       }
     });
     const targetHtml = packagePage.pageFile || `${packagePage.pageId}.html`;

@@ -35,7 +35,7 @@ class TableSegment {
       return;
     }
     const [{ maxId, minId }] = await this.knex(this.table).select(this.knex.raw('max(id) as maxId, min(id) as minId'));
-    console.log('获取最大最小值：', { maxId, minId });
+    // console.log('获取最大最小值：', { maxId, minId });
     this.minId = minId;
     this.maxId = maxId;
   }
@@ -101,16 +101,16 @@ class TableSegment {
   }
 
   async getCountAndChecksum() {
-    console.log('count(*) as count, sum(cast(conv(substring(md5(concat('
-        + this.releventColumns.map(o => o.sql).join(',') +
-        ')), 18), 16, 10) as unsigned)) as checksum');
+    // console.log('count(*) as count, sum(cast(conv(substring(md5(concat('
+    //     + this.releventColumns.map(o => o.sql).join(',') +
+    //     ')), 18), 16, 10) as unsigned)) as checksum');
     const [{ count, checksum }] = await this.knex(this.table)
       .where('id', '>=', this.minId)
       .where('id', '<=', this.maxId)
       .select(this.knex.raw('count(*) as count, sum(cast(conv(substring(md5(concat('
         + this.releventColumns.map(o => o.sql).join(',') +
         ')), 18), 16, 10) as unsigned)) as checksum'));
-    console.log('计算 count, checksum', { count, checksum, maxId: this.maxId, minId: this.minId, table: this.table });
+    // console.log('计算 count, checksum', { count, checksum, maxId: this.maxId, minId: this.minId, table: this.table });
     this.count = count;
     this.checksum = checksum;
   }
@@ -151,7 +151,7 @@ class TableDiffer {
     // 左段
     if (this.oldTableSegment.minId !== this.newTableSegment.minId) {
       const realMinId = Math.min(this.oldTableSegment.minId, this.newTableSegment.minId);
-      console.log('计算左段', { left: realMinId, right: midMinId - 1 });
+      // console.log('计算左段', { left: realMinId, right: midMinId - 1 });
       await this.fetchAndDiff(this.oldTableSegment.cutSegment(realMinId, midMinId - 1), this.newTableSegment.cutSegment(realMinId, midMinId - 1));
     }
     // 中间重复段，递归
@@ -159,7 +159,7 @@ class TableDiffer {
     // 右段
     if (this.oldTableSegment.maxId !== this.newTableSegment.maxId) {
       const realMaxId = Math.max(this.oldTableSegment.maxId, this.newTableSegment.maxId);
-      console.log('计算右段', { left: midMaxId + 1, right: realMaxId });
+      // console.log('计算右段', { left: midMaxId + 1, right: realMaxId });
       await this.fetchAndDiff(this.oldTableSegment.cutSegment(midMaxId + 1, realMaxId), this.newTableSegment.cutSegment(midMaxId + 1, realMaxId));
     }
     return this.diffResult;
@@ -177,7 +177,7 @@ class TableDiffer {
   async recursiveDiff(ts1, ts2) {
     if (ts1.maxId - ts1.minId <= this.stopThreshold) {
       // 如果大小 id 间距小于 stopThreshold，则直接获取数据进行对比
-      console.log('直接获取数据进行对比', ts1.minId, ts1.maxId);
+      // console.log('直接获取数据进行对比', ts1.minId, ts1.maxId);
       await this.fetchAndDiff(ts1, ts2);
       return;
     }
@@ -185,12 +185,12 @@ class TableDiffer {
     await Promise.all([ ts1.getCountAndChecksum(), ts2.getCountAndChecksum() ]);
     if (ts1.count === ts2.count && ts1.checksum === ts2.checksum) {
       // 如果对比一样，就退出
-      console.log('对比一样，退出', ts1.minId, ts1.maxId);
+      // console.log('对比一样，退出', ts1.minId, ts1.maxId);
       return;
     }
     const ts1split = ts1.splitSegment(this.splitCount);
     const ts2split = ts2.splitSegment(this.splitCount);
-    console.log('继续二分', ts1.minId, ts1.maxId, '->', ts1split[0].minId, ts1split[0].maxId, ',', ts1split[1].minId, ts1split[1].maxId);
+    // console.log('继续二分', ts1.minId, ts1.maxId, '->', ts1split[0].minId, ts1split[0].maxId, ',', ts1split[1].minId, ts1split[1].maxId);
     const recursiveList = [];
     for (let i = 0; i < ts1split.length; i++) {
       recursiveList.push(this.recursiveDiff(ts1split[i], ts2split[i]));

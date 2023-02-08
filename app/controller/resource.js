@@ -22,7 +22,6 @@ class ResourceController extends Controller {
         resultData = await sqlResource({ jianghuKnex, ctx });
         ctx.body = httpResponse.success({
           packageId,
-          // TODO: ...resultData, resultData 为兼容代码
           appData: { resultData, appId, pageId, actionId },
         });
         break;
@@ -30,7 +29,6 @@ class ResourceController extends Controller {
         resultData = await serviceResource({ ctx });
         ctx.body = httpResponse.success({
           packageId,
-          // TODO: ...resultData, resultData 为兼容代码
           appData: { resultData, appId, pageId, actionId },
         });
         break;
