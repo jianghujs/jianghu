@@ -2,18 +2,18 @@
 <!--设置 常量数据值转换文字 数据 -->
 <script type="text/javascript">
 // 数据字段文本
-window.getDisplayText = (metadata, value, key) => {
+window.getDisplayText = ({displayObj, displayValue, displayKey}) => {
   let labelText;
-  if(typeof metadata !== 'object') {
-    return value;
+  if(typeof displayObj !== 'object') {
+    return displayValue;
   }
-  if(metadata instanceof Array) {
-    const findItem = metadata.find(item => item.value === value);
+  if(displayObj instanceof Array) {
+    const findItem = displayObj.find(item => item.value === displayValue);
     labelText = findItem && findItem.text;
   } else {
-    labelText = key && metadata[key].text;
+    labelText = displayKey && displayObj[displayKey].text;
   }
-  return labelText || value;
+  return labelText || displayValue;
 }
 </script>
 <!--jianghuDisplayTextV4.html <<<<<<<<<<<<-->
