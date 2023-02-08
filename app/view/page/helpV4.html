@@ -4,21 +4,21 @@
 
 <script type="text/html" id="app-template">
   <div>
-    <v-app id="inspire" mobile-breakpoint="sm">
-      <jhMenu />
-      <v-main class="d-flex flex-column" style="margin-top: 60px">
+    <v-app mobile-breakpoint="sm">
+      <jh-menu />
+      <v-main class="mt-15">
         <!-- 头部内容 >>>>>>>>>>>>> -->
-        <div class="pageSecondBar d-flex px-8"><div>
-            <div class="appTitle pt-3" style="font-size: 18px; font-weight: 700">{{ breadcrumbs[1].fullText }}
-              <!-- 帮助页按钮 -->
-              <v-icon @click="isHelpPageDrawerShow = true" small>mdi-help-circle-outline</v-icon>
-            </div>
-            <v-breadcrumbs class="pb-3 pt-0 pl-0" :items="breadcrumbs" divider="-"></v-breadcrumbs>
+        <div class="jh-page-second-bar px-8">
+          <div class="pt-3 text-h7 font-weight-bold">帮助
+            <!-- 帮助页按钮 -->
+            <v-icon @click="isHelpPageDrawerShown = true" color="success" small>mdi-help-circle-outline</v-icon>
           </div>
+          <v-breadcrumbs class="pb-3 pt-0 px-0" :items="breadcrumbs" divider="-"></v-breadcrumbs>
         </div>
         <!-- <<<<<<<<<<<<< 头部内容 -->
 
-        <div class="pageBodyContainer px-8" style="flex: 1;">
+        <div class="jh-page-body-container px-8">
+          <v-card class="rounded-lg jh-page-doc-container pa-4">
           <!-- 页面内容 >>>>>>>>>>>>> -->
           <div v-if="error.errorCode">
             <h2>{{ error.errorCode }} : {{ error.errorReason }}</h2>
@@ -29,23 +29,23 @@
             <h2>亲，你似乎迷路了？</h2>
           </div>
           <!-- <<<<<<<<<<<<< 页面内容 -->
+          </v-card>
         </div>
 
         <!-- 帮助页抽屉 >>>>>>>>>>>>> -->
-        <v-navigation-drawer v-model="isHelpPageDrawerShow" fixed temporary right width="80%" class="elevation-24">
+        <v-navigation-drawer v-model="isHelpPageDrawerShown" v-click-outside="drawerClickOutside" fixed temporary right width="80%" class="elevation-24">
           <iframe style="border: 0" :src="`/${appInfo.appId}/pageDoc?markdownPath#`" width="100%" height="100%"></iframe>
-          <v-btn elevation="0" color="success" fab absolute top left small tile class="drawer-close-float-btn" @click="isHelpPageDrawerShow = false">
+          <v-btn elevation="0" color="success" fab absolute top left small tile class="drawer-close-float-btn" @click="isHelpPageDrawerShown = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-navigation-drawer>
         <!-- <<<<<<<<<<<<< 帮助页抽屉 -->
-
       </v-main>
     </v-app>
 
-    <jhToast />
-    <jhMask />
-    <jhConfirmDialog />
+    <jh-toast />
+    <jh-mask />
+    <jh-confirm-dialog />
   </div>
 </script>
 
@@ -68,14 +68,21 @@
         errorReason: null,
         errorReasonSupplement: null,
       },
-      breadcrumbs: window.breadcrumbs,
-      isHelpPageDrawerShow: false,
+      isMobile: window.innerWidth < 500,
+      // 面包屑
+      breadcrumbs: [
+        {
+          text: '首页',
+          disabled: true,
+        },
+        {
+          text: '帮助',
+          disabled: true,
+        }
+      ],
+      isHelpPageDrawerShown: false,
     }),
-    computed: {
-      isMobile() {
-        return window.innerWidth < 600;
-      }
-    },
+    computed: {},
     async created() {
       const urlParams = new URLSearchParams(location.search);
       if (urlParams.get('errorCode')) {
