@@ -2,7 +2,7 @@
 
 // ========================================常用 require start===========================================
 const Service = require('egg').Service;
-const validateUtil = require('@jianghujs/jianghu/app/common/validateUtil');
+const validateUtil = require('../common/validateUtil');
 // ========================================常用 require end=============================================
 const actionDataScheme = Object.freeze({
   htmlErrorLogRecord: {
@@ -13,7 +13,7 @@ const actionDataScheme = Object.freeze({
       errorLogList: {
         type: 'array',
         items: {
-          type:'object',
+          type: 'object',
           additionalProperties: true,
           required: [ 'errorTime', 'errorMessage' ],
           properties: {
@@ -22,7 +22,7 @@ const actionDataScheme = Object.freeze({
             errorTime: { anyOf: [{ type: 'string' }] },
             errorMessage: { anyOf: [{ type: 'string' }, { type: 'number' }] },
           },
-        }
+        },
       },
     },
   },
@@ -30,13 +30,13 @@ const actionDataScheme = Object.freeze({
 
 class HtmlErrorService extends Service {
   async htmlErrorLogRecord() {
-   const htmlLogger = this.app.getLogger("htmlLogger");
-   const { actionData } = this.ctx.request.body.appData;
-   validateUtil.validate(actionDataScheme.htmlErrorLogRecord, actionData);
-   const { errorLogList } = actionData;
-   errorLogList.forEach(errorLog => {
-    htmlLogger.error("htmlErrorLogRecord", errorLog);
-   });
+    const htmlLogger = this.app.getLogger('htmlLogger');
+    const { actionData } = this.ctx.request.body.appData;
+    validateUtil.validate(actionDataScheme.htmlErrorLogRecord, actionData);
+    const { errorLogList } = actionData;
+    errorLogList.forEach(errorLog => {
+      htmlLogger.error('htmlErrorLogRecord', errorLog);
+    });
   }
 }
 

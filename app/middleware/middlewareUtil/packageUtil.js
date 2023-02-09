@@ -28,10 +28,10 @@ module.exports = {
 
     // 大文本
     if (requestBodyString.length > 8144) {
-      requestBodyString = "请求文本太大!";
+      requestBodyString = '请求文本太大!';
     }
     if (requestBodyString.length > 8144) {
-      responseBodyString = "响应文本太大!";
+      responseBodyString = '响应文本太大!';
     }
     const insertData = {
       packageId, resourceId, deviceId, userId,

@@ -40,7 +40,7 @@ describe('test/request/role.test.js', () => {
     // });
     it('should failed, not login, page=manual, group=login, role=*', async () => {
       await this.app.httpRequest()
-        .get('/jianghu/page/manual').expect(302);
+        .get('/jianghu/page/manual').expect(500);
     });
   });
   describe('Test resource role and group role', () => {

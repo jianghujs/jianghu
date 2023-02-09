@@ -3,7 +3,7 @@
 const range = require('koa-range');
 const send = require('koa-send');
 const fs = require('fs');
-const userInfoUtil = require('@jianghujs/jianghu/app/middleware/middlewareUtil/userInfoUtil');
+const userInfoUtil = require('./middlewareUtil/userInfoUtil');
 
 module.exports = options => {
   return async (ctx, next) => {
