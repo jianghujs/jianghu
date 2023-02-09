@@ -9,10 +9,7 @@
       <v-main class="mt-15">
         <!-- 头部内容 >>>>>>>>>>>>> -->
         <div class="jh-page-second-bar px-8">
-          <div class="pt-3 text-h7 font-weight-bold">帮助
-            <!-- 帮助页按钮 -->
-            <v-icon @click="isHelpPageDrawerShown = true" color="success" small>mdi-help-circle-outline</v-icon>
-          </div>
+          <div class="pt-3 text-h7 font-weight-bold">帮助</div>
           <v-breadcrumbs class="pb-3 pt-0 px-0" :items="breadcrumbs" divider="-"></v-breadcrumbs>
         </div>
         <!-- <<<<<<<<<<<<< 头部内容 -->
@@ -31,21 +28,8 @@
           <!-- <<<<<<<<<<<<< 页面内容 -->
           </v-card>
         </div>
-
-        <!-- 帮助页抽屉 >>>>>>>>>>>>> -->
-        <v-navigation-drawer v-model="isHelpPageDrawerShown" v-click-outside="drawerClickOutside" fixed temporary right width="80%" class="elevation-24">
-          <iframe style="border: 0" :src="`/${appInfo.appId}/pageDoc?markdownPath#`" width="100%" height="100%"></iframe>
-          <v-btn elevation="0" color="success" fab absolute top left small tile class="drawer-close-float-btn" @click="isHelpPageDrawerShown = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-navigation-drawer>
-        <!-- <<<<<<<<<<<<< 帮助页抽屉 -->
       </v-main>
     </v-app>
-
-    <jh-toast />
-    <jh-mask />
-    <jh-confirm-dialog />
   </div>
 </script>
 
@@ -68,7 +52,6 @@
         errorReason: null,
         errorReasonSupplement: null,
       },
-      isMobile: window.innerWidth < 500,
       // 面包屑
       breadcrumbs: [
         {
@@ -80,25 +63,20 @@
           disabled: true,
         }
       ],
-      isHelpPageDrawerShown: false,
     }),
-    computed: {},
     async created() {
-      const urlParams = new URLSearchParams(location.search);
-      if (urlParams.get('errorCode')) {
-        this.error.errorCode = urlParams.get('errorCode');
+      const urlData = new URLSearchParams(location.search);
+      if (urlData.get('errorCode')) {
+        this.error.errorCode = urlData.get('errorCode');
       }
-      if (urlParams.get('errorReason')) {
-        this.error.errorReason = urlParams.get('errorReason');
+      if (urlData.get('errorReason')) {
+        this.error.errorReason = urlData.get('errorReason');
       }
-      if (urlParams.get('errorReasonSupplement')) {
-        this.error.errorReasonSupplement = urlParams.get('errorReasonSupplement');
+      if (urlData.get('errorReasonSupplement')) {
+        this.error.errorReasonSupplement = urlData.get('errorReasonSupplement');
       }
     },
     methods: {}
   })
 </script>
-
-<style scoped>
-</style>
 {% endblock %}

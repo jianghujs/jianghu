@@ -3,29 +3,31 @@
 <div>
 <!-- 手机端左边抽屉菜单 >>>>>>>>>>>>> -->
 <v-navigation-drawer
-    v-model="isMobileMenuDrawerShown"
-    app
-    clipped
-    v-if="isMobile"
-    style="z-index: 99999"
-    class="jh-page-nav-bar"
+  v-model="isMobileMenuDrawerShown"
+  app
+  clipped
+  v-if="isMobile"
+  style="z-index: 99999"
+  class="jh-page-nav-bar"
 >
-  <v-btn fab color="success"
-         class="elevation-0"
-         x-small
-         style="position: absolute; right: 15px; top: 15px; z-index: 10"
-         @click="isMobileMenuDrawerShown = !isMobileMenuDrawerShown">
+  <v-btn
+    fab
+    color="success"
+    class="elevation-0"
+    x-small
+    style="position: absolute; right: 15px; top: 15px; z-index: 10"
+    @click="isMobileMenuDrawerShown = !isMobileMenuDrawerShown">
     <v-icon>mdi-arrow-left</v-icon>
   </v-btn>
   <v-list>
     <v-list-item-group
-        v-model="currentMenuTabIndex"
-        color="success"
+      v-model="currentMenuTabIndex"
+      color="success"
     >
       <v-list-item
-          disabled
-          class="pa-2"
-          style="color: #333333"
+        disabled
+        class="pa-2"
+        style="color: #333333"
       >
         <v-list-item-content>
           <v-list-item-title class="font-weight-bold text-h7 pr-10 text-center">
@@ -35,9 +37,7 @@
       </v-list-item>
       <template v-for="item in inMenuList">
         <template v-if="item.children && item.children.length > 0">
-          <v-list-group
-              :value="item.extend"
-          >
+          <v-list-group :value="item.extend">
             <template v-slot:activator>
               <v-list-item-content class="pl-3">
                 <v-list-item-title>
@@ -53,9 +53,9 @@
           </v-list-group>
         </template>
         <v-list-item
-            v-else
-            :key="item.path"
-            @click="openUrl(item.path, item.query)"
+          v-else
+          :key="item.path"
+          @click="openUrl(item.path, item.query)"
         >
           <v-list-item-content class="pl-3">
             <v-list-item-title>
@@ -67,15 +67,15 @@
     </v-list-item-group>
   </v-list>
 </v-navigation-drawer>
-<!-- <<<<<<<<<<<<< 手机端左边抽屉菜单 -->
-<!-- 页面头部 >>>>>>>>>>>>> -->
+  <!-- <<<<<<<<<<<<< 手机端左边抽屉菜单 -->
+  <!-- 页面头部 >>>>>>>>>>>>> -->
 <v-app-bar
-    app
-    clipped-left
-    height="60"
-    class="jh-page-header px-8"
-    style="z-index: 50;"
-    flat
+  app
+  clipped-left
+  height="60"
+  class="jh-page-header px-8"
+  style="z-index: 50;"
+  flat
 >
   <!--手机端左侧菜单开启按钮-->
   <v-app-bar-nav-icon color="success" @click.stop="isMobileMenuDrawerShown = !isMobileMenuDrawerShown" v-if="isMobile"></v-app-bar-nav-icon>
@@ -85,21 +85,21 @@
   </v-toolbar-title>
   <!--pc端菜单 >>>>>>>>>>>>>-->
   <v-tabs
-      v-model="currentMenuTabIndex"
-      v-if="!isMobile"
-      show-arrows
-      slider-size="0"
-      color="success"
-      :style="{maxWidth: tabsMaxWidth}"
+    v-model="currentMenuTabIndex"
+    v-if="!isMobile"
+    show-arrows
+    slider-size="0"
+    color="success"
+    :style="{maxWidth: tabsMaxWidth}"
   >
     <template v-for="(item, index) in inMenuList">
       <!--一级菜单 >>>>>>>>>>>> -->
       <template v-if="item.pageId && !item.children">
         <v-tab
-            class="px-5 jh-header-tab"
-            active-class="jh-header-tab-active"
-            :key="item.path"
-            @click="openUrl(item.path, item.query)"
+          class="px-5 jh-header-tab"
+          active-class="jh-header-tab-active"
+          :key="item.path"
+          @click="openUrl(item.path, item.query)"
         >
           {{ item.title }}
         </v-tab>
@@ -110,10 +110,10 @@
         <v-menu offset-y v-model="inMenuShownStatusList[index]">
           <template v-slot:activator="{on, attrs}">
             <v-tab
-                v-bind="attrs" v-on="on"
-                class="px-5 jh-header-tab"
-                :class="{'parent-tab-active': currentMenuTabIndex === index, 'jh-header-tab-active': currentMenuTabIndex === index}"
-                :key="item.path"
+              v-bind="attrs" v-on="on"
+              class="px-5 jh-header-tab"
+              :class="{'parent-tab-active': currentMenuTabIndex === index, 'jh-header-tab-active': currentMenuTabIndex === index}"
+              :key="item.path"
             >
               {{ item.title }}
               <v-icon disabled v-if="inMenuShownStatusList[index]" size="12">mdi-chevron-up</v-icon>
@@ -135,26 +135,25 @@
       </template>
       <!--<<<<<<<<<<<<<二级菜单-->
       <v-divider
-          style="max-height: 35px;min-height: 35px;align-self: center;"
-          v-if="item.path && item.path.includes('operationManual')"
-          vertical
+        style="max-height: 35px;min-height: 35px;align-self: center;"
+        v-if="item.path && item.path.includes('operationManual')"
+        vertical
       ></v-divider>
     </template>
   </v-tabs>
   <!--<<<<<<<<<<<<<pc端菜单-->
   <div style="white-space: nowrap">
-
     <v-menu v-if="!isMobile" offset-y v-model="isAvatarMenuShown">
       <template v-slot:activator="{on, attrs}">
         <div text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
-          <span class="jh-font-size-3 black--text">{{ userInfo.user.username }}</span>
+          <span class="jh-font-size-3 black--text pr-1">{{ userInfo.user.username }}</span>
           <v-icon>mdi-account-circle</v-icon>
         </div>
       </template>
       <v-list nav dense>
         <v-list-item class="mt-2">
           <v-list-item-icon class="mr-1 mt-1">
-            <v-icon color="grey darken-3">mdi-account-outline</v-icon>
+            <v-icon size="16" color="grey darken-3">mdi-account-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title color="grey darken-3">{{ userInfo.user.userId }}</v-list-item-title>
@@ -164,7 +163,7 @@
         <!--右上角下拉菜单-->
         <v-list-item v-for="avatarMenu of inAvatarMenuList" :key="avatarMenu.path" @click="openUrl(avatarMenu.path)">
           <v-list-item-icon class="mr-1 mt-1">
-            <v-icon color="grey darken-3">mdi-account-cog-outline</v-icon>
+            <v-icon size="16" color="grey darken-3">mdi-account-cog-outline</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title color="grey darken-3">{{ avatarMenu.title }}</v-list-item-title>
@@ -173,7 +172,7 @@
 
         <v-list-item @click="logout">
           <v-list-item-icon class="mr-1 mt-1">
-            <v-icon color="grey darken-3">mdi-logout</v-icon>
+            <v-icon size="16" color="grey darken-3">mdi-logout</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title color="grey darken-3">登出</v-list-item-title>
@@ -183,7 +182,7 @@
     </v-menu>
   </div>
 </v-app-bar>
-<!-- <<<<<<<<<<<<< 页面头部 -->
+  <!-- <<<<<<<<<<<<< 页面头部 -->
 </div>
 </script>
 
@@ -255,8 +254,8 @@ Vue.component('jh-menu', {
     openUrl(url, queryParams) {
       if (queryParams) {
         const queryStrings = Object.keys(queryParams)
-            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(queryParams[k]))
-            .join('&');
+          .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(queryParams[k]))
+          .join('&');
         window.location.href = url + '?' + queryStrings;
       } else {
         window.location.href = url;
@@ -293,9 +292,9 @@ Vue.component('jh-menu', {
     groupMenuList() {
       // 菜单元数据处理
       const menuListResource = _
-          .chain(this.userInfo.allowPageList)
-          .filter(page => _.includes(['showInMenu', 'link'], page.pageType) || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && this.currentPageId === page.pageId))
-          .value();
+        .chain(this.userInfo.allowPageList)
+        .filter(page => _.includes(['showInMenu', 'link'], page.pageType) || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && this.currentPageId === page.pageId))
+        .value();
       // 分组菜单数据
       this.menuGroup = _.groupBy(menuListResource, function (item) {
         if (item.pageName.startsWith("[")) {
@@ -364,17 +363,17 @@ Vue.component('jh-menu', {
     // 头像菜单构建
     computedAvatarMenuList() {
       this.inAvatarMenuList = _
-          .chain(this.userInfo.allowPageList)
-          .filter(['pageType', 'showInAvatarMenu'])
-          .map((page) => {
-            return {
-              path: `/${window.appInfo.appId}/page/${page.pageId}`,
-              title: page.pageName,
-              sort: parseInt(page.sort)
-            };
-          })
-          .orderBy(['sort'], ['asc'])
-          .value();
+        .chain(this.userInfo.allowPageList)
+        .filter(['pageType', 'showInAvatarMenu'])
+        .map((page) => {
+          return {
+            path: `/${window.appInfo.appId}/page/${page.pageId}`,
+            title: page.pageName,
+            sort: parseInt(page.sort)
+          };
+        })
+        .orderBy(['sort'], ['asc'])
+        .value();
     },
     // 登出
     async logout() {
@@ -409,6 +408,7 @@ Vue.component('jh-menu', {
 .second-active .v-list-item__title {
   color: #4caf50 !important;
 }
+
 .jh-avatar-menu-btn {
   display: flex;
   align-items: center;
@@ -416,9 +416,11 @@ Vue.component('jh-menu', {
   transition: all .3s;
   border-radius: 5px;
 }
+
 .jh-avatar-menu-btn:hover {
   background-color: #EEEEEE;
 }
+
 .second-active {
   caret-color: #4caf50 !important;
   background-color: rgba(76, 175, 80, 0.1) !important;

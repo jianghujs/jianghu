@@ -17,10 +17,10 @@
   <v-menu offset-y v-model="isSceneOperationShown">
     <template v-slot:activator="{on, attrs}">
       <v-btn
-          v-bind="attrs" v-on="on"
-          small outlined
-          color="grey darken-1"
-          class="mb-2 ml-1 pa-1"
+        v-bind="attrs" v-on="on"
+        small outlined
+        color="grey darken-1"
+        class="mb-2 ml-1 pa-1"
       >
         <v-icon right small class="mx-0">mdi-chevron-down</v-icon>
       </v-btn>
@@ -42,91 +42,91 @@
   </v-menu>
 </v-row>
 
-<!-- 新建场景dialog >>>>>>>>>>> -->
-<v-dialog
+  <!-- 新建场景dialog >>>>>>>>>>> -->
+  <v-dialog
     v-if="!fixed"
     v-model="isCreateSceneDialogShown"
     persistent
     width="360px"
->
-  <v-card>
-    <v-card-title>
-      <v-row class="ma-0">
-        <div style="font-size: 16px;">新建场景</div>
-        <v-spacer></v-spacer>
-        <v-btn class="elevation-0" fab x-small @click="doUiAction('closeCreateSceneDialog')">
-          <v-icon dark>mdi-close</v-icon>
-        </v-btn>
-      </v-row>
-    </v-card-title>
-    <v-card-text>
-      <div class="mb-4">
-        <div class="mb-1">场景名称</div>
-        <v-text-field class="jh-v-input" :rules="validationRules.requireRules" dense filled single-line hide-details v-model="createItem.name" placeholder="场景名称，最多10个字符"></v-text-field>
-      </div>
-      <div class="mb-4">
-        <div>筛选条件</div>
-        <slot name="form" :form="createItem.form">
-          <div>未配置form slot</div>
-        </slot>
-      </div>
-    </v-card-text>
-    <v-card-action class="pb-4">
-      <v-row class="ma-0 pa-6 pt-2 justify-end">
-        <v-btn class="ml-2" @click="doUiAction('doCreateScene')" small color="success">保存</v-btn>
-        <v-btn class="ml-2" @click="doUiAction('closeCreateSceneDialog')" small>取消</v-btn>
-      </v-row>
-    </v-card-action>
-  </v-card>
-</v-dialog>
-<!-- <<<<<<<<<<<<<< 新建场景dialog -->
+  >
+    <v-card>
+      <v-card-title>
+        <v-row class="ma-0">
+          <div style="font-size: 16px;">新建场景</div>
+          <v-spacer></v-spacer>
+          <v-btn class="elevation-0" fab x-small @click="doUiAction('closeCreateSceneDialog')">
+            <v-icon dark>mdi-close</v-icon>
+          </v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text>
+        <div class="mb-4">
+          <div class="mb-1">场景名称</div>
+          <v-text-field class="jh-v-input" :rules="validationRules.requireRules" dense filled single-line hide-details v-model="createItem.name" placeholder="场景名称，最多10个字符"></v-text-field>
+        </div>
+        <div class="mb-4">
+          <div>筛选条件</div>
+          <slot name="form" :form="createItem.form">
+            <div>未配置form slot</div>
+          </slot>
+        </div>
+      </v-card-text>
+      <v-card-action class="pb-4">
+        <v-row class="ma-0 pa-6 pt-2 justify-end">
+          <v-btn class="ml-2" @click="doUiAction('doCreateScene')" small color="success">保存</v-btn>
+          <v-btn class="ml-2" @click="doUiAction('closeCreateSceneDialog')" small>取消</v-btn>
+        </v-row>
+      </v-card-action>
+    </v-card>
+  </v-dialog>
+  <!-- <<<<<<<<<<<<<< 新建场景dialog -->
 
-<!-- 场景列表dialog >>>>>>>>>>>>>>> -->
-<v-dialog
+  <!-- 场景列表dialog >>>>>>>>>>>>>>> -->
+  <v-dialog
     v-model="isSceneListShown"
     persistent
     width="360px"
->
-  <v-card class="scene-manage">
-    <v-card-title>
-      <v-row class="ma-0">
-        <div style="font-size: 16px;">场景管理</div>
-        <v-spacer></v-spacer>
-        <v-btn class="elevation-0" fab x-small @click="doUiAction('closeSceneListDialog')">
-          <v-icon dark>mdi-close</v-icon>
-        </v-btn>
-      </v-row>
-    </v-card-title>
-    <v-card-text class="pb-2">
-      <v-card outlined>
-        <v-list dense class="scene-list">
-          <!--场景列表数据 >>>>>>>>>>>>>> -->
-          <template v-if="sceneCustomList && sceneCustomList.length">
-            <v-list-item class="scene-item px-2" v-for="item in sceneCustomList" :key="item.value">
-              <v-list-item-content>
-                {{item.name}}
-              </v-list-item-content>
-              <v-list-item-icon @click.stop="doUiAction('doDeleteScene', item)">
-                <v-icon size="22">mdi-delete</v-icon>
-              </v-list-item-icon>
-            </v-list-item>
-          </template>
-          <!--<<<<<<<<<<<<<<< 场景列表数据 -->
-          <template v-else>
-            <div class="text-center grey--text" style="line-height: 100px;">暂无自定义场景</div>
-          </template>
-        </v-list>
-      </v-card>
-    </v-card-text>
-    <v-card-action class="pb-4">
-      <v-row class="ma-0 pa-6 pt-2 justify-end">
-        <v-btn class="ml-2" @click="doUiAction('changeToCreateDialog')" small color="success">新建场景</v-btn>
-        <v-btn class="ml-2" @click="doUiAction('closeSceneListDialog')" small>取消</v-btn>
-      </v-row>
-    </v-card-action>
-  </v-card>
-</v-dialog>
-<!-- <<<<<<<<<<<<<<< 场景列表dialog -->
+  >
+    <v-card class="scene-manage">
+      <v-card-title>
+        <v-row class="ma-0">
+          <div style="font-size: 16px;">场景管理</div>
+          <v-spacer></v-spacer>
+          <v-btn class="elevation-0" fab x-small @click="doUiAction('closeSceneListDialog')">
+            <v-icon dark>mdi-close</v-icon>
+          </v-btn>
+        </v-row>
+      </v-card-title>
+      <v-card-text class="pb-2">
+        <v-card outlined>
+          <v-list dense class="scene-list">
+            <!--场景列表数据 >>>>>>>>>>>>>> -->
+            <template v-if="sceneCustomList && sceneCustomList.length">
+              <v-list-item class="scene-item px-2" v-for="item in sceneCustomList" :key="item.value">
+                <v-list-item-content>
+                  {{item.name}}
+                </v-list-item-content>
+                <v-list-item-icon @click.stop="doUiAction('doDeleteScene', item)">
+                  <v-icon size="22">mdi-delete</v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </template>
+            <!--<<<<<<<<<<<<<<< 场景列表数据 -->
+            <template v-else>
+              <div class="text-center grey--text" style="line-height: 100px;">暂无自定义场景</div>
+            </template>
+          </v-list>
+        </v-card>
+      </v-card-text>
+      <v-card-action class="pb-4">
+        <v-row class="ma-0 pa-6 pt-2 justify-end">
+          <v-btn class="ml-2" @click="doUiAction('changeToCreateDialog')" small color="success">新建场景</v-btn>
+          <v-btn class="ml-2" @click="doUiAction('closeSceneListDialog')" small>取消</v-btn>
+        </v-row>
+      </v-card-action>
+    </v-card>
+  </v-dialog>
+  <!-- <<<<<<<<<<<<<<< 场景列表dialog -->
 </div>
 </script>
 

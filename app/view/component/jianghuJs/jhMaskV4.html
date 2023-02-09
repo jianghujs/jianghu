@@ -26,7 +26,7 @@
     methods: {
       hideTimer() {
         this.timer = setInterval(() => {
-          if(this.timeout == 0) {
+          if (this.timeout == 0) {
             return
           }
           this.timerRemind -= 1000;
@@ -36,11 +36,11 @@
         }, 1000);
       },
       show(paramObj) {
-        if (typeof(paramObj)=='number') {
+        if (typeof (paramObj) == 'number') {
           this.timeout = paramObj;
         }
-        if (typeof(paramObj)=='object') {
-          const { timeout } = paramObj
+        if (typeof (paramObj) == 'object') {
+          const {timeout} = paramObj
           this.timeout = timeout;
           this.timerRemind = timeout;
         }
@@ -56,15 +56,15 @@
 <style>
 
 .jh-mask {
-  position:fixed;
-  display:block;
-  background-color:#e3e3e3;
-  z-index:99;
-  left:0;
-  top:0;
-  width:100%;
-  height:100%;
-  opacity:0;
+  position: fixed;
+  display: block;
+  background-color: #e3e3e3;
+  z-index: 99;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
   filter: alpha(opacity=0);
   -moz-opacity: 0;
   animation: all .3s ease;

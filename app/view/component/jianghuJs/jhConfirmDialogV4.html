@@ -1,9 +1,9 @@
 <!--jhConfirmDialog.html >>>>>>>>>>>>> -->
 <script type="text/html" id="jh-confirm-dialog">
 <v-dialog
-    v-model="isConfirmDialogShown"
-    max-width="290"
-    @click:outside="confirmDialogStatus = false; isConfirmDialogShown = false">
+  v-model="isConfirmDialogShown"
+  max-width="290"
+  @click:outside="confirmDialogStatus = false; isConfirmDialogShown = false">
   <v-card>
     <v-card-title v-if="confirmDialogContent.title">{{ confirmDialogContent.title }}</v-card-title>
     <v-card-text v-if="confirmDialogContent.content" v-html="confirmDialogContent.content" class="pa-6 text-pre-line"></v-card-text>
