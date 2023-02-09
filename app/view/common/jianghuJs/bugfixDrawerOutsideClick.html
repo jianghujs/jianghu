@@ -4,7 +4,7 @@
 window.drawerClickOutside = {
   include: () => {
     if(document.querySelector('.v-dialog.v-dialog--active')) {
-      return [document.querySelector('.v-overlay.v-overlay--active'), document.querySelector('.v-dialog.v-dialog--active')]
+      return [...document.querySelectorAll('.v-overlay.v-overlay--active'), ...document.querySelectorAll('.v-dialog.v-dialog--active')]
     }
     return [];
   },
