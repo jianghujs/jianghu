@@ -39,13 +39,14 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
 
 module.exports = {
   async getUserInfo({
+    ctx,
     config,
     body,
     jianghuKnex,
     isGroupIdRequired,
     appType,
     xiaochengxuUserId = null,
-    mockBody = false
+    mockBody = false,
   }) {
     if (mockBody) {
       // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
@@ -116,9 +117,9 @@ module.exports = {
         ? await jianghuKnex('_user_group_role')
           .where({ userId, groupId })
           .select()
-        : await jianghuKnex(`_user_group_role as a`)
-          .innerJoin(`_group as b`, 'b.groupId', 'a.groupId')
-          .innerJoin(`_role as c`, 'c.roleId', 'a.roleId')
+        : await jianghuKnex('_user_group_role as a')
+          .innerJoin('_group as b', 'b.groupId', 'a.groupId')
+          .innerJoin('_role as c', 'c.roleId', 'a.roleId')
           .where({ 'a.userId': userId })
           .select(
             'a.*',

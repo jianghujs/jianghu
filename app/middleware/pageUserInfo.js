@@ -10,6 +10,7 @@ module.exports = options => {
 
     // 捕获 userInfo: { user, userGroupRoleList, allowPageList, userAppList } 到 ctx.userInfo
     ctx.userInfo = await userInfoUtil.getUserInfo({
+      ctx,
       config,
       body: null,
       jianghuKnex,
