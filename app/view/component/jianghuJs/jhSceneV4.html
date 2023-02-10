@@ -267,8 +267,13 @@ Vue.component('jh-scene', {
 
     // 场景列表
     async getSceneList() {
-      let sceneData = JSON.parse(localStorage.getItem('sceneData') || '{}');
-      this.sceneList = sceneData[this.sceneKey] || [];
+      let sceneData = localStorage.getItem('sceneData');
+      if(sceneData == null) sceneData = '{}';
+      sceneData = JSON.parse(sceneData);
+      this.sceneList = sceneData[this.sceneKey];
+      if(!this.sceneList) {
+        this.sceneList = [];
+      }
       this.sceneCustomList = this.sceneList.filter(item => !item.system);
     },
 
@@ -312,8 +317,13 @@ Vue.component('jh-scene', {
 
     // 添加场景
     async doCreateScene() {
-      let sceneData = JSON.parse(localStorage.getItem('sceneData') || '{}');
-      let sceneList = sceneData[this.sceneKey] || [];
+      let sceneData = localStorage.getItem('sceneData');
+      if(sceneData == null) sceneData = '{}';
+      sceneData = JSON.parse(sceneData);
+      let sceneList = sceneData[this.sceneKey];
+      if(!sceneList) {
+        sceneList = [];
+      }
       const newScene = {...this.createItem};
       sceneList.push(newScene);
       sceneData[this.sceneKey] = sceneList;
@@ -366,8 +376,13 @@ Vue.component('jh-scene', {
 
     // 删除场景
     async doDeleteScene() {
-      let sceneData = JSON.parse(localStorage.getItem('sceneData') || '{}');
-      let sceneList = sceneData[this.sceneKey] || [];
+      let sceneData = localStorage.getItem('sceneData');
+      if(sceneData == null) sceneData = '{}';
+      sceneData = JSON.parse(sceneData);
+      let sceneList = sceneData[this.sceneKey];
+      if(!sceneList) {
+        sceneList = [];
+      }
       sceneData[this.sceneKey] = sceneList.filter(item => item.id !== this.deleteItem.id);
       localStorage.setItem('sceneData', JSON.stringify(sceneData));
     },

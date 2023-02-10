@@ -1,45 +1,52 @@
 {% extends 'template/jhTemplateV4.html'%}
 
-<!-- vue template 代码块 -->
 {% block vueTemplate %}
+
 <script type="text/html" id="app-template">
   <div>
     <v-app>
-    <v-main>
-        <v-row align="center" justify="center" style="height: 100vh">
-          <v-col cols="12" xs="1" sm="2" md="3" xl="4"></v-col>
-          <v-col cols="12" xs="12" sm="8" md="6" xl="4">
-            <v-card class="py-10 px-15">
-              <v-card-text>
-                <div class="mb-10 text-center text-h7 font-weight-bold">
-                  <$ ctx.app.config.appTitle $>
-                </div>
-                <v-form>
-                  <input class="mb-5 jh-v-input" v-model="userId" placeholder="用户名"/>
-                  <input
-                    class="mb-5 jh-v-input"
-                    v-model="password"
-                    :type="showPassword ? 'text' : 'password'"
-                    @click:append="showPassword = !showPassword"
-                    data-type="password"
-                    @keyup.enter.exact="login"
-                    placeholder="密码"
-                  />
+      <v-main>
+        <v-row class="align-center" style="height: 100vh">
+          <v-col cols="12" align="center">
+            <div class="mb-10 text-h7 font-weight-bold success--text"><$ ctx.app.config.appTitle $></div>
+            <v-card class="login-form-card pa-8">
+              <v-card-text class="pa-0">
+                <div class="title">登录您的账户</div>
+                <v-form ref="loginForm" lazy-validation>
+                  <!--表单 [注：登录表单包含密码输入框，chrome密码自动填充的时候会与vuetify的v-input组件样式冲突，使用原生input避免冲突]-->
+                  <v-row class="my-0">
+                    <v-col cols="12">
+                      <input class="jh-cus-input" v-model="userId" placeholder="用户名"/>
+                    </v-col>
+                    <v-col cols="12">
+                      <div class="password-wrapper">
+                        <input
+                          class="jh-cus-input"
+                          v-model="password"
+                          :type="isPasswordShown ? 'text' : 'password'"
+                          data-type="password"
+                          @keyup.enter.exact="doUiAction('login')"
+                          placeholder="密码"
+                        />
+                        <v-icon @click="isPasswordShown = !isPasswordShown" small class="mdi-eye">{{isPasswordShown ? 'mdi-eye-off-outline' : 'mdi-eye-outline'}}</v-icon>
+                      </div>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-checkbox class="jh-v-input" dense single-line filled v-model="isRememberPassword" color="success" label="记住密码"/>
+                    </v-col>
+                  </v-row>
+                  <!--操作按钮-->
+                  <v-row class="my-0 px-3">
+                    <v-btn block color="success" @click="doUiAction('login')" small>登录</v-btn>
+                  </v-row>
                 </v-form>
-                <v-checkbox
-                    v-model="remember"
-                    color="success"
-                    label="记住密码"
-                    class="mb-5"
-                />
-                <v-btn block large color="success" type="submit" @click="doUiAction('login')">登录</v-btn>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" xs="1" sm="2" md="3" xl="4"></v-col>
         </v-row>
-    </v-main>
+      </v-main>
     </v-app>
+
     <jh-toast/>
     <jh-mask/>
     <jh-confirm-dialog/>
@@ -51,67 +58,66 @@
 
 {% endblock %}
 
-<!-- vue script 代码块 -->
-<!-- 注意：本项目的 vue 为每个页面使用一个 vue 实例 -->
+
 {% block vueScript %}
 
-<!-- 加载定制样式 >>>>>>>>>>>>> -->
-{% include 'common/jianghuJs/globalCSSFontV4.html' %}
-{% include 'common/jianghuJs/globalCSSVuetifyV4.html' %}
-<!-- <<<<<<<<<<<<< 加载定制样式 -->
-
+<!-- 加载页面组件 >>>>>>>>>>>>> -->
 {% include 'utility/jianghuJs/prepareDeviceIdV4.html' %}
+<!-- <<<<<<<<<<<<< 加载页面组件 -->
 
 <script type="module">
   new Vue({
     el: '#app',
     template: '#app-template',
+    vueComponent: 'page',
     vuetify: new Vuetify(),
     components: {},
     data() {
       return {
         userId: '',
         password: '',
-        showPassword: false,
-        remember: true,
-        loginError: false,
-        loginErrorText: '',
+        isPasswordShown: false,
+        isRememberPassword: true,
       };
     },
-    created() {
-    },
     mounted() {
-      this.doUiAction('checkParams');
+      this.doUiAction('getUrlObj');
     },
     methods: {
       async doUiAction(uiActionId, uiActionData) {
         switch (uiActionId) {
-          case 'checkParams':
-            await this.checkParams();
+          case 'getUrlObj':
+            await this.getUrlObj();
             break;
           case 'login':
             await this.prepareLoginData();
             await this.doLogin();
-            await this.loginSuccess();
+            await this.setLocalStorage();
+            await this.redirectToPreLoginURL();
             break;
           default:
             console.error("[doUiAction] uiActionId not find", { uiActionId });
             break;
         }
       },
-      // ------ uiAction >>>>>>>> -------
-      async checkParams() {
-        const urlParams = new URLSearchParams(location.search);
-        if (urlParams.get('errorReason')) {
-          window.vtoast.fail(urlParams.get('errorReason'));
+
+      // ---------- getUrlObj uiAction >>>>>>>>>> --------
+      async getUrlObj() {
+        const urlObj = new URLSearchParams(location.search);
+
+        if (urlObj.get('errorReason')) {
+          window.vtoast.fail(urlObj.get('errorReason'));
         }
+
+        this.redirectUrl = urlObj.get('redirectUrl');
       },
+      // ---------- <<<<<<<<<<< getUrlObj uiAction  --------
+
+      // ---------- login uiAction >>>>>>>>>> --------
       async prepareLoginData() {
-        const urlParams = new URLSearchParams(location.search);
-        this.redirectUrl = urlParams.get('redirectUrl');
         this.deviceId = window.deviceId;
-        this.userId = (this.userId + '').replace(/\s+/g, '');
-        this.password = this.password + '';
+        this.userId = _.replace(this.userId, /\s+/g, '');;
+        this.password = _.toString(this.password);
       },
       async doLogin() {
         try {
@@ -120,49 +126,73 @@
               appData: {
                 pageId: 'login',
                 actionId: 'passwordLogin',
-                actionData: { userId: this.userId, password: this.password, deviceId: this.deviceId },
+                actionData: {
+                  userId: this.userId,
+                  password: this.password,
+                  deviceId: this.deviceId
+                },
               }
             }
           })).data.appData.resultData;
           this.loginResult = resultData;
+
+          window.vtoast.success('登录成功');
         } catch (error) {
-          console.error(error);
-          throw new Error("登陆失败");
+          throw new Error("登录失败");
         }
       },
-      async loginSuccess() {
-        if (this.loginResult.authToken) {
-          localStorage.setItem(`${window.appInfo.appId}_authToken`, this.loginResult.authToken);
-          localStorage.setItem(`${window.appInfo.appId}_userId`, this.loginResult.userId);
-          localStorage.setItem(`${window.appInfo.appId}_deviceId`, this.deviceId);
-          vtoast.success('登陆成功');
-          let redirectTo = `/${window.appInfo.appId}`;
-          if (this.redirectUrl) {
-            redirectTo = decodeURIComponent(this.redirectUrl);
-          }
-          location.href = redirectTo;
+      async setLocalStorage() {
+        localStorage.setItem(`${window.appInfo.appId}_authToken`, this.loginResult.authToken);
+        localStorage.setItem(`${window.appInfo.appId}_userId`, this.loginResult.userId);
+        localStorage.setItem(`${window.appInfo.appId}_deviceId`, this.deviceId);
+      },
+      async redirectToPreLoginURL() {
+        let redirectTo = `/${window.appInfo.appId}`;
+        if (this.redirectUrl) {
+          redirectTo = decodeURIComponent(this.redirectUrl);
         }
+        window.location.href = redirectTo;
       }
-      // ------ <<<<<<<<<<< uiAction -------
-
+      // ---------- <<<<<<<<<<< login uiAction  --------
     }
   });
 </script>
 <style scoped>
-  .jh-v-input {
-    border: 1px solid #E4E6EF;
+  .login-form-card {
+    width: 400px;
+  }
+
+  /* ---------- 输入框 >>>>>>>>>> -------- */
+  .jh-cus-input {
+    border: 1px solid rgba(0, 0, 0, .06);
     width: 100%;
-    height: 40px;
+    height: 32px;
     border-radius: 6px;
     padding: 0 12px;
     color: #5E6278 !important;
     outline: none;
+    font-size: 13px !important;
   }
 
-  .jh-v-input:focus,
-  .jh-v-input:focus-visible,
+  .jh-cus-input:focus,
+  .jh-cus-input:focus-visible,
   input:focus-visible {
-    border: 1px solid #B5B5C3 !important;
+    border: thin solid #4caf50 !important;
   }
+
+  /* ---------- <<<<<<<<<<< 输入框 -------- */
+
+  /* ---------- 密码框 >>>>>>>>>> -------- */
+  .password-wrapper {
+    position: relative;
+  }
+
+  .password-wrapper .mdi-eye {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+
+  /* ---------- <<<<<<<<<<< 密码框 -------- */
 </style>
 {% endblock %}

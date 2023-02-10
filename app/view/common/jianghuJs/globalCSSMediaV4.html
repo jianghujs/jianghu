@@ -10,7 +10,63 @@
             max-width: 100vw;
         }
     }
-    @media (max-width: 500px) {
+    @media (max-width: 960px) {
+        /* 边距 >>>>>> */
+        body .v-application .mt-xs-0 {
+            margin-top: 0 !important;
+        }
+
+        body .v-application .ml-xs-n1 {
+            margin-left: -4px !important;
+        }
+
+        body .v-application .pa-xs-0 {
+            padding: 0 !important;
+        }
+
+        body .v-application .py-xs-0 {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        body .v-application .px-xs-0 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        body .v-application .pb-xs-2 {
+            padding-bottom: 8px !important;
+        }
+
+        body .v-application .pr-xs-1 {
+            padding-right: 4px !important;
+        }
+
+        body .v-application .pl-xs-1 {
+            padding-left: 4px !important;
+        }
+
+        body .v-application .pt-xs-0 {
+            padding-top: 0 !important;
+        }
+        /* <<<<< 边距 */
+
+        /* 服务端搜索按钮 */
+        body .v-application .jh-backend-search-btn {
+            position: absolute;
+            top: -60px;
+            right: 0;
+        }
+        /* 服务端搜索位置兼容 */
+        body .v-application .jh-backend-form-container {
+            margin-top: -30px !important;
+            margin-bottom: 6px !important;
+            justify-content: start !important;
+            padding-bottom: 6px !important;
+            position: relative;
+        }
+    }
+    @media (max-width: 600px) {
         /* 页面的主体container */
         body .v-application .jh-page-body-container {
             padding-right: 0 !important;
@@ -23,26 +79,13 @@
             padding-left: 0 !important;
             border-radius: 0 !important;
         }
+
         /* 页面第二个工具栏 */
         body .v-application .jh-page-second-bar {
             flex-wrap: wrap !important;
             padding-left: 16px !important;
             padding-right: 16px !important;
         }
-        /* 服务端搜索按钮 */
-        body .v-application .jh-backend-search-btn {
-            position: absolute;
-            top: 6px;
-            right: 16px;
-        }
-        /* 服务端搜索位置兼容 */
-        body .v-application .jh-backend-form-container {
-            margin-top: -30px !important;
-            margin-bottom: 6px !important;
-            justify-content: start !important;
-            padding-bottom: 6px !important;
-        }
-
 
         /* 布局 >>>>>> */
         body [xs='1'] {
@@ -94,48 +137,6 @@
             min-width: 100%
         }
         /* <<<<< 布局 */
-
-        
-        /* 边距 >>>>>> */
-        body .v-application .mt-xs-0 {
-            margin-top: 0 !important;
-        }
-
-        body .v-application .ml-xs-n1 {
-            margin-left: -4px !important;
-        }
-
-        body .v-application .pa-xs-0 {
-            padding: 0 !important;
-        }
-
-        body .v-application .py-xs-0 {
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-        }
-
-        body .v-application .px-xs-0 {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-
-        body .v-application .pb-xs-2 {
-            padding-bottom: 8px !important;
-        }
-
-        body .v-application .pr-xs-1 {
-            padding-right: 4px !important;
-        }
-
-        body .v-application .pl-xs-1 {
-            padding-left: 4px !important;
-        }
-
-        body .v-application .pt-xs-0 {
-            padding-top: 0 !important;
-        }
-        /* <<<<< 边距 */
-
 
         /* 表单 >>>>>> */
         body span.jh-input-label {
@@ -294,6 +295,15 @@
             flex: 1 !important;
         }
         /* <<<<< 系统菜单 */
+
+        /* dialog >>>>>> */
+        .jh-dialog-mobile-fullscreen{
+            width: 100% !important;
+            height: 100%;
+            margin: 0;
+            max-height: 100% !important;
+        }
+        /* <<<<< dialog */
     }
 </style>
 <!-- <<<<<<<<<<<<< 适配 -->

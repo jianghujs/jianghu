@@ -5,7 +5,7 @@ window.appInfo = {
     appId: '<$ ctx.app.config.appId $>',
     upload: '/<$ ctx.app.config.appId $>/upload',
     public: '/<$ ctx.app.config.appId $>/public',
-    userAgent: navigator.userAgent || '',
+    userAgent: navigator.userAgent ? navigator.userAgent : '',
 }
 if (window.appInfo.userAgent.length > 127) {
     window.appInfo.userAgent = window.appInfo.userAgent.substring(0, 126);

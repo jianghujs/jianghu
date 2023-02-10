@@ -65,15 +65,15 @@
       ],
     }),
     async created() {
-      const urlData = new URLSearchParams(location.search);
-      if (urlData.get('errorCode')) {
-        this.error.errorCode = urlData.get('errorCode');
+      const urlObj = new URLSearchParams(location.search);
+      if (urlObj.get('errorCode')) {
+        this.error.errorCode = urlObj.get('errorCode');
       }
-      if (urlData.get('errorReason')) {
-        this.error.errorReason = urlData.get('errorReason');
+      if (urlObj.get('errorReason')) {
+        this.error.errorReason = urlObj.get('errorReason');
       }
-      if (urlData.get('errorReasonSupplement')) {
-        this.error.errorReasonSupplement = urlData.get('errorReasonSupplement');
+      if (urlObj.get('errorReasonSupplement')) {
+        this.error.errorReasonSupplement = urlObj.get('errorReasonSupplement');
       }
     },
     methods: {}
