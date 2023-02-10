@@ -3,11 +3,11 @@
 <div class="jh-scene">
 <v-row class="ma-0 ml-xs-n1">
   <!--场景列表-->
-  <v-btn small :outlined="currentSceneIndex !== index"
+  <v-btn small :outlined="currentSceneId !== scene.id"
          v-for="(scene, index) in sceneList"
          :key="index"
          @click="doUiAction('useScene', scene)"
-         :dark="currentSceneIndex === index"
+         :dark="currentSceneId === scene.id"
          color="grey darken-1" class="mb-2 ml-1">
     {{ scene.name }}
   </v-btn>
@@ -44,7 +44,6 @@
 
   <!-- 新建场景dialog >>>>>>>>>>> -->
   <v-dialog
-    v-if="!fixed"
     v-model="isCreateSceneDialogShown"
     persistent
     width="360px"
@@ -143,9 +142,9 @@ Vue.component('jh-scene', {
       }
     },
     // 当前页面PageId
-    pageId: {
+    sceneListKey: {
       type: String,
-      default: location.href.split('/').pop()
+      default: null
     },
     currentSceneId: {
       type: String,
@@ -160,13 +159,10 @@ Vue.component('jh-scene', {
           v => !!v || 'This is required',
         ],
       },
-
       // 全部场景列表
       sceneList: [],
       // 自定义场景列表
       sceneCustomList: [],
-      // 当前场景索引
-      currentSceneIndex: -1,
       // 场景操作数据
       deleteItem: {
         form: {}
@@ -181,23 +177,6 @@ Vue.component('jh-scene', {
       // 场景管理弹窗
       isSceneListShown: false,
     };
-  },
-  computed: {
-    sceneKey() {
-      return this.pageId + '_' + window.userInfo.userId;
-    },
-    fixed() {
-      return this.pageId === 'sceneSearchFixed';
-    }
-  },
-  watch: {
-    currentSceneId(newId, oldId) {
-      if (newId != null) {
-        this.currentSceneIndex = this.sceneList.findIndex(item => item.id === newId);
-      } else {
-        this.currentSceneIndex = null;
-      }
-    }
   },
   created() {
     this.doUiAction('getSceneList');
@@ -267,21 +246,18 @@ Vue.component('jh-scene', {
 
     // 场景列表
     async getSceneList() {
-      let sceneData = localStorage.getItem('sceneData');
-      if(sceneData == null) sceneData = '{}';
-      sceneData = JSON.parse(sceneData);
-      this.sceneList = sceneData[this.sceneKey];
-      if(!this.sceneList) {
-        this.sceneList = [];
-      }
-      this.sceneCustomList = this.sceneList.filter(item => !item.system);
+      let localSceneList = localStorage.getItem(this.sceneListKey);
+      if(localSceneList == null) localSceneList = '[]';
+      localSceneList = JSON.parse(localSceneList);
+      console.log(localSceneList)
+      this.sceneList = localSceneList;
+      this.sceneCustomList = localSceneList.filter(item => !item.system);
     },
 
     // 使用默认场景
     async useDefaultScene() {
       let defaultScene = this.sceneList.find(item => item.default === true);
       if (defaultScene) {
-        this.currentSceneIndex = this.sceneList.findIndex(item => item.default === true);
         this.useScene(defaultScene);
       }
     },
@@ -317,22 +293,21 @@ Vue.component('jh-scene', {
 
     // 添加场景
     async doCreateScene() {
-      let sceneData = localStorage.getItem('sceneData');
-      if(sceneData == null) sceneData = '{}';
-      sceneData = JSON.parse(sceneData);
-      let sceneList = sceneData[this.sceneKey];
-      if(!sceneList) {
-        sceneList = [];
-      }
+      let localSceneList = localStorage.getItem(this.sceneListKey);
+      if(localSceneList == null) localSceneList = '[]';
+      localSceneList = JSON.parse(localSceneList);
       const newScene = {...this.createItem};
-      sceneList.push(newScene);
-      sceneData[this.sceneKey] = sceneList;
-      localStorage.setItem('sceneData', JSON.stringify(sceneData));
+      localSceneList.push(newScene);
+      console.log(localSceneList);
+      localStorage.setItem(this.sceneListKey, JSON.stringify(localSceneList));
     },
     // 添加完成，直接使用新添加的场景
     async userNewCreateScene() {
-      const currentSceneIndex = this.sceneList.find(item => item.id === this.createItem.id);
-      this.doUiAction('useScene', currentSceneIndex);
+      const newSceneItem = this.sceneList.find(item => item.id === this.createItem.id);
+      console.log('newSceneItem', newSceneItem)
+      if(newSceneItem != null) {
+        this.doUiAction('useScene', newSceneItem);
+      }
     },
 
     // 关闭场景添加弹框
@@ -347,12 +322,7 @@ Vue.component('jh-scene', {
     },
     // 检查并重置当前选中场景
     async checkCurrentScene() {
-      // 未定位任何场景，重新定位到默认场景
-      if (this.currentSceneIndex === -1) {
-        this.useDefaultScene();
-        return;
-      }
-      const currentScene = this.sceneList[this.currentSceneIndex];
+      const currentScene = this.sceneList.find((item, index) => item.id === this.currentSceneId);
       // 当前定位场景已不存在了，重新定位到默认场景
       if (!currentScene) {
         this.useDefaultScene();
@@ -376,15 +346,11 @@ Vue.component('jh-scene', {
 
     // 删除场景
     async doDeleteScene() {
-      let sceneData = localStorage.getItem('sceneData');
-      if(sceneData == null) sceneData = '{}';
-      sceneData = JSON.parse(sceneData);
-      let sceneList = sceneData[this.sceneKey];
-      if(!sceneList) {
-        sceneList = [];
-      }
-      sceneData[this.sceneKey] = sceneList.filter(item => item.id !== this.deleteItem.id);
-      localStorage.setItem('sceneData', JSON.stringify(sceneData));
+      let localSceneList = localStorage.getItem(this.sceneListKey);
+      if(localSceneList == null) localSceneList = '[]';
+      localSceneList = JSON.parse(localSceneList);
+      localSceneList = localSceneList.filter(item => item.id !== this.deleteItem.id);
+      localStorage.setItem('sceneData', JSON.stringify(localSceneList));
     },
     // =================================场景管理 <<<<<<<<<<<< ======================================
   },
