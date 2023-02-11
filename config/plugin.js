@@ -22,4 +22,8 @@ module.exports = {
     enable: true,
     path: path.join(__dirname, '../plugins/socket-io'),
   },
+  xiaochengxu: {
+    enable: true,
+    path: path.join(__dirname, '../plugins/xiaochengxu'),
+  },
 };

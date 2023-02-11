@@ -5,18 +5,18 @@ const {
   socketResponse,
   resourcePath,
   socketRequest: socketRequestBodyBuild,
-} = require('../constant/constant');
-const { BizError, errorInfoEnum } = require('../constant/error');
+} = require('../../../../app/constant/constant');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 const {
   sqlResource,
   serviceResource,
-} = require('./controllerUtil/resourceUtil');
-const socketPackage = require('../middleware/socketPackage');
-const socketPackageRecord = require('../middleware/socketPackageRecord');
-const socketUserInfo = require('../middleware/socketUserInfo');
-const socketAuthorization = require('../middleware/socketAuthorization');
-const socketResourceBeforeHook = require('../middleware/socketResourceBeforeHook');
-const socketResourceAfterHook = require('../middleware/socketResourceAfterHook');
+} = require('../../../../app/controller/controllerUtil/resourceUtil');
+const socketPackage = require('../../../middleware/socketPackage');
+const socketPackageRecord = require('../../../middleware/socketPackageRecord');
+const socketUserInfo = require('../../../middleware/socketUserInfo');
+const socketAuthorization = require('../../../middleware/socketAuthorization');
+const socketResourceBeforeHook = require('../../../middleware/socketResourceBeforeHook');
+const socketResourceAfterHook = require('../../../middleware/socketResourceAfterHook');
 
 async function socketRequest({ socket, app, body }, next) {
   const { packageId, packageType, appData } = body;

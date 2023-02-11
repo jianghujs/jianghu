@@ -1,7 +1,7 @@
 'use strict';
 
-const { userStatusObj } = require('../constant/constant');
-const { BizError, errorInfoEnum } = require('../constant/error');
+const { userStatusObj } = require('../../../../app/constant/constant');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 
 module.exports = option => {
   return async (ctx, next) => {

@@ -1,9 +1,8 @@
 'use strict';
 
-const validateUtil = require('../common/validateUtil');
-const userInfoUtil = require("./middlewareUtil/userInfoUtil");
+const userInfoUtil = require('../../../../app/middleware/middlewareUtil/userInfoUtil');
 
-module.exports = async (ctx) => {
+module.exports = async ctx => {
   const { body } = ctx.request;
   const { jianghuKnex, logger, config } = ctx.app;
   const { appType } = config;

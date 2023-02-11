@@ -1,13 +1,13 @@
 'use strict';
 
-const packageUtil = require('./middlewareUtil/packageUtil');
+const packageUtil = require('../../app/middleware/middlewareUtil/packageUtil');
 
 module.exports = async ctx => {
   const midTime = new Date().getTime();
 
   const { packageResource } = ctx;
   const { resourceId } = packageResource;
-  const { jianghuKnex, config, logger } = ctx.app;
+  const { config, logger } = ctx.app;
   const { jianghuConfig } = config;
 
   // 记录 request resource; 这里的错误不能影响主业务 所以 try catch一下

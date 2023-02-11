@@ -1,6 +1,6 @@
 'use strict';
 
-const { BizError, errorInfoEnum } = require('../constant/error');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 
 module.exports = async ctx => {
   const { packageResource } = ctx;
@@ -24,9 +24,9 @@ module.exports = async ctx => {
     }
   };
 
-  if (beforeHooks) {
-    for (const beforeHook of beforeHooks) {
-      const { service, serviceFunction } = beforeHook;
+  if (afterHooks) {
+    for (const afterHook of afterHooks) {
+      const { service, serviceFunction } = afterHook;
       checkServiceFunction(service, serviceFunction);
       await ctx.service[service][serviceFunction](
         ctx.request.body.appData.actionData,

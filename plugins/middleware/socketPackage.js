@@ -1,7 +1,7 @@
 'use strict';
 
-const validateUtil = require('../common/validateUtil');
-const { errorInfoEnum, BizError } = require('../constant/error');
+const validateUtil = require('../../app/common/validateUtil');
+const { errorInfoEnum, BizError } = require('../../app/constant/error');
 
 const validateSchemaEnum = Object.freeze({
   resourceRequestBody: {
@@ -12,13 +12,7 @@ const validateSchemaEnum = Object.freeze({
       packageId: { type: 'string' },
       packageType: {
         type: 'string',
-        enum: [
-          'socketForward',
-          'socketRequest',
-          'socketResponse',
-          'miniRequest',
-          'miniResponse',
-        ],
+        enum: [ 'socketForward', 'socketRequest', 'socketResponse' ],
       },
       appData: {
         type: 'object',
@@ -44,8 +38,7 @@ module.exports = async ctx => {
     ctx.request.body.appData.actionData = {};
   }
 
-  const { jianghuKnex, config, logger } = ctx.app;
-  const { jianghuConfig } = config;
+  const { jianghuKnex } = ctx.app;
   const { pageId, actionId } = body.appData;
 
   const resourceId = `${pageId}.${actionId}`;
@@ -55,7 +48,7 @@ module.exports = async ctx => {
     .where({ pageId, actionId })
     .first();
   if (!ctx.packageResource) {
-    throw new BizError({ ...errorInfoEnum.resource_not_found, errorReasonSupplement: resourceId });
+    throw new BizError(errorInfoEnum.resource_not_found);
   }
   ctx.packageResource.resourceId = resourceId;
   ctx.packageResource.resourceHook = JSON.parse(
