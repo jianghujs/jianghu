@@ -57,7 +57,7 @@
             :key="item.path"
             @click="openUrl(item.path, item.query)"
           >
-            <v-list-item-content class="pl-3">
+            <v-list-item-content class="pl-0">
               <v-list-item-title>
                 {{ item.title }}
               </v-list-item-title>
@@ -355,14 +355,16 @@ Vue.component('jh-menu', {
     },
     // 多应用项目，添加回到目录
     computedMultiAppMenuList() {
-      const appType = '<$ ctx.app.config.appType $>';
-      if (appType === 'multiApp' && this.appDirectoryLink) {
-        this.inMenuList.unshift({
-          path: this.appDirectoryLink,
-          pageId: 'backToDirectory',
-          title: '回到目录',
-          children: null
-        });
+      if(window.appInfo.appId !== 'directory') {
+        const appType = '<$ ctx.app.config.appType $>';
+        if (appType === 'multiApp' && this.appDirectoryLink) {
+          this.inMenuList.unshift({
+            path: this.appDirectoryLink,
+            pageId: 'directory',
+            title: '回到目录',
+            children: null
+          });
+        }
       }
     },
     // 头像菜单构建
