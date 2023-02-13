@@ -1,13 +1,12 @@
 'use strict';
 
-const assert = require('assert');
 const path = require('path');
 
 const { middleware, middlewareMatch } = require(path.join(process.cwd(), 'config/middlewareConfig'));
 
 
 module.exports = appInfo => {
-  assert(appInfo);
+
   const appId = 'jianghu';
   const uploadDir = path.join(appInfo.baseDir, 'upload');
   const downloadBasePath = `/${appId}/upload`;

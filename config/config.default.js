@@ -3,11 +3,9 @@
 const { httpResponse } = require('../app/constant/constant');
 const { errorInfoEnum } = require('../app/constant/error');
 const path = require('path');
-const assert = require('assert');
 const fs = require('fs');
 
 module.exports = appInfo => {
-  assert(appInfo);
   const appId = appInfo.name || 'defaultAppId';
 
   const config = {
