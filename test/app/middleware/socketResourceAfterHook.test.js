@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const socketResourceAfterHook = require('../../../app/middleware/socketResourceAfterHook');
+const socketResourceAfterHook = require('../../../plugins/socket-io/app/middleware/socketResourceAfterHook');
 
 describe('test/app/middleware/socketResourceAfterHook.test.js', () => {
   before(() => {

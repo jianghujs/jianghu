@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const xiaochengxuPagePackage = require('../../../app/middleware/xiaochengxuPagePackage');
+const xiaochengxuPagePackage = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuPagePackage');
 
 describe('test/app/middleware/xiaochengxuPagePackage.test.js', () => {
   before(() => {

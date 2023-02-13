@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const xiaochengxuUserInfo = require('../../../app/middleware/xiaochengxuUserInfo');
+const xiaochengxuUserInfo = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuUserInfo');
 const userInfoUtil = require('../../../app/middleware/middlewareUtil/userInfoUtil');
 
 describe('test/app/middleware/xiaochengxuUserInfo.test.js', () => {
