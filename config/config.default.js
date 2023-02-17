@@ -20,33 +20,51 @@ module.exports = appInfo => {
     appType: "single", // single: 单应用; multiApp: 多应用
     appDirectoryLink: "/",
 
-    primaryColor: '#1867c0',
     indexPage: `/${appId}/page/manual`,
     loginPage: `/${appId}/page/login`,
     helpPage: `/${appId}/page/help`,
+
+    primaryColor: '#1867c0',
+
     jianghuConfig: {
+      // 页面日志收集
       enableHtmlErrorLogRecord: false,
       htmlErrorLogRecordInterval: 60000,
+
+      // resource 日志收集
       enableResourceLogRecord: true,
       ignoreListOfResourceLogRecord: [ 'user.passwordLogin' ],
-      enableSocket: false,
       updateRequestDemoAndResponseDemo: false,
-      enableUserInfoCache: false,
-      userInfoCacheRefreshInterval: "10s",
-      enableSyncSocketStatus: false,
-      syncSocketStatusRefreshInterval: "60s",
       ignoreListOfResourceRequestLog: ['allPage.getConstantList', 
         'allPage.httpUploadByStream', 'allPage.httpUploadByBase64', 'allPage.httpDownloadByBase64'],
-      // 自动清理旧日志，保留 N 天内的日志
+
+      // 自动清理旧日志文件，保留 N 天内的日志
       autoClearOldLogFile: false,
       autoClearOldLogBeforeDays: 7,
       autoClearOldLogFilePrefixList: [
         'common-error', 'egg-web', 'egg-schedule', 'egg-knex', 'egg-agent', '_resource_request_log',
         `${appId}.html`, `${appId}.resource`, `${appId}-web`, `${appId}.html`,
       ],
-      // /appId/upload 下的文件在鉴权通过之后，设置 max-age，默认 30 天缓存
+
+      // websocket 开关
+      enableSocket: false,
+
+      // websocket 在线状态修正任务
+      enableSyncSocketStatus: false,
+      syncSocketStatusRefreshInterval: "60s",
+
+      // 开启用户信息缓存
+      // @see schedule/syncDataToCache
+      enableUserInfoCache: false,
+      userInfoCacheRefreshInterval: "10s",
+
+      // /appId/upload 上传文件的鉴权、缓存配置
       // @see downloadUserInfo 中间件
+      enableUploadStaticFileCache: true,
+      enableUploadStaticFileAuthorization: false,
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
+
+      // 使用 jianghuConfigImportData/jianghuConfigDumpData 同步配置时忽略的数据项
       jianghuConfigDataIgnoreIdList: { 
         _constant: [],
         _page: [],
@@ -54,11 +72,13 @@ module.exports = appInfo => {
         _test_case: [],
         _ui: [],
       },
+
       // Tip: 兼容配置, 下一个大版本删除
       compatibleConfig: {
         // true =====》 ALTER TABLE `_resource_request_log` ADD COLUMN `userId` varchar(255) NULL COMMENT '用户ID' AFTER `userAgent`;
         // resourceRequestLogRecordUserId: false
       }
+
     },
     security: {
       csrf: { enable: false },
