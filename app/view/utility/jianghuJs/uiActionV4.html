@@ -8,7 +8,7 @@
         }, timeout)
       });
     }
-    const uiActionList = JSON.parse('<$ uiActionList | dump | safe $>');
+    const uiActionList = JSON.parse(String.raw`<$ uiActionList | dump | safe $>`);
     const uiActionMap = {};
     uiActionList.forEach(({uiActionId, uiActionConfig}) => {
       const {before = [], main = [],  after = []} = uiActionConfig;
@@ -18,7 +18,7 @@
         ...after,
       ]
     });
-  
+
     // key -> uiAction
     window.uiActionMap = uiActionMap;
     // 当前页面的 vue 组件，name -> vue
@@ -27,7 +27,7 @@
     window.vueComputed = {}
     // 当前页面的 vue 中的 data 数据
     window.vueData = {};
-  
+
     window.registerData = (data, computed) => {
       Object.assign(window.vueData, data)
       Object.assign(window.vueComputed, computed)
@@ -89,8 +89,7 @@
         },
       }
     };
-  
+
   })();
   </script>
 <!-- <<<<<<<<<<<<< uiAction.html -->
-  
