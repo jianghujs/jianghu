@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-const { tableObj } = require("../constant/constant");
-const { BizError, errorInfoEnum } = require("../constant/error");
+const { tableObj } = require('../../../../app/constant/constant');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 
 module.exports = () => {
   return async (ctx, next) => {
@@ -11,7 +11,7 @@ module.exports = () => {
     const body = ctx.request.body;
     const { pageId } = body.appData.actionData;
 
-    ctx.packagePage = await jianghuKnex(tableObj._page)
+    ctx.packagePage = await jianghuKnex('_page')
       .where({ pageId })
       .first();
 

@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const xiaochengxuPageAuthorization = require('../../../app/middleware/xiaochengxuPageAuthorization');
+const xiaochengxuPageAuthorization = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuPageAuthorization');
 
 describe('test/app/middleware/xiaochengxuPageAuthorization.test.js', () => {
   before(() => {

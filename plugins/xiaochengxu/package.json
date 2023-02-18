@@ -1,0 +1,26 @@
+{
+  "name": "xiaochengxu",
+  "version": "1.0.0",
+  "description": "",
+  "eggPlugin": {
+    "name": "xiaochengxu"
+  },
+  "keywords": [
+    "egg",
+    "eggPlugin",
+    "egg-plugin"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {},
+  "files": [
+    "app",
+    "lib",
+    "config",
+    "app.js"
+  ]
+}

@@ -9,7 +9,6 @@
         "@socket.io/redis-adapter": "^7.1.0",
         "ajv": "^8.7.1",
         "ajv-formats": "^2.1.1",
-        "await-stream-ready": "^1.0.1",
         "axios": "^0.21.1",
         "dayjs": "^1.10.5",
         "egg": "^2.15.1",
@@ -17,8 +16,6 @@
         "egg-knex": "^3.0.1",
         "egg-scripts": "^2.11.0",
         "egg-static": "^2.2.0",
-        "autod": "^3.0.1",
-        "autod-egg": "^1.1.0",
         "egg-bin": "^4.11.0",
         "egg-view-nunjucks": "^2.3.0",
         "geoip-lite": "^1.4.2",
@@ -55,10 +52,7 @@
     "scripts": {
         "test": "egg-bin test",
         "cov": "egg-bin cov",
-        "lint": "eslint . --resolve-plugins-relative-to .",
-        "ci": "npm run lint && egg-bin pkgfiles --check && npm run cov",
-        "autod": "autod",
-        "pkgfiles": "egg-bin pkgfiles"
+        "lint": "eslint . --resolve-plugins-relative-to ."
     },
     "keywords": [
         "egg",
@@ -78,7 +72,7 @@
         "coverage",
         "dist"
     ],
-    "homepage": "https://cn.openjianghu.org",
+    "homepage": "https://cn.jianghujs.org",
     "repository": {
         "type": "git",
         "url": "https://github.com/jianghujs/jianghu.git"

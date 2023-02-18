@@ -1,6 +1,5 @@
 'use strict';
 
-const { tableObj } = require('../../constant/constant');
 const geoip = require('geoip-lite');
 
 module.exports = {
@@ -29,10 +28,10 @@ module.exports = {
 
     // 大文本
     if (requestBodyString.length > 8144) {
-      requestBodyString = "请求文本太大!";
+      requestBodyString = '请求文本太大!';
     }
     if (requestBodyString.length > 8144) {
-      responseBodyString = "响应文本太大!";
+      responseBodyString = '响应文本太大!';
     }
     const insertData = {
       packageId, resourceId, deviceId, userId,
@@ -45,7 +44,7 @@ module.exports = {
     if (enableResourceLogRecord === true) {
       app.getLogger('resourceLogger').info(insertData);
     }
-    // await jianghuKnex(tableObj._resource_request_log)
+    // await jianghuKnex('_resource_request_log')
     //   .insert(insertData);
   },
 
@@ -69,7 +68,7 @@ module.exports = {
     }
     const responseDemo = JSON.stringify(responseBodyTmp);
 
-    await jianghuKnex(tableObj._resource).where({ pageId, actionId }).update({ requestDemo, responseDemo });
+    await jianghuKnex('_resource').where({ pageId, actionId }).update({ requestDemo, responseDemo });
   },
 };
 

@@ -1,7 +1,7 @@
 'use strict';
 
-const { userStatusObj, tableObj } = require('../constant/constant');
-const { BizError, errorInfoEnum } = require('../constant/error');
+const { userStatusObj } = require('../../../../app/constant/constant');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 
 module.exports = option => {
   return async (ctx, next) => {
@@ -13,9 +13,7 @@ module.exports = option => {
     const { appType, appId } = config;
     // 对于 public page ====》不需要做 用户状态的校验
     // public: { user: "*", group: "public", role: "*" }
-    const allUserGroupRolePageList = await jianghuKnex(
-      tableObj._user_group_role_page
-    ).select();
+    const allUserGroupRolePageList = await jianghuKnex('_user_group_role_page').select();
     const isNotPublic = !allUserGroupRolePageList.find(
       rule =>
         rule.group === 'public' && rule.role === '*' && rule.page === pageId

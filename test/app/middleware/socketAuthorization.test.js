@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const socketAuthorization = require('../../../app/middleware/socketAuthorization');
+const socketAuthorization = require('../../../plugins/socket-io/app/middleware/socketAuthorization');
 
 describe('test/app/middleware/socketAuthorization.test.js', () => {
   before(() => {

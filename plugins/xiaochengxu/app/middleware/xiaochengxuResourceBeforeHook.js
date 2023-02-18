@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-const { BizError, errorInfoEnum } = require("../constant/error");
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 
-module.exports = async (ctx) => {
+module.exports = async ctx => {
   const { packageResource } = ctx;
   const {
     resourceHook: { before: beforeHooks, after: afterHooks },
@@ -20,7 +20,11 @@ module.exports = async (ctx) => {
     }
     const serviceFunctionTmp = serviceTmp[serviceFunction];
     if (!serviceFunctionTmp) {
-      throw new BizError(errorInfoEnum.resource_service_method_not_found);
+      throw new BizError({
+        ...errorInfoEnum.resource_service_method_not_found, errorReasonSupplement: {
+          service, serviceFunction
+        }
+      });
     }
   };
 

@@ -6,26 +6,18 @@ module.exports = options => {
   return async (ctx, next) => {
 
     const { jianghuKnex, logger, db, config } = ctx.app;
-    const { appId, appType } = config;
-
-    // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
-    const mockBody = {
-      appData: {
-        authToken: ctx.cookies.get(`${appId}_authToken`, {
-          httpOnly: false,
-          signed: false,
-        }),
-      },
-    };
+    const { appType } = config;
 
     // 捕获 userInfo: { user, userGroupRoleList, allowPageList, userAppList } 到 ctx.userInfo
     ctx.userInfo = await userInfoUtil.getUserInfo({
+      ctx,
       config,
-      body: mockBody,
+      body: null,
       jianghuKnex,
       db,
       logger,
       appType,
+      mockBody: true,
     });
 
     await next();

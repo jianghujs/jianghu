@@ -22,7 +22,7 @@ module.exports.validate = (schema, data, checkColumnName = "数据") => {
     const errorReasonSupplement = validate.errors
       .map(
         (x) =>
-          `${x.instancePath} ${x.message} ${JSON.stringify(x.params || {})}`
+          `${x.instancePath} ${x.message}`
       )
       .join("; ");
     let { errorCode, errorReason } = errorInfoEnum.request_body_invalid;

@@ -1,8 +1,7 @@
 'use strict';
 
-const validateUtil = require('../common/validateUtil');
-const { errorInfoEnum, BizError } = require('../constant/error');
-const { tableObj } = require('../constant/constant');
+const validateUtil = require('../../../../app/common/validateUtil');
+const { errorInfoEnum, BizError } = require('../../../../app/constant/error');
 
 const validateSchemaEnum = Object.freeze({
   resourceRequestBody: {
@@ -13,7 +12,13 @@ const validateSchemaEnum = Object.freeze({
       packageId: { type: 'string' },
       packageType: {
         type: 'string',
-        enum: [ 'socketForward', 'socketRequest', 'socketResponse' ],
+        enum: [
+          'socketForward',
+          'socketRequest',
+          'socketResponse',
+          'miniRequest',
+          'miniResponse',
+        ],
       },
       appData: {
         type: 'object',
@@ -46,11 +51,11 @@ module.exports = async ctx => {
   const resourceId = `${pageId}.${actionId}`;
 
   // 1. 捕获 package resource
-  ctx.packageResource = await jianghuKnex(tableObj._resource)
+  ctx.packageResource = await jianghuKnex('_resource')
     .where({ pageId, actionId })
     .first();
   if (!ctx.packageResource) {
-    throw new BizError(errorInfoEnum.resource_not_found);
+    throw new BizError({ ...errorInfoEnum.resource_not_found, errorReasonSupplement: resourceId });
   }
   ctx.packageResource.resourceId = resourceId;
   ctx.packageResource.resourceHook = JSON.parse(

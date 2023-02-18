@@ -1,7 +1,7 @@
 'use strict';
 // 定时同步 userSession 中的 socketStatus 字段
 
-const { duoxingSocketStatusObj, tableObj } = require('../constant/constant');
+const { duoxingSocketStatusObj } = require('../constant/constant');
 
 module.exports = app => {
   return {
@@ -44,11 +44,11 @@ module.exports = app => {
       });
 
       // 获取对应的 user session
-      let userSessions = await knex(tableObj._user_session)
+      let userSessions = await knex('_user_session')
         .whereIn('deviceId', deviceIds)
         .select();
       // 获取数据库中在线的 user session
-      const onlineUserSessions = await knex(tableObj._user_session)
+      const onlineUserSessions = await knex('_user_session')
         .where('socketStatus', duoxingSocketStatusObj.online)
         .select();
       userSessions = [ ...userSessions, ...onlineUserSessions ];
@@ -70,7 +70,7 @@ module.exports = app => {
               realStatus,
             }
           );
-          const updateRes = await knex(tableObj._user_session)
+          const updateRes = await knex('_user_session')
             .where('id', '=', userSession.id)
             .update('socketStatus', realStatus);
           if (updateRes) {

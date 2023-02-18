@@ -5,12 +5,12 @@ const {
   socketResponse,
   resourcePath,
   socketRequest: socketRequestBodyBuild,
-} = require('../constant/constant');
-const { BizError, errorInfoEnum } = require('../constant/error');
+} = require('../../../../app/constant/constant');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 const {
   sqlResource,
   serviceResource,
-} = require('./controllerUtil/resourceUtil');
+} = require('../../../../app/controller/controllerUtil/resourceUtil');
 const socketPackage = require('../middleware/socketPackage');
 const socketPackageRecord = require('../middleware/socketPackageRecord');
 const socketUserInfo = require('../middleware/socketUserInfo');
@@ -65,7 +65,6 @@ async function socketRequest({ socket, app, body }, next) {
   if (packageType === 'socketRequest') {
     const responseBody = socketResponse.success({
       packageId,
-      // TODO: ...resultData, resultData 为兼容代码
       appData: { resultData, appId, pageId, actionId },
     });
     socket.emit(resourcePath, responseBody);

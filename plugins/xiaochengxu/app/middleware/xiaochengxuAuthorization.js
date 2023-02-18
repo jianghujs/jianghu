@@ -1,7 +1,7 @@
 'use strict';
 
-const { BizError, errorInfoEnum } = require('../constant/error');
-const { userStatusObj, tableObj } = require('../constant/constant');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
+const { userStatusObj } = require('../../../../app/constant/constant');
 
 module.exports = async ctx => {
 
@@ -15,20 +15,18 @@ module.exports = async ctx => {
   const { isGroupIdRequired } = ctx.packageResource.resourceData;
   // 对于 public 的 resource ====》不需要做 用户状态的校验
   // public: { user: "*", group: "public", role: "*" }
-  const allUserGroupRoleResourceList = await jianghuKnex(
-    tableObj._user_group_role_resource
-  ).select();
+  const allUserGroupRoleResourceList = await jianghuKnex('_user_group_role_resource').select();
   const isNotPublic = !allUserGroupRoleResourceList.find(
-    (rule) =>
-      rule.group === "public" &&
-      rule.role === "*" &&
+    rule =>
+      rule.group === 'public' &&
+      rule.role === '*' &&
       rule.resource === resourceId
   );
 
   // 1. 判断用户是否有当前app的权限
-  if (isNotPublic && appType === "multiApp") {
+  if (isNotPublic && appType === 'multiApp') {
     const targetUserApp =
-      userAppList && userAppList.find((x) => x.appId === appId);
+      userAppList && userAppList.find(x => x.appId === appId);
     if (!targetUserApp) {
       throw new BizError(errorInfoEnum.request_app_forbidden);
     }
@@ -50,11 +48,11 @@ module.exports = async ctx => {
     if (!groupId) {
       throw new BizError({
         ...errorInfoEnum.request_data_invalid,
-        errorReason: "groupId is required",
+        errorReason: 'groupId is required',
       });
     }
     const currentUserGroupRole = userGroupRoleList.find(
-      (userGroupRole) => userGroupRole.groupId === groupId
+      userGroupRole => userGroupRole.groupId === groupId
     );
     if (!currentUserGroupRole) {
       throw new BizError(errorInfoEnum.request_group_forbidden);
@@ -62,7 +60,7 @@ module.exports = async ctx => {
   }
 
   // 4. 判断用户是否有 当前 packageResource 的权限
-  if (allowResourceList.findIndex((x) => x.resourceId === resourceId) === -1) {
+  if (allowResourceList.findIndex(x => x.resourceId === resourceId) === -1) {
     // 3.1 若未登陆 则 提示用户登陆后再来 请求这个 resource
     if (!isLoginUser) {
       throw new BizError(errorInfoEnum.request_token_invalid);

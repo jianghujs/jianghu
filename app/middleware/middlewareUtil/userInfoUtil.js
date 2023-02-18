@@ -1,6 +1,5 @@
 'use strict';
 
-const { tableObj } = require('../../constant/constant');
 const _ = require('lodash');
 const dayjs = require('dayjs');
 
@@ -19,12 +18,12 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
       operationAt: dayjs().format(),
     };
   } else {
-    userSession = await jianghuKnex(tableObj._user_session)
+    userSession = await jianghuKnex('_user_session')
       .where({ authToken })
       .first();
   }
   if (userSession && userSession.userId) {
-    const userResult = await jianghuKnex(tableObj._view01_user)
+    const userResult = await jianghuKnex('_view01_user')
       .where({ userId: userSession.userId })
       .first();
     if (userResult) {
@@ -40,13 +39,26 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
 
 module.exports = {
   async getUserInfo({
+    ctx,
     config,
     body,
     jianghuKnex,
     isGroupIdRequired,
     appType,
     xiaochengxuUserId = null,
+    mockBody = false,
   }) {
+    if (mockBody) {
+      // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
+      body = {
+        appData: {
+          authToken: ctx.cookies.get(`${config.appId}_authToken`, {
+            httpOnly: false,
+            signed: false,
+          }),
+        },
+      };
+    }
     const { authToken, actionData = {} } = body.appData;
     // 取到 authToken 后不再需要保留在 actionData 中
     delete body.appData.authToken;
@@ -81,8 +93,8 @@ module.exports = {
   },
 
   async getUserRuleDataFromCache(jianghuKnex, userId) {
-    // const cache = await jianghuKnex(tableObj._cache).where({ userId: userId || 'visitor' }).first();
-    const cache = await jianghuKnex(tableObj._cache).where({ userId }).first();
+    // const cache = await jianghuKnex('_cache').where({ userId: userId || 'visitor' }).first();
+    const cache = await jianghuKnex('_cache').where({ userId }).first();
     if (cache && cache.content) {
       return JSON.parse(cache.content);
     }
@@ -102,12 +114,12 @@ module.exports = {
     if (userId) {
       // Tip: resource指定groupId后 ===> 只能取当前的groupId ===> params: { groupId }
       userGroupRoleList = groupId
-        ? await jianghuKnex(tableObj._user_group_role)
+        ? await jianghuKnex('_user_group_role')
           .where({ userId, groupId })
           .select()
-        : await jianghuKnex(`${tableObj._user_group_role} as a`)
-          .innerJoin(`${tableObj._group} as b`, 'b.groupId', 'a.groupId')
-          .innerJoin(`${tableObj._role} as c`, 'c.roleId', 'a.roleId')
+        : await jianghuKnex('_user_group_role as a')
+          .innerJoin('_group as b', 'b.groupId', 'a.groupId')
+          .innerJoin('_role as c', 'c.roleId', 'a.roleId')
           .where({ 'a.userId': userId })
           .select(
             'a.*',
@@ -146,7 +158,7 @@ module.exports = {
     if (!userId) {
       return [];
     }
-    return await jianghuKnex(tableObj._view_user_app)
+    return await jianghuKnex('_view02_user_app')
       .where({ userId })
       .select();
   },
@@ -194,14 +206,12 @@ module.exports = {
     groupIdList,
     roleIdList,
   }) {
-    const allResourceList = await jianghuKnex(tableObj._resource).select();
+    const allResourceList = await jianghuKnex('_resource').select();
     allResourceList.forEach(resource => {
       const { pageId, actionId } = resource;
       resource.resourceId = `${pageId}.${actionId}`;
     });
-    const allUserGroupRoleResourceList = await jianghuKnex(
-      tableObj._user_group_role_resource
-    ).select();
+    const allUserGroupRoleResourceList = await jianghuKnex('_user_group_role_resource').select();
     const allowResourceList = this.computeAllowList(
       'resource',
       allResourceList,
@@ -226,10 +236,8 @@ module.exports = {
     groupIdList,
     roleIdList,
   }) {
-    const allPageList = await jianghuKnex(tableObj._page).select();
-    const allUserGroupRolePageList = await jianghuKnex(
-      tableObj._user_group_role_page
-    ).select();
+    const allPageList = await jianghuKnex('_page').select();
+    const allUserGroupRolePageList = await jianghuKnex('_user_group_role_page').select();
     const allowPageList = this.computeAllowList(
       'page',
       allPageList,

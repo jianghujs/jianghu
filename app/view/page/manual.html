@@ -34,28 +34,28 @@
 {% block vueScript %}
 
 <script type="module">
-new Vue({
-  el: '#app',
-  template: '#app-template',
-  vuetify: new Vuetify(),
-  data: () => ({
-    // 面包屑
-    breadcrumbs: [
-      {
-        text: '首页',
-        disabled: true,
-      },
-      {
-        text: 'manual',
-        disabled: true,
-      }
-    ],
+  new Vue({
+    el: '#app',
+    template: '#app-template',
+    vuetify: new Vuetify(),
+    data: () => ({
+      // 面包屑
+      breadcrumbs: [
+        {
+          text: '首页',
+          disabled: true,
+        },
+        {
+          text: 'manual',
+          disabled: true,
+        }
+      ],
 
-    appInfo: window.appInfo,
-  }),
-  created() {
-  },
-  methods: {}
-})
+      appInfo: window.appInfo,
+    }),
+    created() {
+    },
+    methods: {}
+  })
 </script>
 {% endblock %}

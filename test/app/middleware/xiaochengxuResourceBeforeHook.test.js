@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const xiaochengxuResourceBeforeHook = require('../../../app/middleware/xiaochengxuResourceBeforeHook');
+const xiaochengxuResourceBeforeHook = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuResourceBeforeHook');
 
 describe('test/app/middleware/xiaochengxuResourceBeforeHook.test.js', () => {
   before(() => {

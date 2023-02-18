@@ -7,7 +7,7 @@ const Redis = require('ioredis');
 module.exports = app => {
   const { logger, config } = app;
   const socketIO = new Server(config.socketIO);
-  if (config.jianghuConfig.enableSocket !== true ) {
+  if (config.jianghuConfig.enableSocket !== true) {
     return socketIO;
   }
 

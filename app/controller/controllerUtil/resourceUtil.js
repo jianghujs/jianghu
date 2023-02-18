@@ -26,9 +26,9 @@ function validate(ctx, body) {
   }
 
   // 如果是更新或删除，需要指定条件
-  if ([ 'update', 'delete', 'jhUpdate', 'jhDelete' ].includes(operation)) {
+  if (['update', 'delete', 'jhUpdate', 'jhDelete'].includes(operation)) {
     let hasCondition = false;
-    for (const conditionKey of [ 'where', 'whereLike', 'whereOrOption', 'whereOption', 'whereIn', 'whereKnex', 'rawSql' ]) {
+    for (const conditionKey of ['where', 'whereLike', 'whereOrOption', 'whereOption', 'whereIn', 'whereKnex', 'rawSql']) {
       if (resourceData[conditionKey] || appData[conditionKey]) {
         hasCondition = true;
         break;
@@ -117,7 +117,7 @@ async function buildWhereConditionFromResourceData(
 
   const backendAppData = {};
   // 如：{ "where": { "field1": "ctx.someData" } }
-  [ 'where', 'whereLike', 'whereIn' ].forEach(appDataKey => {
+  ['where', 'whereLike', 'whereIn'].forEach(appDataKey => {
     const expressionObject = resourceData[appDataKey];
     if (!expressionObject) {
       return;
@@ -131,7 +131,7 @@ async function buildWhereConditionFromResourceData(
   });
 
   // 如：{ "whereOptions": "ctx.someList" }
-  [ 'whereOptions', 'whereOrOptions' ].forEach(appDataKey => {
+  ['whereOptions', 'whereOrOptions'].forEach(appDataKey => {
     const expressionObject = resourceData[appDataKey];
     if (!expressionObject) {
       return;
@@ -192,7 +192,7 @@ async function buildWhereConditionFromAppData({
   // whereIn
   let whereInPart = '';
   if (!_.isEmpty(whereIn)) {
-    Object.entries(whereIn).forEach(([ key, value ]) => {
+    Object.entries(whereIn).forEach(([key, value]) => {
       whereInPart += `.whereIn('${key}', ${JSON.stringify(value)})`;
     });
   }
@@ -257,7 +257,7 @@ async function buildWhereConditionFromAppData({
 
 async function runKnexFunction(knexFunctionString, args = {}) {
   // eslint-disable-next-line no-empty-function
-  const AsyncFunction = Object.getPrototypeOf(async function() {
+  const AsyncFunction = Object.getPrototypeOf(async function () {
   }).constructor;
   const knexCommandCountFunc = new AsyncFunction(..._.keys(args), knexFunctionString);
   return await knexCommandCountFunc(..._.values(args));
@@ -312,7 +312,7 @@ async function sqlResource({ jianghuKnex, ctx }) {
 
   // 1. where 构建：前后端合并
   const whereCondition = await buildWhereCondition(jianghuKnex, ctx, requestBody);
-  if ([ 'delete', 'jhDelete', 'update', 'jhUpdate' ].includes(operation) && !whereCondition) {
+  if (['delete', 'jhDelete', 'update', 'jhUpdate'].includes(operation) && !whereCondition) {
     throw new BizError(errorInfoEnum.resource_sql_exception_of_update_and_delete);
   }
 
@@ -329,7 +329,7 @@ async function sqlResource({ jianghuKnex, ctx }) {
   // 3. jianghuKnex 执行
   let rows = null;
   await jianghuKnex.transaction(async trx => {
-    let knexArgs = [ 'select', 'delete', 'jhDelete' ].includes(operation) ? '' : 'actionData';
+    let knexArgs = ['select', 'delete', 'jhDelete'].includes(operation) ? '' : 'actionData';
     if (operation === 'select' && !_.isEmpty(fieldList)) {
       knexArgs = 'fieldList';
     }
@@ -344,8 +344,13 @@ async function serviceResource({ ctx }) {
   const requestBody = ctx.request.body;
   const appData = requestBody.appData || {};
   const actionData = appData.actionData || {};
-  const { packageResource: { resourceData } } = ctx;
+  const { packageResource: { resourceData, appDataSchema } } = ctx;
   const { service, serviceFunction } = resourceData;
+
+  // 校验 appDataSchema
+  if (!_.isEmpty(appDataSchema)) {
+    validateUtil.validate(appDataSchema, appData, 'appData');
+  }
 
   const serviceTmp = ctx.service[service];
   if (!serviceTmp) {
@@ -354,7 +359,11 @@ async function serviceResource({ ctx }) {
 
   const serviceFunctionTmp = serviceTmp[serviceFunction];
   if (!serviceFunctionTmp) {
-    throw new BizError(errorInfoEnum.resource_service_method_not_found);
+    throw new BizError({
+      ...errorInfoEnum.resource_service_method_not_found, errorReasonSupplement: {
+        service, serviceFunction
+      }
+    });
   }
 
   // 注意: 这里必须 'ctx.service[serviceName][methodName]' 这样 写; 否则service无法获取egg 相关属性

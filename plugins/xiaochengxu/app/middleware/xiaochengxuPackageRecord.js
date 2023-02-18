@@ -1,6 +1,6 @@
 'use strict';
 
-const packageUtil = require('./middlewareUtil/packageUtil');
+const packageUtil = require('../../../../app/middleware/middlewareUtil/packageUtil');
 
 module.exports = async ctx => {
   const midTime = new Date().getTime();
