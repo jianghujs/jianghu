@@ -1,7 +1,6 @@
 'use strict';
 
 const { createJianghuKnex } = require('./app/common/jianghuKnexUtil');
-// const socketIOInit = require('./app/controller/socketResource');
 
 /**
  * 配置文件即将加载，这是最后动态修改配置的时机（configWillLoad）
