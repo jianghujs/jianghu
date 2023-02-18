@@ -1,0 +1,13 @@
+<!-- bugfixDrawerOutsideClick.html >>>>>>>>>>>>> -->
+<script>
+// 抽屉防误关闭
+window.drawerClickOutside = {
+  include: () => {
+    if(document.querySelector('.v-dialog.v-dialog--active')) {
+      return [...document.querySelectorAll('.v-overlay.v-overlay--active'), ...document.querySelectorAll('.v-dialog.v-dialog--active')]
+    }
+    return [];
+  },
+};
+</script>
+<!-- <<<<<<<<<<<<<< bugfixDrawerOutsideClick.html -->

@@ -8,7 +8,7 @@
         }, timeout)
       });
     }
-    const uiActionList = <$ uiActionList | dump | safe $>;
+    const uiActionList = JSON.parse('<$ uiActionList | dump | safe $>');
     const uiActionMap = {};
     uiActionList.forEach(({uiActionId, uiActionConfig}) => {
       const {before = [], main = [],  after = []} = uiActionConfig;

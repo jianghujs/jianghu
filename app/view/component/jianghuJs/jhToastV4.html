@@ -1,22 +1,22 @@
 <!--jhToast.html >>>>>>>>>>>>> -->
-<script type="text/html" id="jhToast">
+<script type="text/html" id="jh-toast">
   <v-snackbar
-  :color="color"
-  :timeout="timer"
-  v-model="showSnackbar"
-  elevation="24"
-  :top="position === 'top'"
-  :bottom="position === 'bottom'">
+    :color="color"
+    :timeout="timer"
+    v-model="showSnackbar"
+    elevation="24"
+    :top="position === 'top'"
+    :bottom="position === 'bottom'">
     <v-progress-circular v-if="showLoading" indeterminate color="green"></v-progress-circular>
     <v-icon v-else left>{{ icon }}</v-icon>
     {{ message }}
     <template v-slot:action="{ attrs }">
     <v-btn
-        color="red"
-        text
-        small
-        v-bind="attrs"
-        @click="showSnackbar = false">
+      color="red"
+      text
+      small
+      v-bind="attrs"
+      @click="showSnackbar = false">
       关闭
     </v-btn>
     </template>
@@ -34,10 +34,10 @@
     window.tabActive = true;
   };
 
-  Vue.component('jhToast', {
-    template: "#jhToast",
-    vueComponent: 'jhToast',
-    mixins: [ window.jianghuUiActionMixins || {} ],
+  Vue.component('jh-toast', {
+    template: "#jh-toast",
+    vueComponent: 'jh-toast',
+    mixins: [window.jianghuUiActionMixins || {}],
     vuetify: new Vuetify(),
     data() {
       return {
@@ -63,7 +63,7 @@
     },
     methods: {
       showAndNotify(paramObj) {
-        let { message } = paramObj;
+        let {message} = paramObj;
         // 限制消息长度
         if (message && message.length > 100) {
           message = message.slice(0, 100) + '...';
@@ -72,7 +72,7 @@
         this.show(paramObj);
         this.notify({message});
       },
-      show({ message, color, timer, icon }) {
+      show({message, color, timer, icon}) {
         this.message = message || 'missing "message".';
         this.color = color || 'success';
         this.timer = timer || 3000;
@@ -82,15 +82,15 @@
       },
       loading(paramObj) {
         // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof(paramObj)=='string') {
+        if (typeof (paramObj) == 'string') {
           this.message = paramObj;
         }
-        if (typeof(paramObj)=='object') {
-          const { message } = paramObj
+        if (typeof (paramObj) == 'object') {
+          const {message} = paramObj
           this.message = message;
         }
         this.color = 'primary';
-        if(paramObj.hasOwnProperty('time')) {
+        if (paramObj.hasOwnProperty('time')) {
           this.timer = paramObj.time;
         } else {
           if (this.message.includes('%')) {
@@ -105,11 +105,11 @@
       },
       success(paramObj) {
         // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof(paramObj)=='string') {
+        if (typeof (paramObj) == 'string') {
           this.message = paramObj;
         }
-        if (typeof(paramObj)=='object') {
-          const { message } = paramObj
+        if (typeof (paramObj) == 'object') {
+          const {message} = paramObj
           this.message = message;
         }
         this.color = 'primary';
@@ -124,11 +124,11 @@
           this.position = paramObj.position;
         }
         // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof(paramObj)=='string') {
+        if (typeof (paramObj) == 'string') {
           this.message = paramObj;
         }
-        if (typeof(paramObj)=='object') {
-          const { message } = paramObj
+        if (typeof (paramObj) == 'object') {
+          const {message} = paramObj
           this.message = message;
         }
         this.color = 'warning';
@@ -143,10 +143,10 @@
       async notify(paramObj) {
         let message = null;
         // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof(paramObj)=='string') {
+        if (typeof (paramObj) == 'string') {
           message = paramObj;
         }
-        if (typeof(paramObj)=='object') {
+        if (typeof (paramObj) == 'object') {
           message = paramObj.message;
         }
         if (Notification.permission !== 'granted') {

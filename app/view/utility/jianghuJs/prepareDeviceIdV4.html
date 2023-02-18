@@ -1,9 +1,8 @@
-{#
-  设置 window.deviceId 数据
-#}
+<!--prepareDeviceIdV4.html >>>>>>>>>>> -->
 <script type="text/javascript">
 
 window.deviceId = getDeviceId();
+
 function getDeviceId() {
   const { osName, osVersion } = this.getOsInfo();
   const browserMachineId = `${osName}.${osVersion}`;
@@ -152,3 +151,4 @@ function getBrowserInfo() {
   return "others";
 }
 </script>
+<!--prepareDeviceIdV4.html <<<<<<<<<<<<<< -->

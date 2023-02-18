@@ -1,0 +1,436 @@
+<!--jhMenu.html >>>>>>>>>>>>> -->
+<script type="text/html" id="jh-menu">
+<div>
+  <!-- 手机端左边抽屉菜单 >>>>>>>>>>>>> -->
+  <v-navigation-drawer
+    v-model="isMobileMenuDrawerShown"
+    app
+    clipped
+    v-if="isMobile"
+    style="z-index: 99999"
+    class="jh-page-nav-bar"
+  >
+    <v-btn
+      fab
+      color="success"
+      class="elevation-0"
+      x-small
+      style="position: absolute; right: 15px; top: 15px; z-index: 10"
+      @click="isMobileMenuDrawerShown = !isMobileMenuDrawerShown">
+      <v-icon>mdi-arrow-left</v-icon>
+    </v-btn>
+    <v-list>
+      <v-list-item-group
+        v-model="currentMenuTabIndex"
+        color="success"
+      >
+        <v-list-item
+          disabled
+          class="pa-2"
+          style="color: #333333"
+        >
+          <v-list-item-content>
+            <v-list-item-title class="font-weight-bold text-h7 pr-10 text-center">
+              {{ appTitle }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <template v-for="item in inMenuList">
+          <template v-if="item.children && item.children.length > 0">
+            <v-list-group :value="item.extend">
+              <template v-slot:activator>
+                <v-list-item-content class="pl-3">
+                  <v-list-item-title>
+                    {{ item.title }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </template>
+              <v-list-item @click="openUrl(menu.path, menu.query)" v-for="menu in item.children">
+                <v-list-item-content>
+                  <v-list-item-title class="pl-7 jh-font-size-2" style="color: #666977;">{{ menu.title }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-group>
+          </template>
+          <v-list-item
+            v-else
+            :key="item.path"
+            @click="openUrl(item.path, item.query)"
+          >
+            <v-list-item-content class="pl-0">
+              <v-list-item-title>
+                {{ item.title }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+      </v-list-item-group>
+    </v-list>
+  </v-navigation-drawer>
+  <!-- <<<<<<<<<<<<< 手机端左边抽屉菜单 -->
+  <!-- 页面头部 >>>>>>>>>>>>> -->
+  <v-app-bar
+    app
+    clipped-left
+    height="60"
+    class="jh-page-header px-8"
+    style="z-index: 50;"
+    flat
+  >
+    <!--手机端左侧菜单开启按钮-->
+    <v-app-bar-nav-icon color="success" @click.stop="isMobileMenuDrawerShown = !isMobileMenuDrawerShown" v-if="isMobile"></v-app-bar-nav-icon>
+    <!--页面标题-->
+    <v-toolbar-title ref="toolbarTitle" class="mr-8">
+      <span class="text-h7 font-weight-bold">{{ appTitle }}</span>
+    </v-toolbar-title>
+    <!--pc端菜单 >>>>>>>>>>>>>-->
+    <v-tabs
+      v-model="currentMenuTabIndex"
+      v-if="!isMobile"
+      show-arrows
+      slider-size="0"
+      color="success"
+      :style="{maxWidth: tabsMaxWidth}"
+    >
+      <template v-for="(item, index) in inMenuList">
+        <!--一级菜单 >>>>>>>>>>>> -->
+        <template v-if="item.pageId && !item.children">
+          <v-tab
+            class="px-5 jh-header-tab"
+            active-class="jh-header-tab-active"
+            :key="item.path"
+            @click="openUrl(item.path, item.query)"
+          >
+            {{ item.title }}
+          </v-tab>
+        </template>
+        <!--<<<<<<<<<<<<<一级菜单-->
+        <!--二级菜单>>>>>>>>>>>>-->
+        <template v-else>
+          <v-menu offset-y v-model="inMenuShownStatusList[index]">
+            <template v-slot:activator="{on, attrs}">
+              <v-tab
+                v-bind="attrs" v-on="on"
+                class="px-5 jh-header-tab"
+                :class="{'parent-tab-active': currentMenuTabIndex === index, 'jh-header-tab-active': currentMenuTabIndex === index}"
+                :key="item.path"
+              >
+                {{ item.title }}
+                <v-icon disabled v-if="inMenuShownStatusList[index]" size="12">mdi-chevron-up</v-icon>
+                <v-icon disabled v-else size="12">mdi-chevron-down</v-icon>
+              </v-tab>
+            </template>
+            <v-list nav dense>
+              <v-list-item @click="openUrl(child.path, child.query)"
+                           v-for="child in item.children"
+                           :class="{'second-active': currentSecondMenuPageId === child.pageId && currentMenuTabIndex === index}"
+              >
+                <v-list-item-content>
+                  <v-list-item-title style="color: #41434f">{{ child.title }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+
+        </template>
+        <!--<<<<<<<<<<<<<二级菜单-->
+        <v-divider
+          style="max-height: 35px;min-height: 35px;align-self: center;"
+          v-if="item.path && item.path.includes('operationManual')"
+          vertical
+        ></v-divider>
+      </template>
+    </v-tabs>
+    <!--<<<<<<<<<<<<<pc端菜单-->
+    <div style="white-space: nowrap">
+      <v-menu v-if="!isMobile" offset-y v-model="isAvatarMenuShown">
+        <template v-slot:activator="{on, attrs}">
+          <div text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
+            <span class="jh-font-size-3 black--text pr-1">{{ userInfo.user.username }}</span>
+            <v-icon>mdi-account-circle</v-icon>
+          </div>
+        </template>
+        <v-list nav dense>
+          <v-list-item class="mt-2">
+            <v-list-item-icon class="mr-1 mt-1">
+              <v-icon size="16" color="grey darken-3">mdi-account-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title color="grey darken-3">{{ userInfo.user.userId }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <!--右上角下拉菜单-->
+          <v-list-item v-for="avatarMenu of inAvatarMenuList" :key="avatarMenu.path" @click="openUrl(avatarMenu.path)">
+            <v-list-item-icon class="mr-1 mt-1">
+              <v-icon size="16" color="grey darken-3">mdi-account-cog-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title color="grey darken-3">{{ avatarMenu.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item @click="logout">
+            <v-list-item-icon class="mr-1 mt-1">
+              <v-icon size="16" color="grey darken-3">mdi-logout</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title color="grey darken-3">登出</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
+  </v-app-bar>
+  <!-- <<<<<<<<<<<<< 页面头部 -->
+</div>
+</script>
+
+<script>
+Vue.component('jh-menu', {
+  template: "#jh-menu",
+  vueComponent: 'jh-menu',
+  vuetify: new Vuetify(),
+  data() {
+    return {
+      isMobile: window.innerWidth < 500,
+      tabsMaxWidth: 'calc(100vw - 353px)',
+      appDirectoryLink: '<$ ctx.app.config.appDirectoryLink $>',
+      appType: '<$ ctx.app.config.appType $>',
+      appTitle: '<$ ctx.app.config.appTitle $>',
+      userInfo: window.userInfo,
+      // 弹出菜单数据
+      isMobileMenuDrawerShown: false,
+      isAvatarMenuShown: false,
+      // 用户菜单
+      menuSort: null,
+      menuGroup: null,
+      inMenuList: [],
+      inAvatarMenuList: [],
+      inMenuShownStatusList: [],
+      currentMenuTabIndex: -1,
+      // 当前二级菜单pageID
+      currentSecondMenuPageId: null,
+
+    };
+  },
+  watch: {
+    isMobileMenuDrawerShown(value) {
+      this.setCurrentMenuItem();
+    },
+    inMenuShownStatusList: {
+      deep: true,
+      handler(value, oValue) {
+        if (this.currentMenuTabIndex > -1 && !value[this.currentMenuTabIndex]) {
+          this.setCurrentMenuItem();
+        }
+      }
+    }
+  },
+  created() {
+    this.computedPageId();
+    this.groupMenuList();
+    this.computedMenuList();
+    this.computedMultiAppMenuList();
+    this.computedAvatarMenuList();
+    this.setCurrentMenuItem();
+    this.getTabsMaxWidth();
+  },
+  methods: {
+    // 获取当前页面PageId
+    computedPageId() {
+      const urlPathList = window.location.pathname.split('/');
+      this.currentPageId = urlPathList && urlPathList[urlPathList.length - 1];
+    },
+    // 动态计算菜单栏目的最大宽度，按照实际的标题宽度计算
+    getTabsMaxWidth() {
+      this.$nextTick(() => {
+        if (this.$refs.toolbarTitle) {
+          this.tabsMaxWidth = 'calc(100vw - ' + (this.$refs.toolbarTitle.offsetWidth + 195) + 'px)';
+        }
+      })
+    },
+    // 跳转链接
+    openUrl(url, queryParams) {
+      if (queryParams) {
+        const queryStrings = Object.keys(queryParams)
+          .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(queryParams[k]))
+          .join('&');
+        window.location.href = url + '?' + queryStrings;
+      } else {
+        window.location.href = url;
+      }
+    },
+    // 定位当前页面在属于哪个菜单
+    setCurrentMenuItem() {
+      // 一级菜单定位
+      const index = _.findIndex(this.inMenuList, {path: location.pathname});
+      if (index > -1) {
+        // 设置标题、菜单选中
+        this.currentMenuTabIndex = index + (this.isMobile ? 1 : 0);
+        const currentPageTitle = this.inMenuList[index].title;
+        document.title = this.appTitle + (currentPageTitle ? " - " + currentPageTitle : "");
+        return;
+      }
+      // 子菜单定位
+      this.inMenuList.some((item, index) => {
+        const findSecondMenuSuccess = item.children && item.children.some(child => {
+          if (child.pageId === this.currentPageId) {
+            this.currentMenuTabIndex = index + (this.isMobile ? 1 : 0);
+            this.currentSecondMenuPageId = child.pageId;
+            const currentPageTitle = `[${item.title}]${child.title}`;
+            document.title = this.appTitle + (currentPageTitle ? " - " + currentPageTitle : "");
+            return true;
+          }
+          return false;
+        })
+        return findSecondMenuSuccess;
+      })
+
+    },
+    // 菜单数据分组、排序处理
+    groupMenuList() {
+      // 菜单元数据处理
+      const menuListResource = _
+        .chain(this.userInfo.allowPageList)
+        .filter(page => _.includes(['showInMenu', 'link'], page.pageType) || (_.includes(['dynamicInMenu', 'avatarInMenu'], page.pageType) && this.currentPageId === page.pageId))
+        .value();
+      // 分组菜单数据
+      this.menuGroup = _.groupBy(menuListResource, function (item) {
+        if (item.pageName.startsWith("[")) {
+          const pageName = item.pageName.substring(1);
+          const pageNameArr = pageName.split("]");
+          return `${pageNameArr[0]}`;
+        }
+        return `${item.pageName}`;
+      });
+      // 二级菜单排序
+      for (let key in this.menuGroup) {
+        this.menuGroup[key] = _.orderBy(this.menuGroup[key], ['sort'], ['asc'])
+      }
+      // 一级菜单排序
+      this.menuSort = Object.keys(this.menuGroup).sort((a, b) => {
+        return this.menuGroup[a][0].sort - this.menuGroup[b][0].sort
+      })
+    },
+    // 菜单构建
+    computedMenuList() {
+      this.inMenuList = this.menuSort.map(key => {
+        const page = this.menuGroup[key];
+        // 没有子菜单，直接构建菜单
+        if (page.length === 1) {
+          const menu = page[0];
+          return {
+            path: menu.pageType === 'link' ? menu.pageFile : `/${window.appInfo.appId}/page/${menu.pageId}`,
+            pageId: menu.pageId,
+            title: menu.pageName,
+            children: null
+          };
+        }
+        // 二级的菜单创建
+        const children = page.map(child => {
+          let title = '';
+          if (child.pageName.startsWith("[")) {
+            const pageName = child.pageName.substring(1);
+            title = pageName.split("]")[1];
+          } else if (child.pageName.includes("|")) {
+            title = child.pageName.split('|')[1];
+          } else {
+            title = child.pageName;
+          }
+          return {
+            path: child.pageType === 'link' ? child.pageFile : `/${window.appInfo.appId}/page/${child.pageId}`,
+            pageId: child.pageId,
+            title,
+            children: null
+          };
+        });
+        return {
+          path: null,
+          pageId: null,
+          title: key,
+          children
+        }
+      })
+    },
+    // 多应用项目，添加回到目录
+    computedMultiAppMenuList() {
+      if(window.appInfo.appId !== 'directory') {
+        const appType = '<$ ctx.app.config.appType $>';
+        if (appType === 'multiApp' && this.appDirectoryLink) {
+          this.inMenuList.unshift({
+            path: this.appDirectoryLink,
+            pageId: 'directory',
+            title: '回到目录',
+            children: null
+          });
+        }
+      }
+    },
+    // 头像菜单构建
+    computedAvatarMenuList() {
+      this.inAvatarMenuList = _
+        .chain(this.userInfo.allowPageList)
+        .filter(['pageType', 'showInAvatarMenu'])
+        .map((page) => {
+          return {
+            path: `/${window.appInfo.appId}/page/${page.pageId}`,
+            title: page.pageName,
+            sort: parseInt(page.sort)
+          };
+        })
+        .orderBy(['sort'], ['asc'])
+        .value();
+    },
+    // 登出
+    async logout() {
+      try {
+        await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'allPage',
+              actionId: 'logout'
+            }
+          }
+        })
+        vtoast.success('注销成功');
+        this.routeToLoginPage();
+      } catch (error) {
+        vtoast.fail(error.errorReason);
+        this.routeToLoginPage();
+      }
+    },
+    // 导航到登陆页
+    routeToLoginPage() {
+      localStorage.removeItem(`${window.appInfo.appId}_authToken`);
+      setTimeout(() => {
+        location.href = `/${window.appInfo.appId}/page/login`;
+      }, 700);
+    }
+  },
+});
+
+</script>
+<style>
+.second-active .v-list-item__title {
+  color: #4caf50 !important;
+}
+
+.jh-avatar-menu-btn {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all .3s;
+  border-radius: 5px;
+}
+
+.jh-avatar-menu-btn:hover {
+  background-color: #EEEEEE;
+}
+
+.second-active {
+  caret-color: #4caf50 !important;
+  background-color: rgba(76, 175, 80, 0.1) !important;
+}
+</style>
+<!-- <<<<<<<<<<<<< jhMenu.html -->
