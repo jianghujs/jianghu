@@ -1,0 +1,56 @@
+<!--uiAction.html >>>>>>>>>>>>> -->
+<script>
+(function () {
+  /**
+   * 使用说明：✅✅项目中需要配置 doUiActionSwitch
+   * @type {{}}
+   * 案例：
+   * async function doUiActionSwitch(uiActionId, uiActionObj = {}) {
+   *   // 组件映射
+   *   const root = window.$vueComponent.root;
+   *   const chatSession = window.$vueComponent.chatSession;
+   *   const leftPanel = window.$vueComponent.leftPanel;
+   *   const chatInput = window.$vueComponent.chatInput;
+   *   // 组件 uiAction 调用
+   *   switch (uiActionId) {
+   *     // 禁止系统菜单和文字选中
+   *     case 'disableSystemEvent':
+   *       await root.disableSystemEvent();
+   *       break;
+   *     // 同步中
+   *     case 'setSyncStatusToSyncing':
+   *       await root.setSyncStatusToSyncing();
+   *       break;
+   *     default:
+   *       console.error('doUiAction 异常; actionId找不到', { pageId: window.appInfo.pageId, uiActionId })
+   *       break;
+   *   }
+   * }
+   */
+  // 当前页面的 vue 组件，name -> vue
+  window.$vueComponent = {};
+  // 当前页面的 vue 中的 computed 数据
+  window.vueComputed = {}
+  // 当前页面的 vue 中的 data 数据
+  window.vueData = {};
+
+  window.registerData = (data, computed) => {
+    Object.assign(window.vueData, data)
+    Object.assign(window.vueComputed, computed)
+  }
+
+  window.jianghuUiActionMixins = {
+    beforeCreate() {
+      if (this.$options.vueComponent) {
+        window.$vueComponent[this.$options.vueComponent] = this;
+      }
+    },
+    methods: {
+      async doUiAction(uiActionId, uiActionParamObj) {
+        doUiActionSwitch && doUiActionSwitch(uiActionId, uiActionParamObj);
+      },
+    }
+  };
+})();
+</script>
+<!-- <<<<<<<<<<<<< uiAction.html -->
