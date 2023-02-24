@@ -50,7 +50,7 @@ module.exports.middlewareMatch = {
     match(ctx) {
       // url 格式符合 /appId/upload
       return (ctx.request.method === 'GET' || ctx.request.method === 'HEAD')
-        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/upload/`);
+        && ctx.request.path.startsWith(`/${ctx.app.config.downloadBasePath}`);
     },
   },
   httpPackage: {
