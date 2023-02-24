@@ -2,7 +2,6 @@
 
 const dayjs = require('dayjs');
 const _ = require('lodash');
-const { tableObj } = require('../constant/constant');
 
 async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation, operationByUserId, operationByUser, operationAt }) {
 
@@ -32,7 +31,7 @@ async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody,
       operationAt: newData.operationAt,
     };
   });
-  return await knex(tableObj._record_history).insert(recordHistoryList);
+  return await knex('_record_history').insert(recordHistoryList);
 
 }
 

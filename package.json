@@ -15,7 +15,6 @@
         "egg-bin": "^4.11.0",
         "egg-view-nunjucks": "^2.3.0",
         "geoip-lite": "1.4.7",
-        "ioredis": "^4.28.2",
         "koa-send": "^5.0.1",
         "lodash": "^4.17.21",
         "md5-node": "^1.0.1",
@@ -54,5 +53,5 @@
         "type": "git",
         "url": "https://github.com/jianghujs/jianghu.git"
     },
-    "license": "GLP"
+    "license": "Apache-2.0"
 }

@@ -12,7 +12,9 @@
   ],
   "dependencies": {
     "@socket.io/redis-adapter": "^7.1.0",
-    "ioredis": "^4.28.2"
+    "ioredis": "^4.28.2",
+    "socket.io": "4.4.1",
+    "socket.io-client": "4.4.1"
   },
   "devDependencies": {},
   "engines": {

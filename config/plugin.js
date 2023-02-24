@@ -19,11 +19,11 @@ module.exports = {
     enable: true,
   },
   socketIO: {
-    enable: true,
+    enable: false,
     path: path.join(__dirname, '../plugins/socket-io'),
   },
   xiaochengxu: {
-    enable: true,
+    enable: false,
     path: path.join(__dirname, '../plugins/xiaochengxu'),
   },
 };
