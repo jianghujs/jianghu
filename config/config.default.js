@@ -3,24 +3,23 @@
 const { httpResponse } = require('../app/constant/constant');
 const { errorInfoEnum } = require('../app/constant/error');
 const path = require('path');
-const fs = require('fs');
 
 module.exports = appInfo => {
-  const appId = appInfo.name || 'defaultAppId';
+  const appPackageName = appInfo.name || 'defaultAppId';
 
   const config = {
-    appId,
-    keys: `${appId}_1638108566009`,
+    appId: appPackageName,
+    keys: `${appPackageName}_1638108566009`,
     appTitle: "第一个应用",
-    appLogo: `${appId}/public/img/logo.svg`,
+    appLogo: `${appPackageName}/public/img/logo.svg`,
     debug: false,
 
     appType: "single", // single: 单应用; multiApp: 多应用
     appDirectoryLink: "/",
 
-    indexPage: `/${appId}/page/manual`,
-    loginPage: `/${appId}/page/login`,
-    helpPage: `/${appId}/page/help`,
+    indexPage: `/${appPackageName}/page/manual`,
+    loginPage: `/${appPackageName}/page/login`,
+    helpPage: `/${appPackageName}/page/help`,
 
     primaryColor: '#1867c0',
 
@@ -41,7 +40,7 @@ module.exports = appInfo => {
       autoClearOldLogBeforeDays: 7,
       autoClearOldLogFilePrefixList: [
         'common-error', 'egg-web', 'egg-schedule', 'egg-knex', 'egg-agent', '_resource_request_log',
-        `${appId}.html`, `${appId}.resource`, `${appId}-web`, `${appId}.html`,
+        `${appPackageName}.html`, `${appPackageName}.resource`, `${appPackageName}-web`, `${appPackageName}.html`,
       ],
 
       // websocket 开关
@@ -56,8 +55,8 @@ module.exports = appInfo => {
       enableUserInfoCache: false,
       userInfoCacheRefreshInterval: "10s",
 
-      // /appId/upload 上传文件的鉴权、缓存配置
-      // @see downloadUserInfo 中间件
+      // /appPackageName/upload 上传文件的鉴权、缓存配置
+      // 参考 downloadUserInfo 中间件
       enableUploadStaticFileCache: true,
       enableUploadStaticFileAuthorization: false,
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
@@ -78,6 +77,7 @@ module.exports = appInfo => {
       }
 
     },
+    
     security: {
       csrf: { enable: false },
     },
@@ -138,11 +138,11 @@ module.exports = appInfo => {
     },
     logrotator: {
       filesRotateBySize: [
-        path.join(appInfo.baseDir, `logs/${appId}.page.log`),
-        path.join(appInfo.baseDir, `logs/${appId}.page.json.log`),
+        path.join(appInfo.baseDir, `logs/${appPackageName}.page.log`),
+        path.join(appInfo.baseDir, `logs/${appPackageName}.page.json.log`),
   
-        path.join(appInfo.baseDir, `logs/${appId}.html.log`),
-        path.join(appInfo.baseDir, `logs/${appId}.html.json.log`),
+        path.join(appInfo.baseDir, `logs/${appPackageName}.html.log`),
+        path.join(appInfo.baseDir, `logs/${appPackageName}.html.json.log`),
       ],
       maxFileSize: 10 * 1024 * 1024, // 10M
       maxFiles: 20, // 最大文件个数
@@ -152,19 +152,19 @@ module.exports = appInfo => {
       knex: { consoleLevel: "WARN" },
       // https://www.eggjs.org/zh-CN/core/logger
       htmlLogger: {
-        file: path.join(appInfo.baseDir, `logs/${appId}.html.log`),
+        file: path.join(appInfo.baseDir, `logs/${appPackageName}.html.log`),
         contextFormatter(meta) {
           return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
         },
       },
       resourceLogger: {
-        file: path.join(appInfo.baseDir, `logs/${appId}.resource.log`),
+        file: path.join(appInfo.baseDir, `logs/${appPackageName}.resource.log`),
         contextFormatter(meta) {
           return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
         },
       },
       pageLogger: {
-        file: path.join(appInfo.baseDir, `logs/${appId}.page.log`),
+        file: path.join(appInfo.baseDir, `logs/${appPackageName}.page.log`),
         contextFormatter(meta) {
           return `[${meta.date}] [${meta.level}] [${meta.ctx.method} ${meta.ctx.url}] ${meta.message}`;
         },
@@ -190,7 +190,7 @@ module.exports = appInfo => {
           errorCode === "request_app_forbidden" ||
           errorCode === "user_banned"
         ) {
-          ctx.cookies.set(`${ctx.app.config.appId}_authToken`, null);
+          ctx.cookies.set(`${ctx.app.config.appPackageName}_authToken`, null);
         }
         const errorReasonSupplement = err.errorReasonSupplement || null;
         ctx.body = httpResponse.fail({
