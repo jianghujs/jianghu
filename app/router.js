@@ -11,9 +11,12 @@ module.exports = app => {
   router.get('/', controller.page.index);
   router.get(`/${appId}/`, controller.page.index);
   router.get(`/${appId}/page/`, controller.page.index);
+
   router.get(`/${appId}/page/:pageName`, controller.page.page);
   router.get(`/${appId}/page/:pageName/*`, controller.page.page);
+
   router.get(`/${appId}/pageDoc`, controller.pageDoc.index);
+  
   router.post(`/${appId}/resource`, controller.resource.httpRequest);
 };
 
