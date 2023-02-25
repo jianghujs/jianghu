@@ -3,6 +3,7 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
+const fs = require('fs');
 const mock = require('egg-mock');
 const utils = require('../../utils');
 const pageDocUserInfo = require('../../../app/middleware/pageDocUserInfo');
@@ -13,14 +14,14 @@ describe('test/app/middleware/pageDocUserInfo.test.js', () => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
   });
-  after(() => {
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
+  after(async () => {
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
     this.app.close();
   });
 
   describe('Test middleware pageDocUserInfo', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       const jianghuKnexResult = {
         select: () => {},
         where: () => {},
@@ -39,14 +40,24 @@ describe('test/app/middleware/pageDocUserInfo.test.js', () => {
       this.whereStub = sinon.stub(jianghuKnexResult, 'where').returns(whereResult);
       this.firstStub = sinon.stub(whereResult, 'first');
       this.getUserInfoStub = sinon.stub(userInfoUtil, 'getUserInfo');
+
+      this.pageDocDir = path.join(this.ctx.app.config.baseDir, "app/view/pageDoc");
+      this.readMeFile = path.join(this.pageDocDir, "README.md");
+      await fs.promises.mkdir(this.pageDocDir, { recursive: true });
+      await fs.promises.writeFile(this.readMeFile, "Unit Testing");
     });
-    afterEach(() => {
+    afterEach(async () => {
       this.getUserInfoStub.restore();
       this.selectStub.restore();
       this.redirectStub.restore();
       this.whereStub.restore();
       this.firstStub.restore();
       mock.restore();
+
+      await fs.promises.unlink(this.readMeFile)
+        .then(_ => fs.promises.rmdir(this.pageDocDir))
+        // the "view" directory
+        .then(_ => fs.promises.rmdir(path.dirname(this.pageDocDir)));
     });
     it('should success', async () => {
       const expUserId = 'test101';
@@ -62,6 +73,10 @@ describe('test/app/middleware/pageDocUserInfo.test.js', () => {
         deviceId: expDeviceId,
         userStatus: 'active',
         md5Salt: 'test',
+        user: {
+          userId: expUserId,
+          deviceId: 'web'
+        }
       };
 
       this.ctx.userInfo = {
@@ -71,7 +86,7 @@ describe('test/app/middleware/pageDocUserInfo.test.js', () => {
       this.ctx.packagePage = {
         page: expPageId,
       };
-      this.ctx.request.path = `/${this.ctx.app.config.appId}/pageDoc/index`;
+      this.ctx.request.path = `/${this.ctx.app.config.appId}/pageDoc/README.md`;
       this.ctx.body = expResponseBody;
 
       this.getUserInfoStub.returns(expUser);
@@ -80,7 +95,7 @@ describe('test/app/middleware/pageDocUserInfo.test.js', () => {
 
       assert.deepEqual(this.getUserInfoStub.callCount, 1);
       assert.deepEqual(this.ctx.userInfo, expUser);
-      assert.deepEqual(this.nextSpy.callCount, 1);
+      assert.deepEqual(this.nextSpy.callCount, 0);
     });
   });
 });

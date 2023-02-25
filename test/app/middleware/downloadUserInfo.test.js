@@ -13,9 +13,9 @@ describe('test/app/middleware/downloadUserInfo.test.js', () => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
   });
-  after(() => {
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
+  after(async () => {
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
     this.app.close();
   });
 
@@ -45,6 +45,11 @@ describe('test/app/middleware/downloadUserInfo.test.js', () => {
       mock.restore();
     });
     it('should success', async () => {
+      this.ctx.app.config.jianghuConfig = {
+        enableUploadStaticFileCache: true,
+        enableUploadStaticFileAuthorization: true
+      };
+
       const expUserId = 'test101';
       const expDeviceId = `${Date.now()}`;
       const expResourceId = 'page.index';

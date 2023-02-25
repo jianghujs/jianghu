@@ -9,12 +9,12 @@ const syncSocketStatus = require('../../../app/schedule/syncSocketStatus');
 
 describe('test/app/schedule/syncSocketStatus.test.js', () => {
   before(() => {
-    this.app = utils.app('apps/jianghu-config');
+    this.app = utils.app('apps/jianghu-socket');
     return this.app.ready();
   });
-  after(() => {
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
+  after(async () => {
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-socket/run'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-socket/logs'));
     this.app.close();
   });
 

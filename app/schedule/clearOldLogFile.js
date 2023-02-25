@@ -21,62 +21,44 @@ module.exports = app => {
       const startTime = new Date().getTime();
       const { logger } = app;
 
-      // 遍历
-      const walk = function(dir, done) {
-        let results = [];
-        fs.readdir(dir, (err, list) => {
-          if (err) return done(err);
-          let i = 0;
-          (function next() {
-            let file = list[i++];
-            if (!file) return done(null, results);
-            file = path.resolve(dir, file);
-            fs.stat(file, (err, stat) => {
-              if (stat && stat.isDirectory()) {
-                walk(file, (err, res) => {
-                  results = results.concat(res);
-                  next();
-                });
-              } else {
-                results.push(file);
-                next();
-              }
-            });
-          })();
-        });
-      };
-
-
-      // 获取日志文件夹文件
-      walk(path.join(app.baseDir, 'logs'), async (error, logFiles) => {
-        if (!logFiles || !logFiles.length) {
-          logger.error('遍历文件失败或无文件', { error, logFiles });
+      const dateRegex = new RegExp(/\d{4}-\d{2}-\d{2}/);
+      const deleteLogFile = async (fileName, fullPath) => {
+        const matchPrefix = ctx.app.config.jianghuConfig.autoClearOldLogFilePrefixList.find(prefix => fileName.startsWith(prefix));
+        if (!matchPrefix) {
           return;
         }
-        // 过滤要清理的日志文件
-        const dateReg = /\d\d\d\d-\d\d-\d\d/ig;
-        for (const logFile of logFiles) {
-          const fileName = path.basename(logFile);
-          const matchPrefix = ctx.app.config.jianghuConfig.autoClearOldLogFilePrefixList.find(prefix => fileName.startsWith(prefix));
-          if (!matchPrefix) {
-            continue;
-          }
-          const dateMatches = [ ...fileName.matchAll(dateReg) ];
-          if (dateMatches && dateMatches.length) {
-            const date = dateMatches[0];
-            const dayDiff = dayjs().diff(dayjs(date), 'day');
-            if (dayDiff >= ctx.app.config.jianghuConfig.autoClearOldLogBeforeDays) {
-              // 大于保留日期则删除
-              await fs.promises.rm(logFile);
-            }
+        const dateMatches = fileName.match(dateRegex);
+        if (!dateMatches) {
+          return;
+        }
+        const date = dateMatches[0];
+        const dayDiff = dayjs().diff(dayjs(date), 'day');
+        if (dayDiff >= ctx.app.config.jianghuConfig.autoClearOldLogBeforeDays) {
+          // 大于保留日期则删除
+          await fs.promises.unlink(fullPath);
+        }
+      }
+
+      const walk = async (dirName) => {
+        dirName = path.resolve(dirName);
+        const files = await fs.promises.readdir(dirName);
+        let fullPath = '';
+        let stat = null;
+        for (const file of files) {
+          fullPath = path.join(dirName, file);
+          stat = await fs.promises.stat(fullPath);
+          if (stat && stat.isDirectory()) {
+            await walk(fullPath);
+          } else {
+            await deleteLogFile(file, fullPath);
           }
         }
+      }
 
-        const endTime = new Date().getTime();
-        logger.info('[clearOldLogFile.js]', { useTime: `${endTime - startTime}/ms` });
-      });
+      await walk(path.join(app.baseDir, 'logs'));
 
+      const endTime = new Date().getTime();
+      logger.info('[clearOldLogFile.js]', { useTime: `${endTime - startTime}/ms` });
     },
-
   };
 };
