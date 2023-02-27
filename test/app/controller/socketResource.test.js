@@ -24,11 +24,11 @@ describe('test/request/socketResource.test.js', () => {
 
     this.authToken = result.body.appData.resultData.authToken;
   });
-  after(() => {
+  after(async () => {
     this.authToken = null;
     this.app.socketIO.close();
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-socket/run'));
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-socket/logs'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-socket/run'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-socket/logs'));
     this.app.close();
   });
   describe('Test socket socketResource', () => {

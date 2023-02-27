@@ -12,9 +12,9 @@ describe('test/app/middleware/socketPackage.test.js', () => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
   });
-  after(() => {
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
+  after(async () => {
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
     this.app.close();
   });
 

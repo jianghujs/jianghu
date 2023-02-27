@@ -38,6 +38,10 @@ module.exports = appInfo => {
       app: true,
       agent: true,
     },
+    view: {
+      defaultViewEngine: 'nunjucks',
+      root: path.join(appInfo.baseDir, '../../../../app/view')
+    },
     middleware,
     ...middlewareMatch,
     socketIO: {
