@@ -50,6 +50,10 @@ const errorInfoEnum = Object.freeze({
     errorCode: 'request_group_forbidden',
     errorReason: '你不在当前群内',
   },
+  request_rate_limit_exceeded: {
+    errorCode: 'request_rate_limit_exceeded',
+    errorReason: '请求过于频繁，请稍后再试',
+  },
 
   // =============================server error: 服务器内部错误===========================================
   server_error: { errorCode: 'server_error', errorReason: '服务器开小差了' },

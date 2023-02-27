@@ -59,6 +59,14 @@ module.exports = appInfo => {
       enableUploadStaticFileCache: true,
       enableUploadStaticFileAuthorization: false,
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
+
+      // 限流及黑白名单
+      enableRateLimiter: false,
+      rateLimiterDuration: 60000,
+      rateLimiterMax: 100,
+      rateLimiterWhitelist: [],
+      rateLimiterBlacklist: [],
+      rateLimiterIgnorePathPrefix: [ '/${appId}/resource', '/${appId}/page', '/${appId}/public', '${appId}/upload' ],
     },
 
     // https://eggjs.org/zh-cn/plugins/multipart.html
