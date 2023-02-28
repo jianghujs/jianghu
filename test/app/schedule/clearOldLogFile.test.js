@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon');
 const path = require('path');
 const fs = require('fs');
 const dayjs = require('dayjs');

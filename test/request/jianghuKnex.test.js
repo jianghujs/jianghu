@@ -10,10 +10,10 @@ describe('test/request/jianghuKnex.test.js', () => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
   });
-  after(() => {
+  after(async () => {
     this.authToken = null;
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
-    utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/run'));
+    await utils.deleteFileAndDirByPath(path.join(process.cwd(), 'test/fixtures/apps/jianghu-config/logs'));
     this.app.close();
   });
   beforeEach(async () => {
