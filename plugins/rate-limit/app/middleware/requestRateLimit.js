@@ -1,6 +1,6 @@
 'use strict';
 
-const { BizError, errorInfoEnum } = require('../constant/error');
+const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 
 // 每个 ip 请求统计，记录在内存
 const ipStatMap = new Map();
@@ -56,13 +56,6 @@ module.exports = options => {
     }
 
     const ip = ctx.ip;
-    // 黑白名单判断
-    if (jianghuConfig.rateLimiterBlacklist.includes(ip)) {
-      throw new BizError(errorInfoEnum.request_rate_limit_exceeded);
-    }
-    if (jianghuConfig.rateLimiterWhitelist.includes(ip)) {
-      return await next();
-    }
 
     const limit = getStat(ip, jianghuConfig.rateLimiterDuration, jianghuConfig.rateLimiterMax);
 

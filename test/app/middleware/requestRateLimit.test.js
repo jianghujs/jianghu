@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../utils');
-const requestRateLimit = require('../../../app/middleware/requestRateLimit');
+const requestRateLimit = require('../../../plugins/rate-limit//app/middleware/requestRateLimit');
 
 describe('test/app/middleware/requestRateLimit.test.js', () => {
   before(() => {
@@ -34,21 +34,6 @@ describe('test/app/middleware/requestRateLimit.test.js', () => {
       await this.requestRateLimit(this.ctx, this.nextSpy);
 
       assert.equal(this.nextSpy.callCount, 1);
-    });
-
-    it('IP whitelist, should success', async () => {
-      this.ctx.app.config.jianghuConfig.rateLimiterWhitelist = ['127.0.0.1'];
-      this.ctx.request.path = `/${this.app.config.appId}/notImportant/`;
-      await this.requestRateLimit(this.ctx, this.nextSpy);
-
-      assert.equal(this.nextSpy.callCount, 1);
-    });
-
-    it('IP blacklist, should success', async () => {
-      this.ctx.app.config.jianghuConfig.rateLimiterBlacklist = ['127.0.0.1'];
-      this.ctx.request.path = `/${this.app.config.appId}/notImportant/`;
-
-      assert.rejects(async () => await this.requestRateLimit(this.ctx, this.nextSpy), /request_rate_limit_exceeded/);
     });
 
     it('Limit number reached, should success', async () => {
