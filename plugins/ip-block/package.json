@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "eggPlugin": {
-    "name": "ip-block"
+    "name": "ipBlock"
   },
   "keywords": [
     "egg",

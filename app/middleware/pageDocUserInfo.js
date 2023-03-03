@@ -12,7 +12,7 @@ module.exports = options => {
     const { appType, appTitle } = config;
 
     // 捕获 userInfo: { user, userGroupRoleList, allowPageList, userAppList } 到 ctx.userInfo
-    ctx.userInfo = await userInfoUtil.getUserInfo({ config, body: null, jianghuKnex, db, logger, appType, mockBody: true });
+    ctx.userInfo = await userInfoUtil.getUserInfo({ ctx, config, body: null, jianghuKnex, db, logger, appType, mockBody: true });
 
     if (ctx.userInfo && ctx.userInfo.user && Object.keys(ctx.userInfo.user).length) {
       // md 文件中，对资源链接做特殊处理，将 ![](./xxx) 转成 ![]()

@@ -1,8 +1,6 @@
 'use strict';
 
 module.exports.middleware = [
-  // 限流
-  'requestRateLimit',
   // /upload/*
   'downloadUserInfo',
   // /page/*

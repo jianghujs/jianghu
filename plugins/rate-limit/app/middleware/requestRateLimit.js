@@ -2,6 +2,7 @@
 
 const { BizError, errorInfoEnum } = require('../../../../app/constant/error');
 
+// todo 这个记录应该是进程间共享的
 // 每个 ip 请求统计，记录在内存
 const ipStatMap = new Map();
 

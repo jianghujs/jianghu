@@ -26,4 +26,12 @@ module.exports = {
     enable: false,
     path: path.join(__dirname, '../plugins/xiaochengxu'),
   },
+  rateLimit: {
+    enable: false,
+    path: path.join(__dirname, '../plugins/rate-limit'),
+  },
+  ipBlock: {
+    enable: false,
+    path: path.join(__dirname, '../plugins/ip-block'),
+  },
 };

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "eggPlugin": {
-    "name": "rate-limit"
+    "name": "rateLimit"
   },
   "keywords": [
     "egg",
