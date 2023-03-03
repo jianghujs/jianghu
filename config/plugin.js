@@ -34,4 +34,8 @@ module.exports = {
     enable: false,
     path: path.join(__dirname, '../plugins/ip-block'),
   },
+  pageLog: {
+    enable: false,
+    path: path.join(__dirname, '../plugins/page-log'),
+  },
 };
