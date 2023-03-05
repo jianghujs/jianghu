@@ -58,6 +58,11 @@ module.exports = options => {
 
     const ip = ctx.ip;
 
+    // ip 白名单
+    if (jianghuConfig.rateLimiterWhitelist.includes(ip)) {
+      return await next();
+    }
+
     const limit = getStat(ip, jianghuConfig.rateLimiterDuration, jianghuConfig.rateLimiterMax);
 
     const currentRemaining = limit.remaining > 0 ? limit.remaining - 1 : 0;

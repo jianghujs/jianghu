@@ -18,13 +18,13 @@ module.exports = options => {
     }
 
     // 黑名单判断
-    if (jianghuConfig.rateLimiterBlacklist.includes(ip)) {
+    if (jianghuConfig.ipBlocklist.includes(ip)) {
       throw new BizError(errorInfoEnum.request_rate_limit_exceeded);
     }
 
     // 黑名单文件配置
-    if (jianghuConfig.rateLimiterBlacklistFilePath) {
-      const content = fs.readFileSync(jianghuConfig.rateLimiterBlacklistFilePath);
+    if (jianghuConfig.ipBlocklistFilePath) {
+      const content = fs.readFileSync(jianghuConfig.ipBlocklistFilePath);
       const ipList = content.split(/\r?\n/);
       if (ipList.includes(ip)) {
         throw new BizError(errorInfoEnum.request_rate_limit_exceeded);

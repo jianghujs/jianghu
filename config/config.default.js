@@ -60,13 +60,16 @@ module.exports = appInfo => {
       enableUploadStaticFileAuthorization: false,
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
 
-      // 限流及黑白名单
+      // WAF: 限流
       enableRateLimiter: false,
       rateLimiterDuration: 60000,
       rateLimiterMax: 100,
-      rateLimiterWhitelist: [],
-      rateLimiterBlacklist: [],
       rateLimiterIgnorePathPrefix: [ '/${appId}/resource', '/${appId}/page', '/${appId}/public', '${appId}/upload' ],
+      rateLimiterWhitelist: [],
+      // WAF: IP 黑名单
+      enableIpBlock: false,
+      ipBlocklist: [],
+      ipBlocklistFilePath: '',
     },
 
     // https://eggjs.org/zh-cn/plugins/multipart.html
