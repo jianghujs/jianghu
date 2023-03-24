@@ -196,7 +196,7 @@ module.exports = appInfo => {
           errorCode === 'request_app_forbidden' ||
           errorCode === 'user_banned'
         ) {
-          ctx.cookies.set(`${ctx.app.config.appPackageName}_authToken`, null);
+          ctx.cookies.set(`${ctx.app.config.appId}_authToken`, null);
         }
         const errorReasonSupplement = err.errorReasonSupplement || null;
         ctx.body = httpResponse.fail({
