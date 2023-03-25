@@ -81,7 +81,6 @@
 
     // 需要把 errorCode 转成异常抛出来
     if (errorCode) {
-      window.vtoast.fail({ message: errorReason });
       throw new BizError({
         errorCode,
         errorReason,
@@ -99,7 +98,9 @@
     if (!errorReason && message) {
       errorReason = message;
     }
-    window.vtoast.fail({ message: errorReason });
+    if(response.data.appData.actionId !== 'getConstantList') {
+      window.vtoast.fail({ message: errorReason });
+    }
     return Promise.reject(new BizError({errorCode, errorReason, response}));
   });
 
