@@ -10,7 +10,7 @@
   :bottom="position === 'bottom'">
 <v-progress-circular v-if="showLoading" indeterminate color="green" size="18" width="3"></v-progress-circular>
 <v-icon v-else left>{{ icon }}</v-icon>
-<span class="jh-snackbar-content">{{ message }}</span>
+<span class="jh-snackbar-content" :class="{'jh-single-line': singleLine}">{{ message }}</span>
 <template v-slot:action="{ attrs }">
   <v-btn
     color="red"
@@ -41,6 +41,7 @@ Vue.component('jh-toast', {
   vuetify: new Vuetify(),
   data() {
     return {
+      singleLine: false,
       showSnackbar: false,
       showLoading: false,
       message: '',
@@ -68,12 +69,13 @@ Vue.component('jh-toast', {
       this.show(paramObj);
       this.notify({message});
     },
-    show({message, color, timer, icon}) {
+    show({message, color, timer, icon, single}) {
       // 限制消息长度
       this.message = message || 'missing "message".';
       this.color = color || 'success';
       this.timer = timer || 3000;
       this.icon = icon || 'mdi-check';
+      this.singleLine = single || false;
       this.showLoading = false;
       this.showSnackbar = true;
     },
@@ -84,9 +86,11 @@ Vue.component('jh-toast', {
         _message = paramObj;
       }
       if (typeof (paramObj) == 'object') {
-        const {message} = paramObj
+        const {message, single} = paramObj
         _message = message;
+        this.singleLine = single || false;
       }
+
       this.color = 'primary';
       if (paramObj.hasOwnProperty('time')) {
         this.timer = paramObj.time;
@@ -110,8 +114,9 @@ Vue.component('jh-toast', {
         _message = paramObj;
       }
       if (typeof (paramObj) == 'object') {
-        const {message} = paramObj
+        const {message, single} = paramObj
         _message = message;
+        this.singleLine = single || false;
       }
       // 限制消息长度
       this.message = _message;
@@ -132,8 +137,9 @@ Vue.component('jh-toast', {
         _message = paramObj;
       }
       if (typeof (paramObj) == 'object') {
-        const {message} = paramObj
+        const {message, single} = paramObj
         _message = message;
+        this.singleLine = single || false;
       }
       // 限制消息长度
       this.message = _message;
@@ -185,12 +191,14 @@ Vue.component('jh-toast', {
   align-items: center;
 }
 
+.jh-snackbar .jh-snackbar-content.jh-single-line {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .jh-snackbar .jh-snackbar-content {
   flex: 1;
   overflow: hidden;
   max-width: 570px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   padding-left: 10px;
 }
 
