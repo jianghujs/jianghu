@@ -1,175 +1,203 @@
 <!--jhToast.html >>>>>>>>>>>>> -->
 <script type="text/html" id="jh-toast">
-  <v-snackbar
-    :color="color"
-    :timeout="timer"
-    v-model="showSnackbar"
-    elevation="24"
-    :top="position === 'top'"
-    :bottom="position === 'bottom'">
-    <v-progress-circular v-if="showLoading" indeterminate color="green"></v-progress-circular>
-    <v-icon v-else left>{{ icon }}</v-icon>
-    {{ message }}
-    <template v-slot:action="{ attrs }">
-    <v-btn
-      color="red"
-      text
-      small
-      v-bind="attrs"
-      @click="showSnackbar = false">
-      关闭
-    </v-btn>
-    </template>
-  </v-snackbar>
+<v-snackbar
+  :color="color"
+  :timeout="timer"
+  v-model="showSnackbar"
+  elevation="24"
+  class="jh-snackbar"
+  :top="position === 'top'"
+  :bottom="position === 'bottom'">
+<v-progress-circular v-if="showLoading" indeterminate color="green" size="18" width="3"></v-progress-circular>
+<v-icon v-else left>{{ icon }}</v-icon>
+<span class="jh-snackbar-content">{{ message }}</span>
+<template v-slot:action="{ attrs }">
+  <v-btn
+    color="red"
+    text
+    small
+    v-bind="attrs"
+    @click="showSnackbar = false">
+    关闭
+  </v-btn>
+</template>
+</v-snackbar>
 </script>
 
 <script>
 
-  // 当前 tab 是否激活
+// 当前 tab 是否激活
+window.tabActive = true;
+window.onblur = function (e) {
+  window.tabActive = false;
+};
+window.onfocus = function (e) {
   window.tabActive = true;
-  window.onblur = function (e) {
-    window.tabActive = false;
-  };
-  window.onfocus = function (e) {
-    window.tabActive = true;
-  };
+};
 
-  Vue.component('jh-toast', {
-    template: "#jh-toast",
-    vueComponent: 'jh-toast',
-    mixins: [window.jianghuUiActionMixins || {}],
-    vuetify: new Vuetify(),
-    data() {
-      return {
-        showSnackbar: false,
-        showLoading: false,
-        message: '',
-        color: 'success',
-        icon: 'mdi-check',
-        timer: 3000,
-        position: 'top'
-      };
+Vue.component('jh-toast', {
+  template: "#jh-toast",
+  vueComponent: 'jh-toast',
+  vuetify: new Vuetify(),
+  data() {
+    return {
+      showSnackbar: false,
+      showLoading: false,
+      message: '',
+      color: 'success',
+      icon: 'mdi-check',
+      timer: 3000,
+      position: 'top'
+    };
+  },
+  created() {
+    window.vtoast = {
+      showAndNotify: this.showAndNotify,
+      show: this.show,
+      loading: this.loading,
+      success: this.success,
+      fail: this.fail,
+      dismiss: this.dismiss,
+      notify: this.notify
+    };
+  },
+  methods: {
+    showAndNotify(paramObj) {
+      let {message} = paramObj;
+      // 限制消息长度
+      this.show(paramObj);
+      this.notify({message});
     },
-    created() {
-      window.vtoast = {
-        showAndNotify: this.showAndNotify,
-        show: this.show,
-        loading: this.loading,
-        success: this.success,
-        fail: this.fail,
-        dismiss: this.dismiss,
-        notify: this.notify
-      };
+    show({message, color, timer, icon}) {
+      // 限制消息长度
+      this.message = message || 'missing "message".';
+      this.color = color || 'success';
+      this.timer = timer || 3000;
+      this.icon = icon || 'mdi-check';
+      this.showLoading = false;
+      this.showSnackbar = true;
     },
-    methods: {
-      showAndNotify(paramObj) {
-        let {message} = paramObj;
-        // 限制消息长度
-        if (message && message.length > 100) {
-          message = message.slice(0, 100) + '...';
-        }
-
-        this.show(paramObj);
-        this.notify({message});
-      },
-      show({message, color, timer, icon}) {
-        this.message = message || 'missing "message".';
-        this.color = color || 'success';
-        this.timer = timer || 3000;
-        this.icon = icon || 'mdi-check';
-        this.showLoading = false;
-        this.showSnackbar = true;
-      },
-      loading(paramObj) {
-        // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof (paramObj) == 'string') {
-          this.message = paramObj;
-        }
-        if (typeof (paramObj) == 'object') {
-          const {message} = paramObj
-          this.message = message;
-        }
-        this.color = 'primary';
-        if (paramObj.hasOwnProperty('time')) {
-          this.timer = paramObj.time;
-        } else {
-          if (this.message.includes('%')) {
-            this.timer = this.message.includes('100') ? 3000 : -1;
-          } else {
-            this.timer = 3000;
-          }
-        }
-        this.icon = 'mdi-check';
-        this.showLoading = true;
-        this.showSnackbar = true;
-      },
-      success(paramObj) {
-        // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof (paramObj) == 'string') {
-          this.message = paramObj;
-        }
-        if (typeof (paramObj) == 'object') {
-          const {message} = paramObj
-          this.message = message;
-        }
-        this.color = 'primary';
-        this.timer = 3000;
-        this.icon = 'mdi-check';
-        this.showLoading = false;
-        this.showSnackbar = true;
-      },
-      fail(paramObj) {
-        // Tip: position 适配不了 ===》xuanfeng v5 web 需要 改下代码
-        if (paramObj.position) {
-          this.position = paramObj.position;
-        }
-        // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof (paramObj) == 'string') {
-          this.message = paramObj;
-        }
-        if (typeof (paramObj) == 'object') {
-          const {message} = paramObj
-          this.message = message;
-        }
-        this.color = 'warning';
-        this.timer = 3000;
-        this.icon = 'mdi-alert-circle';
-        this.showLoading = false;
-        this.showSnackbar = true;
-      },
-      dismiss() {
-        this.showSnackbar = false;
-      },
-      async notify(paramObj) {
-        let message = null;
-        // 注意: typeof(paramObj)=='string' 是为了适配老版本
-        if (typeof (paramObj) == 'string') {
-          message = paramObj;
-        }
-        if (typeof (paramObj) == 'object') {
-          message = paramObj.message;
-        }
-        if (Notification.permission !== 'granted') {
-          await Notification.requestPermission();
-        }
-        const notification = new Notification('<$ ctx.app.config.appTitle $>', {
-          // icon: 'http://cdn.sstatic.net/stackexchange/img/logos/so/so-icon.png',
-          body: message
-        });
-        // 打开 tab
-        notification.onclick = function (event) {
-          window.parent.focus();
-          notification.close();
-        };
-        // 3 秒后关闭
-        notification.onshow = function (event) {
-          setTimeout(() => {
-            notification.close();
-          }, 3000);
-        };
+    loading(paramObj) {
+      // 注意: typeof(paramObj)=='string' 是为了适配老版本
+      let _message = '';
+      if (typeof (paramObj) == 'string') {
+        _message = paramObj;
       }
+      if (typeof (paramObj) == 'object') {
+        const {message} = paramObj
+        _message = message;
+      }
+      this.color = 'primary';
+      if (paramObj.hasOwnProperty('time')) {
+        this.timer = paramObj.time;
+      } else {
+        if (_message.includes('%')) {
+          this.timer = _message.includes('100') ? 3000 : -1;
+        } else {
+          this.timer = 3000;
+        }
+      }
+      // 限制消息长度
+      this.message = _message;
+      this.icon = 'mdi-check';
+      this.showLoading = true;
+      this.showSnackbar = true;
     },
-  });
+    success(paramObj) {
+      // 注意: typeof(paramObj)=='string' 是为了适配老版本
+      let _message = '';
+      if (typeof (paramObj) == 'string') {
+        _message = paramObj;
+      }
+      if (typeof (paramObj) == 'object') {
+        const {message} = paramObj
+        _message = message;
+      }
+      // 限制消息长度
+      this.message = _message;
+      this.color = 'primary';
+      this.timer = 3000;
+      this.icon = 'mdi-check';
+      this.showLoading = false;
+      this.showSnackbar = true;
+    },
+    fail(paramObj) {
+      // Tip: position 适配不了 ===》xuanfeng v5 web 需要 改下代码
+      let _message = '';
+      if (paramObj.position) {
+        this.position = paramObj.position;
+      }
+      // 注意: typeof(paramObj)=='string' 是为了适配老版本
+      if (typeof (paramObj) == 'string') {
+        _message = paramObj;
+      }
+      if (typeof (paramObj) == 'object') {
+        const {message} = paramObj
+        _message = message;
+      }
+      // 限制消息长度
+      this.message = _message;
+      this.color = 'warning';
+      this.timer = 3000;
+      this.icon = 'mdi-alert-circle';
+      this.showLoading = false;
+      this.showSnackbar = true;
+    },
+    dismiss() {
+      this.showSnackbar = false;
+    },
+    async notify(paramObj) {
+      let message = null;
+      // 注意: typeof(paramObj)=='string' 是为了适配老版本
+      if (typeof (paramObj) == 'string') {
+        message = paramObj;
+      }
+      if (typeof (paramObj) == 'object') {
+        message = paramObj.message;
+      }
+      if (Notification.permission !== 'granted') {
+        await Notification.requestPermission();
+      }
+      // 限制消息长度
+      const notification = new Notification('<$ ctx.app.config.appTitle $>', {
+        // icon: 'http://cdn.sstatic.net/stackexchange/img/logos/so/so-icon.png',
+        body: message
+      });
+      // 打开 tab
+      notification.onclick = function (event) {
+        window.parent.focus();
+        notification.close();
+      };
+      // 3 秒后关闭
+      notification.onshow = function (event) {
+        setTimeout(() => {
+          notification.close();
+        }, 3000);
+      };
+    }
+  },
+});
 
 </script>
+<style>
+.jh-snackbar .v-snack__content {
+  display: flex;
+  align-items: center;
+}
+
+.jh-snackbar .jh-snackbar-content {
+  flex: 1;
+  overflow: hidden;
+  max-width: 570px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 10px;
+}
+
+@media screen and (max-width: 500px) {
+  .jh-snackbar .jh-snackbar-content {
+    max-width: calc(100vw - 150px);
+  }
+}
+</style>
 <!-- <<<<<<<<<<<<< jhToast.html -->
