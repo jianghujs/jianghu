@@ -10,7 +10,7 @@
   :bottom="position === 'bottom'">
 <v-progress-circular v-if="showLoading" indeterminate color="green" size="18" width="3"></v-progress-circular>
 <v-icon v-else left>{{ icon }}</v-icon>
-<span class="jh-snackbar-content" :class="{'jh-single-line': singleLine}">{{ message }}</span>
+<span class="jh-snackbar-content">{{ message }}</span>
 <template v-slot:action="{ attrs }">
   <v-btn
     color="red"
@@ -41,7 +41,6 @@ Vue.component('jh-toast', {
   vuetify: new Vuetify(),
   data() {
     return {
-      singleLine: false,
       showSnackbar: false,
       showLoading: false,
       message: '',
@@ -69,26 +68,29 @@ Vue.component('jh-toast', {
       this.show(paramObj);
       this.notify({message});
     },
-    show({message, color, timer, icon, single}) {
+    show({message = '', color, timer, icon, count = 40}) {
       // 限制消息长度
+      if(message.length > count) {
+        message = message.substring(0, count)
+      }
       this.message = message || 'missing "message".';
       this.color = color || 'success';
       this.timer = timer || 3000;
       this.icon = icon || 'mdi-check';
-      this.singleLine = single || false;
       this.showLoading = false;
       this.showSnackbar = true;
     },
     loading(paramObj) {
       // 注意: typeof(paramObj)=='string' 是为了适配老版本
       let _message = '';
+      let _count = 40;
       if (typeof (paramObj) == 'string') {
         _message = paramObj;
       }
       if (typeof (paramObj) == 'object') {
-        const {message, single} = paramObj
+        const {message = '', count = 40} = paramObj
         _message = message;
-        this.singleLine = single || false;
+        _count = count;
       }
 
       this.color = 'primary';
@@ -101,7 +103,11 @@ Vue.component('jh-toast', {
           this.timer = 3000;
         }
       }
+
       // 限制消息长度
+      if(_message.length > _count) {
+        _message = _message.substring(0, _count)
+      }
       this.message = _message;
       this.icon = 'mdi-check';
       this.showLoading = true;
@@ -110,15 +116,19 @@ Vue.component('jh-toast', {
     success(paramObj) {
       // 注意: typeof(paramObj)=='string' 是为了适配老版本
       let _message = '';
+      let _count = 40;
       if (typeof (paramObj) == 'string') {
         _message = paramObj;
       }
       if (typeof (paramObj) == 'object') {
-        const {message, single} = paramObj
+        const {message = '', count = 40} = paramObj
         _message = message;
-        this.singleLine = single || false;
+        _count = count;
       }
       // 限制消息长度
+      if(_message.length > _count) {
+        _message = _message.substring(0, _count)
+      }
       this.message = _message;
       this.color = 'primary';
       this.timer = 3000;
@@ -129,6 +139,7 @@ Vue.component('jh-toast', {
     fail(paramObj) {
       // Tip: position 适配不了 ===》xuanfeng v5 web 需要 改下代码
       let _message = '';
+      let _count = 40;
       if (paramObj.position) {
         this.position = paramObj.position;
       }
@@ -137,11 +148,14 @@ Vue.component('jh-toast', {
         _message = paramObj;
       }
       if (typeof (paramObj) == 'object') {
-        const {message, single} = paramObj
+        const {message = '', count = 40} = paramObj
         _message = message;
-        this.singleLine = single || false;
+        _count = count;
       }
       // 限制消息长度
+      if(_message.length > _count) {
+        _message = _message.substring(0, _count)
+      }
       this.message = _message;
       this.color = 'warning';
       this.timer = 3000;
@@ -191,10 +205,6 @@ Vue.component('jh-toast', {
   align-items: center;
 }
 
-.jh-snackbar .jh-snackbar-content.jh-single-line {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .jh-snackbar .jh-snackbar-content {
   flex: 1;
   overflow: hidden;
