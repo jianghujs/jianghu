@@ -13,11 +13,7 @@ module.exports = option => {
     const { appType, appId } = config;
     // 对于 public page ====》不需要做 用户状态的校验
     // public: { user: "*", group: "public", role: "*" }
-    const allUserGroupRolePageList = await jianghuKnex('_user_group_role_page').select();
-    const isNotPublic = !allUserGroupRolePageList.find(
-      (rule) =>
-        rule.group === "public" && rule.role === "*" && rule.page === pageId
-    );
+    const isNotAllow = !allowPageList.some((page) => page.pageId === pageId);
     const { originalUrl } = ctx.request;
     const originalUrlEncode = encodeURIComponent(originalUrl);
 
@@ -38,7 +34,7 @@ module.exports = option => {
     if (appType === "multiApp") {
       const targetUserApp =
         userAppList && userAppList.find((x) => x.appId === appId);
-      if (isNotPublic && !targetUserApp) {
+      if (isNotAllow && !targetUserApp) {
         const { errorCode, errorReason } = errorInfoEnum.request_app_forbidden;
         ctx.redirect(
           `${ctx.app.config.loginPage}?errorCode=${errorCode}&errorReason=${errorReason}`
@@ -48,7 +44,7 @@ module.exports = option => {
     }
 
     // 2 判断用户状态
-    if (isNotPublic && isLoginUser) {
+    if (isNotAllow && isLoginUser) {
       const { userStatus } = user;
       if (userStatus === userStatusObj.banned) {
         goToErrorPage({ isLoginUser, error: errorInfoEnum.user_banned });
@@ -61,7 +57,7 @@ module.exports = option => {
     }
 
     // 3. 判断用户是否有 当前 packagePage 的权限
-    if (allowPageList.findIndex((x) => x.pageId === pageId) === -1) {
+    if (isNotAllow) {
       goToErrorPage({ isLoginUser, error: errorInfoEnum.page_forbidden });
       return;
     }

@@ -16,12 +16,10 @@ module.exports = option => {
     const { isGroupIdRequired } = ctx.packageResource.resourceData;
     // 对于 public 的 resource ====》不需要做 用户状态的校验
     // public: { user: "*", group: "public", role: "*" }
-    const allUserGroupRoleResourceList = await jianghuKnex('_user_group_role_resource').select();
-    const isNotPublic = !allUserGroupRoleResourceList.find(rule => rule.group === 'public'
-        && rule.role === '*' && rule.resource === resourceId);
+    const isNotAllow = !allowResourceList.some((resource) => resource.resourceId === resourceId);
 
     // 1. 判断用户是否有当前app的权限
-    if (isNotPublic && appType === 'multiApp') {
+    if (isNotAllow && appType === 'multiApp') {
       const targetUserApp = userAppList && userAppList.find(x => x.appId === appId);
       if (!targetUserApp) {
         throw new BizError(errorInfoEnum.request_app_forbidden);
@@ -29,7 +27,7 @@ module.exports = option => {
     }
 
     // 2 判断用户状态
-    if (isNotPublic && isLoginUser) {
+    if (isNotAllow && isLoginUser) {
       const { userStatus } = user;
       if (userStatus === userStatusObj.banned) {
         throw new BizError(errorInfoEnum.user_banned);
@@ -51,7 +49,7 @@ module.exports = option => {
     }
 
     // 4. 判断用户是否有 当前 packageResource 的权限
-    if (allowResourceList.findIndex(x => x.resourceId === resourceId) === -1) {
+    if (isNotAllow) {
       // 3.1 若未登陆 则 提示用户登陆后再来 请求这个 resource
       if (!isLoginUser) {
         throw new BizError(errorInfoEnum.request_token_invalid);
