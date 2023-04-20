@@ -34,7 +34,7 @@ module.exports = option => {
     if (appType === "multiApp") {
       const targetUserApp =
         userAppList && userAppList.find((x) => x.appId === appId);
-      if (!targetUserApp) {
+      if (isNotAllow && !targetUserApp) {
         const { errorCode, errorReason } = errorInfoEnum.request_app_forbidden;
         ctx.redirect(
           `${ctx.app.config.loginPage}?errorCode=${errorCode}&errorReason=${errorReason}`
