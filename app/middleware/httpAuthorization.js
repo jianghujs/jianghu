@@ -17,9 +17,10 @@ module.exports = option => {
     // 对于 public 的 resource ====》不需要做 用户状态的校验
     // public: { user: "*", group: "public", role: "*" }
     const isNotAllow = !allowResourceList.some((resource) => resource.resourceId === resourceId);
+    const isPublic = allowResourceList.find((resource) => resource.resourceId === resourceId)?.isPublic || false;
 
     // 1. 判断用户是否有当前app的权限
-    if (isNotAllow && appType === 'multiApp') {
+    if (appType === 'multiApp'&& !isPublic) {
       const targetUserApp = userAppList && userAppList.find(x => x.appId === appId);
       if (!targetUserApp) {
         throw new BizError(errorInfoEnum.request_app_forbidden);

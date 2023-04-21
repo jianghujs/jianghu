@@ -14,6 +14,8 @@ module.exports = option => {
     // 对于 public page ====》不需要做 用户状态的校验
     // public: { user: "*", group: "public", role: "*" }
     const isNotAllow = !allowPageList.some((page) => page.pageId === pageId);
+    const isPublic = allowPageList.find((page) => page.pageId === pageId)?.isPublic || false;
+    // const pageIsNotPublic = 
     const { originalUrl } = ctx.request;
     const originalUrlEncode = encodeURIComponent(originalUrl);
 
@@ -31,16 +33,15 @@ module.exports = option => {
     };
 
     // 1. 判断用户是否有当前app的权限
-    if (appType === "multiApp") {
+    if (appType === "multiApp" && !isPublic) {
       const targetUserApp =
         userAppList && userAppList.find((x) => x.appId === appId);
-      if (isNotAllow && !targetUserApp) {
+      if (!targetUserApp) {
         const { errorCode, errorReason } = errorInfoEnum.request_app_forbidden;
         ctx.redirect(
           `${ctx.app.config.loginPage}?errorCode=${errorCode}&errorReason=${errorReason}`
         );
-        return;
-      }
+      }  
     }
 
     // 2 判断用户状态
