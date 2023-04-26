@@ -226,6 +226,7 @@ module.exports = {
         pageId: resource.pageId,
         actionId: resource.actionId,
         resourceType: resource.resourceType,
+        isPublic: resource.isPublic,
       };
     });
   },
