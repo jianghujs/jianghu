@@ -279,6 +279,7 @@ module.exports = {
     // 检查每个数据项有没有权限
     allItemList.forEach(item => {
       let resultAllowOrDeny = '';
+      let isPublic = false;
       // 遍历并检查规则
       allRuleList.forEach(rule => {
         // deny 的优先级高于全部，一旦有 deny 则不再需要判断
@@ -298,12 +299,15 @@ module.exports = {
         if (!this.checkResource(item[idFieldKey], rule[fieldKey])) {
           return;
         }
+        if (rule.group === 'public') {
+          isPublic = true;
+        }
         resultAllowOrDeny = rule.allowOrDeny;
       });
 
       if (resultAllowOrDeny === 'allow') {
         const allItem = allItemMap[item[idFieldKey]];
-        allowItemList.push(allItem);
+        allowItemList.push({ ...allItem, isPublic });
       }
     });
     return allowItemList;
