@@ -9,7 +9,7 @@
 
   class BizError extends Error {
     constructor({errorCode, errorReason, errorReasonSupplement, response}) {
-      super(errorCode);
+      super(JSON.stringify({errorCode, errorReason, errorReasonSupplement}));
       this.name = 'BizError';
       this.errorCode = errorCode;
       this.errorReason = errorReason;
@@ -56,40 +56,7 @@
     return Promise.reject(err);
   });
 
-  /**
-   * desc: 响应拦截器 ==> 异常处理
-   * [axios文档](https://axios-http.com/zh/docs/interceptors)
-   */
-  window.jianghuAxios.interceptors.response.use(async response => {
-    const data = response.data || {};
-    const responseData = data.appData || {};
-    const {errorCode, errorReason} = responseData;
-    if (errorCode === 'request_token_invalid' || errorCode === 'request_user_not_exist' ||
-        errorCode === 'request_token_expired' || errorCode === 'user_banned') {
-      localStorage.removeItem(`${window.appInfo.appId}_authToken`);
-      window.vtoast.fail({ message: errorReason });
-      if (location.pathname === `/${window.appInfo.appId}/page/login`) {
-        throw new BizError({
-          errorCode,
-          errorReason,
-          response
-        });
-      }
-      location.href = `/${window.appInfo.appId}/page/login`;
-      return response;
-    }
-
-    // 需要把 errorCode 转成异常抛出来
-    if (errorCode) {
-      throw new BizError({
-        errorCode,
-        errorReason,
-        response
-      });
-    }
-
-    return response;
-  }, err => {
+  const responseError = err => {
     const {code, message, response} = err;
     let {errorCode, errorReason} = err;
     if (!errorCode && code) {
@@ -102,7 +69,41 @@
       window.vtoast.fail({ message: errorReason });
     }
     return Promise.reject(new BizError({errorCode, errorReason, response}));
-  });
+  };
+
+  /**
+   * desc: 响应拦截器 ==> 异常处理
+   * [axios文档](https://axios-http.com/zh/docs/interceptors)
+   */
+  window.jianghuAxios.interceptors.response.use(response => {
+    const data = response.data || {};
+    const responseData = data.appData || {};
+    const {errorCode, errorReason} = responseData;
+    if (errorCode === 'request_token_invalid' || errorCode === 'request_user_not_exist' ||
+        errorCode === 'request_token_expired' || errorCode === 'user_banned') {
+      localStorage.removeItem(`${window.appInfo.appId}_authToken`);
+      window.vtoast.fail({ message: errorReason });
+      if (location.pathname === `/${window.appInfo.appId}/page/login`) {
+        return responseError({
+          errorCode,
+          errorReason,
+          response
+        });
+      }
+      location.href = `/${window.appInfo.appId}/page/login`;
+      return response;
+    }
+
+    // 需要把 errorCode 转成异常抛出来
+    if (errorCode) {
+      return responseError({
+        errorCode,
+        errorReason,
+        response
+      });
+    }
+    return response;
+  }, responseError);
 
   // =============上传下载相关=============
   window.jianghuAxios.base64ToFile = ({ base64, name }) => {
