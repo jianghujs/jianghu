@@ -1,4 +1,4 @@
-<!--jianghuAxios.html >>>>>>>>>>>>> -->
+<!-- jianghuAxios.html >>>>>>>>>>>>> -->
 <script src="/<$ ctx.app.config.appId $>/public/lib/spark-md5/spark-md5.min.js"></script>
 <script>
 (function () {
@@ -56,26 +56,11 @@
     return Promise.reject(err);
   });
 
-  const responseError = err => {
-    const {code, message, response} = err;
-    let {errorCode, errorReason} = err;
-    if (!errorCode && code) {
-      errorCode = code;
-    }
-    if (!errorReason && message) {
-      errorReason = message;
-    }
-    if(response.data.appData.actionId !== 'getConstantList') {
-      window.vtoast.fail({ message: errorReason });
-    }
-    return Promise.reject(new BizError({errorCode, errorReason, response}));
-  };
-
   /**
    * desc: 响应拦截器 ==> 异常处理
    * [axios文档](https://axios-http.com/zh/docs/interceptors)
    */
-  window.jianghuAxios.interceptors.response.use(response => {
+  window.jianghuAxios.interceptors.response.use(async response => {
     const data = response.data || {};
     const responseData = data.appData || {};
     const {errorCode, errorReason} = responseData;
@@ -84,7 +69,7 @@
       localStorage.removeItem(`${window.appInfo.appId}_authToken`);
       window.vtoast.fail({ message: errorReason });
       if (location.pathname === `/${window.appInfo.appId}/page/login`) {
-        return responseError({
+        throw new BizError({
           errorCode,
           errorReason,
           response
@@ -96,14 +81,28 @@
 
     // 需要把 errorCode 转成异常抛出来
     if (errorCode) {
-      return responseError({
+      if (response.data.appData.actionId !== 'getConstantList') {
+        window.vtoast.fail({ message: errorReason });
+      }
+      throw new BizError({
         errorCode,
         errorReason,
         response
       });
     }
+
     return response;
-  }, responseError);
+  }, err => {
+    const {code, message, response} = err;
+    let {errorCode, errorReason} = err;
+    if (!errorCode && code) {
+      errorCode = code;
+    }
+    if (!errorReason && message) {
+      errorReason = message;
+    }
+    return Promise.reject(new BizError({errorCode, errorReason, response}));
+  });
 
   // =============上传下载相关=============
   window.jianghuAxios.base64ToFile = ({ base64, name }) => {
