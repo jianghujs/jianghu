@@ -80,7 +80,7 @@
     <!--手机端左侧菜单开启按钮-->
     <v-app-bar-nav-icon color="success" @click.stop="isMobileMenuDrawerShown = !isMobileMenuDrawerShown" v-if="isMobile"></v-app-bar-nav-icon>
     <!--页面标题-->
-    <v-toolbar-title ref="toolbarTitle" class="mr-8">
+    <v-toolbar-title ref="toolbarTitle" class="pl-0 mr-2">
       <span class="text-h7 font-weight-bold">{{ appTitle }}</span>
     </v-toolbar-title>
     <!--pc端菜单 >>>>>>>>>>>>>-->
@@ -143,7 +143,7 @@
     </v-tabs>
     <!--<<<<<<<<<<<<<pc端菜单-->
     <div style="white-space: nowrap">
-      <v-menu v-if="!isMobile" offset-y v-model="isAvatarMenuShown">
+      <v-menu offset-y v-model="isAvatarMenuShown">
         <template v-slot:activator="{on, attrs}">
           <div text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
             <span class="jh-font-size-3 black--text pr-1">{{ userInfo.user.username }}</span>
