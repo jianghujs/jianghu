@@ -203,11 +203,6 @@ function buildJianghuKnexFunc(knex) {
       return result;
     };
 
-    // 映射事务提交 commit()
-    builder.commit = async () => {
-      return await target.commit();
-    };
-
     return builder;
   };
 
@@ -229,6 +224,12 @@ module.exports.createJianghuKnex = knex => {
   jianghuKnex.transaction = async (callback, ctx = {}) => {
     await knex.transaction(async trx => {
       const jianghuKnexTrx = buildJianghuKnexFunc(trx, ctx);
+
+      // 映射事务提交 commit()
+      jianghuKnexTrx.commit = async () => {
+        return await trx.commit();
+      };
+
       await callback(jianghuKnexTrx);
     });
   };
