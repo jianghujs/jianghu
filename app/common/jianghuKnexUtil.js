@@ -203,6 +203,11 @@ function buildJianghuKnexFunc(knex) {
       return result;
     };
 
+    // 映射事务提交 commit()
+    builder.commit = async () => {
+      return await target.commit();
+    };
+
     return builder;
   };
 
