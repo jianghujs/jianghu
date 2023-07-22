@@ -230,6 +230,11 @@ module.exports.createJianghuKnex = knex => {
         return await trx.commit();
       };
 
+      // 映射事务回滚 rollback()
+      jianghuKnexTrx.rollback = async () => {
+        return await trx.rollback();
+      };
+
       await callback(jianghuKnexTrx);
     });
   };
