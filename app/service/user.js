@@ -6,7 +6,6 @@ const { BizError, errorInfoEnum } = require('../constant/error');
 const { userStatusObj } = require('../constant/constant');
 const validateUtil = require('../common/validateUtil');
 const idGenerateUtil = require('../common/idGenerateUtil');
-const geoip = require('geoip-lite');
 // ========================================常用 require end=============================================
 const md5 = require('md5-node');
 const actionDataaScheme = Object.freeze({
@@ -85,23 +84,17 @@ class UserService extends Service {
 
     const userAgent = this.ctx.request.body.appData.userAgent || '';
     const userIp = this.ctx.header['x-real-ip'] || this.ctx.request.ip || '';
-    const geo = geoip.lookup(userIp);
-    let userIpRegion = '';
-    if (geo) {
-      userIpRegion = `${geo.country}|${geo.region}|${geo.timezone}|${geo.city}|${geo.ll}|${geo.range}`;
-    }
 
     if (userSession && userSession.id) {
       await jianghuKnex('_user_session', this.ctx)
         .where({ id: userSession.id })
-        .jhUpdate({ authToken, deviceType, userAgent, userIp, userIpRegion });
+        .jhUpdate({ authToken, deviceType, userAgent, userIp });
     } else {
       await jianghuKnex('_user_session', this.ctx).jhInsert({
         userId,
         deviceId,
         userAgent,
         userIp,
-        userIpRegion,
         deviceType,
         authToken,
       });
