@@ -1,29 +1,19 @@
-<!--jhScene.html >>>>>>>>>>>>> -->
+<!-- jhScene.html >>>>>>>>>>>>> -->
 <script type="text/html" id="jh-scene">
 <div class="jh-scene">
 <v-row class="ma-0 ml-xs-n1">
-  <!--场景列表-->
-  <v-btn small :outlined="currentSceneId !== scene.id"
-         v-for="(scene, index) in sceneList"
-         :key="index"
-         @click="doUiAction('useScene', scene)"
-         :dark="currentSceneId === scene.id"
-         color="grey darken-1" class="mb-2 ml-1">
-    {{ scene.name }}
-  </v-btn>
-  <!--新增场景按钮-->
+  <!-- 场景列表 -->
+  <v-btn-toggle :value="0" mandatory dense class="mr-2" color="success" @change="doUiAction('useScene', sceneList[$event])" > 
+    <v-btn small v-for="scene, index in sceneList" :key="index"> {{scene.name}} </v-btn> 
+  </v-btn-toggle>
+  <!-- 新增场景按钮 -->
 
-  <!--场景操作菜单-->
+  <!-- 场景操作菜单 -->
   <v-menu offset-y v-model="isSceneOperationShown">
     <template v-slot:activator="{on, attrs}">
-      <v-btn
-        v-bind="attrs" v-on="on"
-        small outlined
-        color="grey darken-1"
-        class="mb-2 ml-1 pa-1"
-      >
-        <v-icon right small class="mx-0">mdi-chevron-down</v-icon>
-      </v-btn>
+      <v-btn-toggle dense color="white"> 
+        <v-btn small v-bind="attrs" v-on="on"><v-icon right small class="mx-0">mdi-chevron-down</v-icon></v-btn> 
+      </v-btn-toggle>
     </template>
     <v-list dense class="pb-0">
       <v-list-item @click="doUiAction('openCreateSceneDialog')">
@@ -99,7 +89,7 @@
       <v-card-text class="pb-2">
         <v-card outlined>
           <v-list dense class="scene-list">
-            <!--场景列表数据 >>>>>>>>>>>>>> -->
+            <!-- 场景列表数据 >>>>>>>>>>>>>> -->
             <template v-if="sceneCustomList && sceneCustomList.length">
               <v-list-item class="scene-item px-2" v-for="item in sceneCustomList" :key="item.value">
                 <v-list-item-content>
@@ -110,7 +100,7 @@
                 </v-list-item-icon>
               </v-list-item>
             </template>
-            <!--<<<<<<<<<<<<<<< 场景列表数据 -->
+            <!-- <<<<<<<<<<<<<<< 场景列表数据 -->
             <template v-else>
               <div class="text-center grey--text" style="line-height: 100px;">暂无自定义场景</div>
             </template>
@@ -360,11 +350,6 @@ Vue.component('jh-scene', {
 <style>
 .jh-scene {
   display: inline-block;
-}
-
-.v-application--is-ltr .jh-scene .v-btn-toggle > .v-btn.v-btn {
-  border-left-width: 1px !important;
-  margin-left: 2px;
 }
 
 .scene-manage .scene-item:not(:last-child) {

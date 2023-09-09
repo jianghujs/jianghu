@@ -1,4 +1,4 @@
-<!--jhMenu.html >>>>>>>>>>>>> -->
+<!-- jhMenu.html >>>>>>>>>>>>> -->
 <script type="text/html" id="jh-menu">
 <div>
   <!-- 手机端左边抽屉菜单 >>>>>>>>>>>>> -->
@@ -10,45 +10,34 @@
     style="z-index: 99999"
     class="jh-page-nav-bar"
   >
-    <v-btn
-      fab
-      color="success"
-      class="elevation-0"
-      x-small
-      style="position: absolute; right: 15px; top: 15px; z-index: 10"
-      @click="isMobileMenuDrawerShown = !isMobileMenuDrawerShown">
-      <v-icon>mdi-arrow-left</v-icon>
-    </v-btn>
+    <!-- 页面标题 -->
+    <v-toolbar-title ref="toolbarTitle" class="px-4 jh-toolbar-title">
+      <span class="text-h7 font-weight-bold">{{ appTitle }}</span>
+    </v-toolbar-title>
     <v-list>
       <v-list-item-group
         v-model="currentMenuTabIndex"
         color="success"
       >
-        <v-list-item
-          disabled
-          class="pa-2"
-          style="color: #333333"
-        >
-          <v-list-item-content>
-            <v-list-item-title class="font-weight-bold text-h7 pr-10 text-center">
-              {{ appTitle }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
         <template v-for="item in inMenuList">
           <template v-if="item.children && item.children.length > 0">
             <v-list-group :value="item.extend">
               <template v-slot:activator>
-                <v-list-item-content class="pl-3">
-                  <v-list-item-title>
-                    {{ item.title }}
-                  </v-list-item-title>
-                </v-list-item-content>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ item.title }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
               </template>
-              <v-list-item @click="openUrl(menu.path, menu.query)" v-for="menu in item.children">
+              <v-list-item @click="openUrl(menu.path, menu.query)" v-for="menu in item.children" class="mx-2">
                 <v-list-item-content>
-                  <v-list-item-title class="pl-7 jh-font-size-2" style="color: #666977;">{{ menu.title }}</v-list-item-title>
+                  <v-list-item-title class="pl-4 jh-font-size-12" style="color: #666977;">{{ menu.title }}</v-list-item-title>
                 </v-list-item-content>
+                <v-list-item-action>
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-list-item-action>
               </v-list-item>
             </v-list-group>
           </template>
@@ -56,16 +45,27 @@
             v-else
             :key="item.path"
             @click="openUrl(item.path, item.query)"
+            class="mx-2"
           >
             <v-list-item-content class="pl-0">
               <v-list-item-title>
                 {{ item.title }}
               </v-list-item-title>
             </v-list-item-content>
+            <v-list-item-action>
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-list-item-action>
           </v-list-item>
         </template>
       </v-list-item-group>
     </v-list>
+
+    <!-- 抽屉关闭按钮 -->
+    <v-btn
+      elevation="0" color="success" fab absolute top left small tile class="jh-menu-drawer-close-float-btn"
+      @click="isMobileMenuDrawerShown = !isMobileMenuDrawerShown">
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
   </v-navigation-drawer>
   <!-- <<<<<<<<<<<<< 手机端左边抽屉菜单 -->
   <!-- 页面头部 >>>>>>>>>>>>> -->
@@ -77,13 +77,13 @@
     style="z-index: 50;"
     flat
   >
-    <!--手机端左侧菜单开启按钮-->
+    <!-- 手机端左侧菜单开启按钮 -->
     <v-app-bar-nav-icon color="success" @click.stop="isMobileMenuDrawerShown = !isMobileMenuDrawerShown" v-if="isMobile"></v-app-bar-nav-icon>
-    <!--页面标题-->
-    <v-toolbar-title ref="toolbarTitle" class="pl-0 mr-2">
+    <!-- 页面标题 -->
+    <v-toolbar-title ref="toolbarTitle" class="mr-8 pl-0">
       <span class="text-h7 font-weight-bold">{{ appTitle }}</span>
     </v-toolbar-title>
-    <!--pc端菜单 >>>>>>>>>>>>>-->
+    <!-- pc端菜单 >>>>>>>>>>>>> -->
     <v-tabs
       v-model="currentMenuTabIndex"
       v-if="!isMobile"
@@ -93,7 +93,7 @@
       :style="{maxWidth: tabsMaxWidth}"
     >
       <template v-for="(item, index) in inMenuList">
-        <!--一级菜单 >>>>>>>>>>>> -->
+        <!-- 一级菜单 >>>>>>>>>>>> -->
         <template v-if="item.pageId && !item.children">
           <v-tab
             class="px-5 jh-header-tab"
@@ -104,8 +104,8 @@
             {{ item.title }}
           </v-tab>
         </template>
-        <!--<<<<<<<<<<<<<一级菜单-->
-        <!--二级菜单>>>>>>>>>>>>-->
+        <!-- <<<<<<<<<<<<<一级菜单 -->
+        <!-- 二级菜单>>>>>>>>>>>> -->
         <template v-else>
           <v-menu offset-y v-model="inMenuShownStatusList[index]">
             <template v-slot:activator="{on, attrs}">
@@ -133,7 +133,7 @@
           </v-menu>
 
         </template>
-        <!--<<<<<<<<<<<<<二级菜单-->
+        <!-- <<<<<<<<<<<<<二级菜单 -->
         <v-divider
           style="max-height: 35px;min-height: 35px;align-self: center;"
           v-if="item.path && item.path.includes('operationManual')"
@@ -141,26 +141,28 @@
         ></v-divider>
       </template>
     </v-tabs>
-    <!--<<<<<<<<<<<<<pc端菜单-->
+    <!-- <<<<<<<<<<<<<pc端菜单 -->
     <div style="white-space: nowrap">
       <v-menu offset-y v-model="isAvatarMenuShown">
         <template v-slot:activator="{on, attrs}">
-          <div text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
-            <span class="jh-font-size-3 black--text pr-1">{{ userInfo.user.username }}</span>
-            <v-icon>mdi-account-circle</v-icon>
+          <!-- pc端右上角用户信息 -->
+          <div v-if="!isMobile" text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
+            <v-icon :size="32">mdi-account-circle</v-icon>
+            <div class="ml-1">
+              <p class="jh-font-size-10 grey--text mb-0">{{ userInfo.user.userId }}</p>
+              <p class="jh-font-size-13 black--text mb-0">{{ userInfo.user.username }}</p>
+            </div>
+          </div>
+          <!-- 移动端右上角用户信息 -->
+          <div v-else text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
+            <v-icon :size="25">mdi-account-circle</v-icon>
+            <div class="ml-1">
+              <p class="jh-font-size-13 black--text mb-0">{{ userInfo.user.userId }}</p>
+            </div>
           </div>
         </template>
         <v-list nav dense>
-          <v-list-item class="mt-2">
-            <v-list-item-icon class="mr-1 mt-1">
-              <v-icon size="16" color="grey darken-3">mdi-account-outline</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title color="grey darken-3">{{ userInfo.user.userId }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-
-          <!--右上角下拉菜单-->
+          <!-- 右上角下拉菜单 -->
           <v-list-item v-for="avatarMenu of inAvatarMenuList" :key="avatarMenu.path" @click="openUrl(avatarMenu.path)">
             <v-list-item-icon class="mr-1 mt-1">
               <v-icon size="16" color="grey darken-3">mdi-account-cog-outline</v-icon>
@@ -431,6 +433,16 @@ Vue.component('jh-menu', {
 .second-active {
   caret-color: #4caf50 !important;
   background-color: rgba(76, 175, 80, 0.1) !important;
+}
+.jh-toolbar-title{
+  height: 60px;
+  line-height: 60px;
+}
+.jh-menu-drawer-close-float-btn{
+  top: 120px !important;
+  right: -40px;
+  position: fixed;
+  left: auto !important;
 }
 </style>
 <!-- <<<<<<<<<<<<< jhMenu.html -->
