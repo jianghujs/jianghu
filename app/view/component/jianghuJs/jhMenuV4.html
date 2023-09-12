@@ -96,7 +96,7 @@
         <!-- 一级菜单 >>>>>>>>>>>> -->
         <template v-if="item.pageId && !item.children">
           <v-tab
-            class="px-5 jh-header-tab"
+            class="px-2 mr-2 jh-header-tab"
             active-class="jh-header-tab-active"
             :key="item.path"
             @click="openUrl(item.path, item.query)"
@@ -147,22 +147,26 @@
         <template v-slot:activator="{on, attrs}">
           <!-- pc端右上角用户信息 -->
           <div v-if="!isMobile" text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
-            <v-icon :size="32">mdi-account-circle</v-icon>
+            <v-icon :size="34">mdi-account-circle</v-icon>
             <div class="ml-1">
+              <p class="jh-font-size-12 black--text mb-0">{{ userInfo.user.username }}</p>
               <p class="jh-font-size-10 grey--text mb-0">{{ userInfo.user.userId }}</p>
-              <p class="jh-font-size-13 black--text mb-0">{{ userInfo.user.username }}</p>
             </div>
           </div>
           <!-- 移动端右上角用户信息 -->
           <div v-else text v-bind="attrs" v-on="on" class="jh-avatar-menu-btn px-1">
-            <v-icon :size="25">mdi-account-circle</v-icon>
-            <div class="ml-1">
-              <p class="jh-font-size-13 black--text mb-0">{{ userInfo.user.userId }}</p>
-            </div>
+            <v-icon :size="32">mdi-account-circle</v-icon>
           </div>
         </template>
         <v-list nav dense>
           <!-- 右上角下拉菜单 -->
+          <v-list-item v-if="isMobile">
+            <v-list-item-content>
+              <p class="jh-font-size-12 black--text mb-0">{{ userInfo.user.username }}</p>
+                <p class="jh-font-size-10 grey--text mb-0">{{ userInfo.user.userId }}</p>
+            </v-list-item-content>
+          </v-list-item>
+
           <v-list-item v-for="avatarMenu of inAvatarMenuList" :key="avatarMenu.path" @click="openUrl(avatarMenu.path)">
             <v-list-item-icon class="mr-1 mt-1">
               <v-icon size="16" color="grey darken-3">mdi-account-cog-outline</v-icon>
@@ -427,7 +431,7 @@ Vue.component('jh-menu', {
 }
 
 .jh-avatar-menu-btn:hover {
-  background-color: #EEEEEE;
+  opacity: 0.8;
 }
 
 .second-active {

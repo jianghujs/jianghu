@@ -49,12 +49,12 @@
         </v-row>
       </v-card-title>
       <v-card-text>
-        <div class="mb-4">
-          <div class="mb-1">场景名称</div>
-          <v-text-field class="jh-v-input" :rules="validationRules.requireRules" dense filled single-line hide-details v-model="createItem.name" placeholder="场景名称，最多10个字符"></v-text-field>
+        <div class="mb-2">
+          <span class="jh-input-label">场景名称</span>
+          <v-text-field class="jh-v-input" dense single-line filled hide-details label="学生ID" v-model="createItem.name" placeholder="场景名称，最多10个字符" :rules="validationRules.requireRules"></v-text-field>
         </div>
-        <div class="mb-4">
-          <div>筛选条件</div>
+        <div class="mb-2">
+          <span class="jh-input-label">筛选条件</span>
           <slot name="form" :form="createItem.form">
             <div>未配置form slot</div>
           </slot>
