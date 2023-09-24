@@ -1,6 +1,6 @@
 {
     "name": "@jianghujs/jianghu",
-    "version": "4.0.47",
+    "version": "4.1.0",
     "description": "Progressive Enterprise Framework",
     "dependencies": {
         "ajv": "^8.7.1",
@@ -14,7 +14,6 @@
         "egg-static": "^2.2.0",
         "egg-bin": "^4.11.0",
         "egg-view-nunjucks": "^2.3.0",
-        "geoip-lite": "1.4.7",
         "koa-send": "^5.0.1",
         "lodash": "^4.17.21",
         "md5-node": "^1.0.1",

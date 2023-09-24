@@ -52,10 +52,8 @@
         /* <<<<< 边距 */
 
         /* 服务端搜索按钮 */
-        body .v-application .jh-backend-search-btn {
-            position: absolute;
-            top: -60px;
-            right: 0;
+        body .jh-backend-search-btn{
+            width: 100%;
         }
         /* 服务端搜索位置兼容 */
         body .v-application .jh-backend-form-container {
@@ -264,19 +262,20 @@
         body .v-application .v-data-footer__select {
             flex: 1 !important;
         }
+
+        /* table 取消定高 */
+        .jh-fixed-table-height {
+           height: auto !important;
+        }
+
         /* <<<<< table */
 
 
         /* 系统菜单 >>>>>> */
-        body .jh-page-nav-bar .v-list-item:not(.v-item--active):not(.v-item--active + div):not(:first-child) {
-            border-top: 1px solid #EEEEEE;
-        }
-
         body .jh-page-nav-bar .v-list-item {
             border-top: 1px solid #FFFFFF;
             min-height: 42px !important;
             padding: 0 10px !important;
-            margin: 0 14px !important;
         }
 
         body .jh-page-nav-bar .v-list-item:first-child {
@@ -285,6 +284,10 @@
 
         body .jh-page-nav-bar .v-navigation-drawer__content .v-list-item--link:before {
             margin: 0 !important;
+        }
+
+        body .jh-page-nav-bar .v-list-group__header__append-icon{
+            margin-right: 8px !important;
         }
 
         body .v-application .jh-page-header {

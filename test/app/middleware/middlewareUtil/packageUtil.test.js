@@ -5,7 +5,6 @@ const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
 const utils = require('../../../utils');
-const geoip = require('geoip-lite');
 const packageUtil = require('../../../../app/middleware/middlewareUtil/packageUtil');
 
 describe('test/app/middleware/middlewareUtil/packageUtil.test.js', () => {
@@ -29,11 +28,9 @@ describe('test/app/middleware/middlewareUtil/packageUtil.test.js', () => {
         return jianghuKnexResult;
       });
       this.insertStub = sinon.stub(jianghuKnexResult, 'insert');
-      this.lookupStub = sinon.stub(geoip, 'lookup');
     });
     afterEach(() => {
       this.insertStub.restore();
-      this.lookupStub.restore();
       mock.restore();
     });
     it('should success', async () => {

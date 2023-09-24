@@ -1,7 +1,5 @@
 'use strict';
 
-const geoip = require('geoip-lite');
-
 module.exports = {
 
   async saveRequestLogForResource(ctx) {
@@ -21,9 +19,6 @@ module.exports = {
     const { status: responseStatus } = responseBody;
     let responseBodyString = JSON.stringify(responseBody);
     const userAgent = requestBody.appData.userAgent || '';
-    const geo = geoip.lookup(userIp);
-    let userIpRegion = '';
-    if (geo) { userIpRegion = `${geo.country}|${geo.region}|${geo.timezone}|${geo.city}|${geo.ll}|${geo.range}`; }
     let requestBodyString = JSON.stringify(requestBody);
 
     // 大文本
@@ -35,7 +30,7 @@ module.exports = {
     }
     const insertData = {
       packageId, resourceId, deviceId, userId,
-      userIp, userAgent, userIpRegion,
+      userIp, userAgent,
       requestBody: requestBodyString,
       responseBody: responseBodyString,
       responseStatus,

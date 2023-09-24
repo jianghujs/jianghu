@@ -1,6 +1,6 @@
-<!--htmlErrorCollectionV4.html >>>>>>>>>> -->
+<!-- htmlErrorCollectionV4.html >>>>>>>>>> -->
 {% if ctx.app.config.jianghuConfig.enableHtmlErrorLogRecord %}
-<!--htmlErrorCollectionV4.html >>>>>>>>>> -->
+<!-- htmlErrorCollectionV4.html >>>>>>>>>> -->
 <script>
   const errorCollectionFunc = ({
     runtimeError = true,
@@ -126,5 +126,5 @@
   const intervalTimeout = '<$ ctx.app.config.jianghuConfig.htmlErrorLogRecordInterval $>' || 60000;
   intervalSyncErrorLogListToServerFunc({ intervalTimeout });
 </script>
-<!--htmlErrorCollectionV4.html <<<<<<<<<<<< -->
+<!-- htmlErrorCollectionV4.html <<<<<<<<<<<< -->
 {% endif %}
