@@ -273,7 +273,7 @@ Vue.component('jh-menu', {
       const index = _.findIndex(this.inMenuList, {path: location.pathname});
       if (index > -1) {
         // 设置标题、菜单选中
-        this.currentMenuTabIndex = index + (this.isMobile ? 1 : 0);
+        this.currentMenuTabIndex = index;
         const currentPageTitle = this.inMenuList[index].title;
         document.title = this.appTitle + (currentPageTitle ? " - " + currentPageTitle : "");
         return;
@@ -282,7 +282,7 @@ Vue.component('jh-menu', {
       this.inMenuList.some((item, index) => {
         const findSecondMenuSuccess = item.children && item.children.some(child => {
           if (child.pageId === this.currentPageId) {
-            this.currentMenuTabIndex = index + (this.isMobile ? 1 : 0);
+            this.currentMenuTabIndex = index;
             this.currentSecondMenuPageId = child.pageId;
             const currentPageTitle = `[${item.title}]${child.title}`;
             document.title = this.appTitle + (currentPageTitle ? " - " + currentPageTitle : "");
