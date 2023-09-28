@@ -221,7 +221,10 @@ Vue.component('jh-menu', {
   },
   watch: {
     isMobileMenuDrawerShown(value) {
-      this.setCurrentMenuItem();
+      // this.setCurrentMenuItem();
+      if (!value) {
+        this.pageId = '<$ ctx.packagePage.pageId $>';
+      }
     },
     inMenuShownStatusList: {
       deep: true,
