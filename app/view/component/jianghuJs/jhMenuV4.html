@@ -16,35 +16,34 @@
     </v-toolbar-title>
     <v-list>
       <v-list-item-group
-        v-model="currentMenuTabIndex"
+        v-model="pageId"
         color="success"
       >
         <template v-for="item in inMenuList">
-          <template v-if="item.children && item.children.length > 0">
-            <v-list-group :value="item.extend">
-              <template v-slot:activator>
-                <v-list-item>
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      {{ item.title }}
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-              <v-list-item @click="openUrl(menu.path, menu.query)" v-for="menu in item.children" class="mx-2">
+          <v-list-group v-if="item.children && item.children.length > 0" :value="item.children.some(e => e.pageId == pageId)">
+            <template v-slot:activator>
+              <v-list-item>
                 <v-list-item-content>
-                  <v-list-item-title class="pl-4 jh-font-size-12" style="color: #666977;">{{ menu.title }}</v-list-item-title>
+                  <v-list-item-title :class="{ 'primary--text': item.children.some(e => e.pageId == pageId) }">
+                    {{ item.title }}
+                  </v-list-item-title>
                 </v-list-item-content>
-                <v-list-item-action>
-                  <v-icon>mdi-chevron-right</v-icon>
-                </v-list-item-action>
               </v-list-item>
-            </v-list-group>
-          </template>
+            </template>
+            <v-list-item @click="openUrl(menu.path, menu.query)" v-for="menu in item.children" class="mx-2" :value="menu.pageId">
+              <v-list-item-content>
+                <v-list-item-title class="pl-4 jh-font-size-12">{{ menu.title }}</v-list-item-title>
+              </v-list-item-content>
+              <!-- <v-list-item-action>
+                <v-icon>mdi-chevron-right</v-icon>
+              </v-list-item-action> -->
+            </v-list-item>
+          </v-list-group>
           <v-list-item
             v-else
             :key="item.path"
             @click="openUrl(item.path, item.query)"
+            :value="item.pageId"
             class="mx-2"
           >
             <v-list-item-content class="pl-0">
@@ -53,7 +52,7 @@
               </v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-icon>mdi-chevron-right</v-icon>
+              <v-icon v-if="!inMenuList.some(e => e.children && e.children.length > 0)">mdi-chevron-right</v-icon>
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -217,7 +216,7 @@ Vue.component('jh-menu', {
       currentMenuTabIndex: -1,
       // 当前二级菜单pageID
       currentSecondMenuPageId: null,
-
+      pageId: '<$ ctx.packagePage.pageId $>'
     };
   },
   watch: {
