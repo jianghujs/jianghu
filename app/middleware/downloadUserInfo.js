@@ -1,17 +1,28 @@
 'use strict';
 
-const range = require('koa-range');
-const send = require('koa-send');
+const path = require('path');
+const eggStatic = require('egg-static/app/middleware/static');
 const userInfoUtil = require('./middlewareUtil/userInfoUtil');
 
-module.exports = options => {
+module.exports = (options, app) => {
+
+  // 构造新的 static 配置，生成新的 egg-static 中间件
+  const staticOptions = Object.assign({}, app.config.static, {
+    dir: [
+      { prefix: `/${app.config.appId}/upload/`, dir: path.join(app.config.baseDir, 'upload') },
+      { prefix: '/upload/', dir: path.join(app.config.baseDir, 'upload') },
+    ],
+  });
+  const eggStaticMiddleware = eggStatic(staticOptions, app);
+
+  // 进行鉴权，鉴权成功后，使用 static 中间件返回静态资源
   return async (ctx, next) => {
 
     const { jianghuKnex, logger, db, config } = ctx.app;
     const { appId, appType, jianghuConfig = {} } = config;
 
     if (!jianghuConfig.enableUploadStaticFileCache) {
-      return
+      return;
     }
 
     if (jianghuConfig.enableUploadStaticFileAuthorization) {
@@ -29,23 +40,11 @@ module.exports = options => {
       ctx.userInfo = await userInfoUtil.getUserInfo({ config, body: mockBody, jianghuKnex, db, logger, appType });
       if (!ctx.userInfo || !ctx.userInfo.user || !Object.keys(ctx.userInfo.user).length) {
         ctx.redirect(ctx.app.config.loginPage || '/');
-        return
+        return;
       }
     }
 
-    // 兼容 /upload 开头的配置
-    if (ctx.path.startsWith(`/${config.appId}/upload/`)) {
-      await send(ctx, decodeURI(ctx.path.replace(`/${config.appId}/upload/`, '')), {
-        root: config.baseDir + '/upload',
-        maxage: jianghuConfig.uploadFileMaxAge || 0,
-      });
-    } else {
-      await send(ctx, decodeURI(ctx.path.replace('/upload/', '')), {
-        root: config.baseDir + '/upload',
-        maxage: jianghuConfig.uploadFileMaxAge || 0,
-      });
-    }
-    return range(ctx, next);
+    return eggStaticMiddleware(ctx, next);
   };
 };
 
