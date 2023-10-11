@@ -28,7 +28,7 @@ async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody,
       operation: newData.operation,
       operationByUserId: newData.operationByUserId,
       operationByUser: newData.operationByUser,
-      operationAt: newData.operationAt,
+      operationAt,
     };
   });
   return await knex('_record_history').insert(recordHistoryList);
