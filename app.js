@@ -21,7 +21,7 @@ class AppBootHook {
 
   configDidLoad() {
     // 挂载jianghuKnex
-    this.app.jianghuKnex = createJianghuKnex(this.app.knex);
+    this.app.jianghuKnex = createJianghuKnex(this.app.knex, this.app.config.jianghuConfig);
   }
 
   async didLoad() {

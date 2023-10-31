@@ -3,7 +3,7 @@
 const dayjs = require('dayjs');
 const _ = require('lodash');
 
-async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation, operationByUserId, operationByUser, operationAt }) {
+async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation, operationByUserId, operationByUser, operationAt, jhId }) {
 
   if (_.isEmpty(ids)) {
     return;
@@ -31,6 +31,11 @@ async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody,
       operationAt,
     };
   });
+  if (jhId) {
+    recordHistoryList.forEach(item => {
+      item.jhId = jhId;
+    });
+  }
   return await knex('_record_history').insert(recordHistoryList);
 
 }
@@ -47,8 +52,9 @@ async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody,
              // trx('table2').insert({ name: 'xx' });
           })
  * @param knex
+ * @param jhIdConfig
  */
-function buildJianghuKnexFunc(knex) {
+function buildJianghuKnexFunc(knex, jhIdConfig = {}) {
 
   const builderGenerator = (table, ctx = {}, jianghuKnexInstance = null) => {
     let target = jianghuKnexInstance || knex(table);
@@ -57,6 +63,11 @@ function buildJianghuKnexFunc(knex) {
     const requestBody = request.body || {};
     const { userId: operationByUserId, username: operationByUser } = userInfo;
     const operationAt = dayjs().format();
+    // 开启 jhId 功能，需要对内置表进行处理
+    let jhId = null;
+    if (jhIdConfig.enable && jhIdConfig.careTableViewList.includes(table)) {
+      jhId = jhIdConfig.jhId;
+    }
 
     // builder模式 ==> 代理knex相关api
     [
@@ -142,8 +153,16 @@ function buildJianghuKnexFunc(knex) {
         params = params.map(item => {
           return { ...item, operation, operationByUserId, operationByUser, operationAt };
         });
+        if (jhId) {
+          params.forEach(item => {
+            item.jhId = jhId;
+          });
+        }
       } else {
         params = { ...params, operation, operationByUserId, operationByUser, operationAt };
+        if (jhId) {
+          params.jhId = jhId;
+        }
       }
       return target.insert(params);
     };
@@ -159,12 +178,20 @@ function buildJianghuKnexFunc(knex) {
         params = params.map(item => {
           return { ...item, operation, operationByUserId, operationByUser, operationAt };
         });
+        if (jhId) {
+          params.forEach(item => {
+            item.jhId = jhId;
+          });
+        }
       } else {
         params = { ...params, operation, operationByUserId, operationByUser, operationAt };
+        if (jhId) {
+          params.jhId = jhId;
+        }
       }
       const ids = await target.insert(params);
       // 根据ids查询最新新数据 并 备份最新数据 到 _record_history
-      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation });
+      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation, jhId });
       return ids;
     };
 
@@ -176,7 +203,7 @@ function buildJianghuKnexFunc(knex) {
       const ids = idsResult.map(item => item.id);
 
       // 根据ids查询最新新数据 并 备份最新数据 到 _record_history; Tip: delete需要记录上一个版本的数据
-      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation, operationByUserId, operationByUser, operationAt });
+      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation, operationByUserId, operationByUser, operationAt, jhId });
 
       // 执行操作
       const result = await target.delete();
@@ -192,13 +219,13 @@ function buildJianghuKnexFunc(knex) {
       const ids = idsResult.map(item => item.id);
 
       // 根据ids查询最新新数据 并 备份最新数据 到 _record_history
-      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation: 'jhUpdate:before' });
+      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation: 'jhUpdate:before', jhId });
 
       // 执行操作
       const result = await knex(table).whereIn('id', ids).update({ ...params, operation, operationByUserId, operationByUser, operationAt });
 
       // 根据ids查询最新新数据 并 备份最新数据 到 _record_history
-      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation: 'jhUpdate:after' });
+      await backupNewDataListToRecordHistory({ ids, table, knex, requestBody, operation: 'jhUpdate:after', jhId });
 
       return result;
     };
@@ -212,18 +239,19 @@ function buildJianghuKnexFunc(knex) {
 /**
  * 包装 knex
  * @param knex
+ * @param jhIdConfig
  */
-module.exports.createJianghuKnex = knex => {
-  const jianghuKnex = buildJianghuKnexFunc(knex);
+module.exports.createJianghuKnex = (knex, jhIdConfig = {}) => {
+  const jianghuKnex = buildJianghuKnexFunc(knex, jhIdConfig);
 
   jianghuKnex.raw = async sql => {
     const result = await knex.raw(sql);
     return result;
   };
 
-  jianghuKnex.transaction = async (callback, ctx = {}) => {
+  jianghuKnex.transaction = async callback => {
     await knex.transaction(async trx => {
-      const jianghuKnexTrx = buildJianghuKnexFunc(trx, ctx);
+      const jianghuKnexTrx = buildJianghuKnexFunc(trx, jhIdConfig);
 
       // 映射事务提交 commit()
       jianghuKnexTrx.commit = async () => {
