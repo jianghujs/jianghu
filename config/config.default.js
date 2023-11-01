@@ -70,6 +70,34 @@ module.exports = appInfo => {
       enableIpBlock: false,
       ipBlocklist: [],
       ipBlocklistFilePath: '',
+
+      // jhId 配置，用于多应用使用同个数据库场景
+      jhIdConfig: {
+        // 是否开启
+        enable: false,
+        // 当前应用使用的 jhId，在使用配置表时，自动用该 jhId 做过滤
+        jhId: '',
+        // 使用到 jhId 的配置表，一般保持默认即可
+        careTableViewList: [
+          '_cache',
+          '_constant',
+          '_file',
+          '_group',
+          '_page',
+          '_record_history',
+          '_resource',
+          '_resource_request_log',
+          '_role',
+          '_test_case',
+          '_ui',
+          '_user',
+          '_user_group_role',
+          '_user_group_role_page',
+          '_user_group_role_resource',
+          '_user_session',
+          '_view01_user',
+        ],
+      },
     },
 
     // https://eggjs.org/zh-cn/plugins/multipart.html
