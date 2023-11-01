@@ -40,7 +40,7 @@ module.exports = appInfo => {
     },
     view: {
       defaultViewEngine: 'nunjucks',
-      root: path.join(appInfo.baseDir, '../../../../app/view')
+      root: path.join(appInfo.baseDir, '../../../../app/view'),
     },
     middleware,
     ...middlewareMatch,

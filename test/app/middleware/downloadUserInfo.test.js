@@ -30,24 +30,35 @@ describe('test/app/middleware/downloadUserInfo.test.js', () => {
       });
 
       this.nextSpy = sinon.spy();
-      this.rangeStub = sinon.stub();
-      this.sendStub = sinon.stub();
+      const pathObj = {
+        join: () => {},
+      };
+      const staticObj = {
+        static: () => {},
+      };
+      this.pathJoinStub = sinon.stub(pathObj, 'join');
+      this.staticStub = sinon.stub(staticObj, 'static');
+      this.eggStaticMiddlewareStub = sinon.spy();
+      this.staticStub.returns(this.eggStaticMiddlewareStub);
       this.downloadUserInfo = proxyquire('../../../app/middleware/downloadUserInfo', {
-        'koa-range': this.rangeStub,
-        'koa-send': this.sendStub,
-      })();
+        path: pathObj,
+        'egg-static/app/middleware/static': staticObj,
+      })({}, this.app);
       this.redirectStub = sinon.stub(this.ctx, 'redirect');
       this.getUserInfoStub = sinon.stub(userInfoUtil, 'getUserInfo');
     });
     afterEach(() => {
+      this.pathJoinStub.restore();
+      this.staticStub.restore();
       this.getUserInfoStub.restore();
       this.redirectStub.restore();
+      this.eggStaticMiddlewareStub.restore();
       mock.restore();
     });
     it('should success', async () => {
       this.ctx.app.config.jianghuConfig = {
         enableUploadStaticFileCache: true,
-        enableUploadStaticFileAuthorization: true
+        enableUploadStaticFileAuthorization: true,
       };
 
       const expUserId = 'test101';
@@ -75,8 +86,6 @@ describe('test/app/middleware/downloadUserInfo.test.js', () => {
           md5Salt: 'test',
         },
       };
-      const expResult = {};
-
       this.ctx.userInfo = {
         user: expUser,
       };
@@ -87,13 +96,12 @@ describe('test/app/middleware/downloadUserInfo.test.js', () => {
       this.ctx.body = expResponseBody;
 
       this.getUserInfoStub.returns(expUser);
-      this.rangeStub.returns(expResult);
 
-      const result = await this.downloadUserInfo(this.ctx, this.nextSpy);
+      await this.downloadUserInfo(this.ctx, this.nextSpy);
       assert.deepEqual(this.getUserInfoStub.callCount, 1);
-      assert.deepEqual(this.rangeStub.callCount, 1);
-      assert.deepEqual(this.sendStub.callCount, 1);
-      assert(result, expResult);
+      assert.deepEqual(this.eggStaticMiddlewareStub.callCount, 1);
+      assert.deepEqual(this.eggStaticMiddlewareStub.getCall(0).args[0], this.ctx);
+      assert.deepEqual(this.eggStaticMiddlewareStub.getCall(0).args[1], this.nextSpy);
     });
   });
 });
