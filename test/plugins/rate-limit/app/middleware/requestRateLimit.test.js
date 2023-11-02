@@ -4,8 +4,8 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const requestRateLimit = require('../../../plugins/rate-limit//app/middleware/requestRateLimit');
+const utils = require('../../../../utils');
+const requestRateLimit = require('../../../../../plugins/rate-limit/app/middleware/requestRateLimit');
 
 describe('test/app/middleware/requestRateLimit.test.js', () => {
   before(() => {
@@ -48,4 +48,4 @@ describe('test/app/middleware/requestRateLimit.test.js', () => {
       assert.rejects(async () => await this.requestRateLimit(this.ctx, this.nextSpy), /request_rate_limit_exceeded/);
     });
   });
-})
+});

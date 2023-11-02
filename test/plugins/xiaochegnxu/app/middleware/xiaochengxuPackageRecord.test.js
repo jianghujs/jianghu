@@ -4,10 +4,11 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const xiaochengxuResourceAfterHook = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuResourceAfterHook');
+const utils = require('../../../../utils');
+const xiaochengxuPackageRecord = require('../../../../../plugins/xiaochengxu/app/middleware/xiaochengxuPackageRecord');
+const packageUtil = require('../../../../../app/middleware/middlewareUtil/packageUtil');
 
-describe('test/app/middleware/xiaochengxuResourceAfterHook.test.js', () => {
+describe('test/app/middleware/xiaochengxuPackageRecord.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -18,29 +19,30 @@ describe('test/app/middleware/xiaochengxuResourceAfterHook.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware xiaochengxuResourceAfterHook', () => {
+  describe('Test middleware xiaochengxuPackageRecord', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         where: () => {},
+      };
+      const whereResult = {
+        first: () => {},
       };
       this.ctx = this.app.mockContext({});
       mock(this.app, 'jianghuKnex', () => {
         return jianghuKnexResult;
       });
-      // this.xiaochengxuResourceAfterHook = xiaochengxuResourceAfterHook();
+      // this.xiaochengxuPackageRecord = xiaochengxuPackageRecord();
       this.nextSpy = sinon.spy();
-      this.ctx.service.beforeService = {
-        beforeFunction: () => {},
-      };
-      this.ctx.service.afterService = {
-        afterFunction: () => {},
-      };
-      this.beforeFunctionStub = sinon.stub(this.ctx.service.beforeService, 'beforeFunction');
-      this.afterFunctionStub = sinon.stub(this.ctx.service.afterService, 'afterFunction');
+      this.whereStub = sinon.stub(jianghuKnexResult, 'where').returns(whereResult);
+      this.firstStub = sinon.stub(whereResult, 'first');
+      this.saveRequestLogForResourceStub = sinon.stub(packageUtil, 'saveRequestLogForResource');
+      this.updateRequestDemoAndResponseDemoStub = sinon.stub(packageUtil, 'updateRequestDemoAndResponseDemo');
     });
     afterEach(() => {
-      this.beforeFunctionStub.restore();
-      this.afterFunctionStub.restore();
+      this.whereStub.restore();
+      this.firstStub.restore();
+      this.saveRequestLogForResourceStub.restore();
+      this.updateRequestDemoAndResponseDemoStub.restore();
       mock.restore();
     });
     it('should success', async () => {
@@ -82,16 +84,17 @@ describe('test/app/middleware/xiaochengxuResourceAfterHook.test.js', () => {
       this.ctx.packageResource = {
         resourceId: expResourceId,
         resourceData: {},
-        resourceHook: { before: [{ service: 'beforeService', serviceFunction: 'beforeFunction' }], after: [{ service: 'afterService', serviceFunction: 'afterFunction' }] },
       };
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
+      this.ctx.app.config.jianghuConfig = {
+        updateRequestDemoAndResponseDemo: true,
+      };
 
-      const result = await xiaochengxuResourceAfterHook(this.ctx);
+      await xiaochengxuPackageRecord(this.ctx);
 
-      assert.deepEqual(this.beforeFunctionStub.callCount, 0);
-      assert.deepEqual(this.ctx, result);
-      assert.deepEqual(this.afterFunctionStub.callCount, 1);
+      assert.deepEqual(this.saveRequestLogForResourceStub.callCount, 1);
+      assert.deepEqual(this.updateRequestDemoAndResponseDemoStub.callCount, 1);
     });
   });
 });

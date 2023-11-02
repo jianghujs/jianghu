@@ -4,10 +4,11 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const xiaochengxuPackage = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuPackage');
+const utils = require('../../../../utils');
+const socketUserInfo = require('../../../../../plugins/socket-io/app/middleware/socketUserInfo');
+const userInfoUtil = require('../../../../../app/middleware/middlewareUtil/userInfoUtil');
 
-describe('test/app/middleware/xiaochengxuPackage.test.js', () => {
+describe('test/app/middleware/socketUserInfo.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -18,26 +19,21 @@ describe('test/app/middleware/xiaochengxuPackage.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware xiaochengxuPackage', () => {
+  describe('Test middleware socketUserInfo', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         where: () => {},
-      };
-      const whereResult = {
-        first: () => {},
       };
       this.ctx = this.app.mockContext({});
       mock(this.app, 'jianghuKnex', () => {
         return jianghuKnexResult;
       });
-      // this.xiaochengxuPackage = xiaochengxuPackage();
+      // this.socketUserInfo = socketUserInfo();
       this.nextSpy = sinon.spy();
-      this.whereStub = sinon.stub(jianghuKnexResult, 'where').returns(whereResult);
-      this.firstStub = sinon.stub(whereResult, 'first');
+      this.getUserInfoStub = sinon.stub(userInfoUtil, 'getUserInfo');
     });
     afterEach(() => {
-      this.whereStub.restore();
-      this.firstStub.restore();
+      this.getUserInfoStub.restore();
       mock.restore();
     });
     it('should success', async () => {
@@ -48,7 +44,7 @@ describe('test/app/middleware/xiaochengxuPackage.test.js', () => {
       const expPackageId = `package_${Date.now()}`;
       const expRequestBody = {
         packageId: expPackageId,
-        packageType: 'socketRequest',
+        packageType: 'httpRequest',
         appData: {
           appId: 'jianghu',
           pageId: 'index',
@@ -62,17 +58,9 @@ describe('test/app/middleware/xiaochengxuPackage.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        user: {
-          userId: expUserId,
-          username: 'username',
-          deviceId: expDeviceId,
-          userStatus: 'active',
-          md5Salt: 'test',
-        },
-
-      };
-      const expPackageResource = {
-        resourceId: expResourceId,
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
       };
 
       this.ctx.userInfo = {
@@ -82,16 +70,16 @@ describe('test/app/middleware/xiaochengxuPackage.test.js', () => {
       this.ctx.packageResource = {
         resourceId: expResourceId,
         resourceData: {},
+        resourceHook: { before: [{ service: 'beforeService', serviceFunction: 'beforeFunction' }], after: [{ service: 'afterService', serviceFunction: 'afterFunction' }] },
       };
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
 
-      this.firstStub.returns(expPackageResource);
+      this.getUserInfoStub.returns(expUser);
 
-      const result = await xiaochengxuPackage(this.ctx);
+      const result = await socketUserInfo(this.ctx);
 
-      assert.deepEqual(this.whereStub.callCount, 1);
-      assert.deepEqual(this.firstStub.callCount, 1);
+      assert.deepEqual(this.ctx.userInfo, expUser);
       assert.deepEqual(this.ctx, result);
     });
   });

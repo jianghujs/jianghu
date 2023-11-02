@@ -473,6 +473,7 @@ describe('test/app/middleware/middlewareUtil/userInfoUtil.test.js', () => {
         pageId: 'index',
         actionId: 'selectItem',
         resourceType: 'request',
+        isPublic: true,
       }];
       const expResult = expAllowResourceList;
 
@@ -619,7 +620,7 @@ describe('test/app/middleware/middlewareUtil/userInfoUtil.test.js', () => {
     it('should success', async () => {
       const expUserId = 'test101';
       const expFieldKey = 'page';
-      const expAllList = [{ id: 1, pageId: 'index', pageName: '首页', pageType: 'static', sort: 1 }, { id: 2, pageId: 'userManagement', pageName: '用户管理', pageType: 'static', sort: 2 }];
+      const expAllList = [{ id: 1, pageId: 'index', pageName: '首页', pageType: 'static', sort: 1, isPublic: false }, { id: 2, pageId: 'userManagement', pageName: '用户管理', pageType: 'static', sort: 2, isPublic: false }];
       const expAllRuleList = [{ id: 1, pageId: 'index', allowOrDeny: 'allow' }, { id: 2, pageId: 'userManagement', allowOrDeny: 'allow' }];
       const expGroupIdList = [ '1', '2', '*' ];
       const expRoleIdList = [ '11', '22', '*' ];

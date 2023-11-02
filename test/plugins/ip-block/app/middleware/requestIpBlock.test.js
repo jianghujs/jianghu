@@ -4,8 +4,8 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const requestIpBlock = require('../../../plugins/ip-block/app/middleware/requestIpBlock');
+const utils = require('../../../../utils');
+const requestIpBlock = require('../../../../../plugins/ip-block/app/middleware/requestIpBlock');
 
 describe('test/app/middleware/requestIpBlock.test.js', () => {
   before(() => {

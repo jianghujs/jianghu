@@ -4,8 +4,8 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const xiaochengxuPagePackage = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuPagePackage');
+const utils = require('../../../../utils');
+const xiaochengxuPagePackage = require('../../../../../plugins/xiaochengxu/app/middleware/xiaochengxuPagePackage');
 
 describe('test/app/middleware/xiaochengxuPagePackage.test.js', () => {
   before(() => {

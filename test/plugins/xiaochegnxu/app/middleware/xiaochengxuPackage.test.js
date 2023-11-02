@@ -4,11 +4,10 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const socketPackageRecord = require('../../../plugins/socket-io/app/middleware/socketPackageRecord');
-const packageUtil = require('../../../app/middleware/middlewareUtil/packageUtil');
+const utils = require('../../../../utils');
+const xiaochengxuPackage = require('../../../../../plugins/xiaochengxu/app/middleware/xiaochengxuPackage');
 
-describe('test/app/middleware/socketPackageRecord.test.js', () => {
+describe('test/app/middleware/xiaochengxuPackage.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -19,7 +18,7 @@ describe('test/app/middleware/socketPackageRecord.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware socketPackageRecord', () => {
+  describe('Test middleware xiaochengxuPackage', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         where: () => {},
@@ -31,18 +30,14 @@ describe('test/app/middleware/socketPackageRecord.test.js', () => {
       mock(this.app, 'jianghuKnex', () => {
         return jianghuKnexResult;
       });
-      // this.socketPackageRecord = socketPackageRecord();
+      // this.xiaochengxuPackage = xiaochengxuPackage();
       this.nextSpy = sinon.spy();
       this.whereStub = sinon.stub(jianghuKnexResult, 'where').returns(whereResult);
       this.firstStub = sinon.stub(whereResult, 'first');
-      this.saveRequestLogForResourceStub = sinon.stub(packageUtil, 'saveRequestLogForResource');
-      this.updateRequestDemoAndResponseDemoStub = sinon.stub(packageUtil, 'updateRequestDemoAndResponseDemo');
     });
     afterEach(() => {
       this.whereStub.restore();
       this.firstStub.restore();
-      this.saveRequestLogForResourceStub.restore();
-      this.updateRequestDemoAndResponseDemoStub.restore();
       mock.restore();
     });
     it('should success', async () => {
@@ -53,7 +48,7 @@ describe('test/app/middleware/socketPackageRecord.test.js', () => {
       const expPackageId = `package_${Date.now()}`;
       const expRequestBody = {
         packageId: expPackageId,
-        packageType: 'httpRequest',
+        packageType: 'socketRequest',
         appData: {
           appId: 'jianghu',
           pageId: 'index',
@@ -76,6 +71,9 @@ describe('test/app/middleware/socketPackageRecord.test.js', () => {
         },
 
       };
+      const expPackageResource = {
+        resourceId: expResourceId,
+      };
 
       this.ctx.userInfo = {
         user: expUser,
@@ -87,14 +85,14 @@ describe('test/app/middleware/socketPackageRecord.test.js', () => {
       };
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
-      this.ctx.app.config.jianghuConfig = {
-        updateRequestDemoAndResponseDemo: true,
-      };
 
-      await socketPackageRecord(this.ctx);
+      this.firstStub.returns(expPackageResource);
 
-      assert.deepEqual(this.saveRequestLogForResourceStub.callCount, 1);
-      assert.deepEqual(this.updateRequestDemoAndResponseDemoStub.callCount, 1);
+      const result = await xiaochengxuPackage(this.ctx);
+
+      assert.deepEqual(this.whereStub.callCount, 1);
+      assert.deepEqual(this.firstStub.callCount, 1);
+      assert.deepEqual(this.ctx, result);
     });
   });
 });

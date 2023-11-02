@@ -4,10 +4,10 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const xiaochengxuAuthorization = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuAuthorization');
+const utils = require('../../../../utils');
+const socketAuthorization = require('../../../../../plugins/socket-io/app/middleware/socketAuthorization');
 
-describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
+describe('test/app/middleware/socketAuthorization.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -18,7 +18,7 @@ describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware xiaochengxuAuthorization', () => {
+  describe('Test middleware socketAuthorization', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         select: () => {},
@@ -52,14 +52,9 @@ describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        user: {
-          userId: expUserId,
-          username: 'username',
-          deviceId: expDeviceId,
-          userStatus: 'active',
-          md5Salt: 'test',
-        },
-
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
       };
       const expAllUserGroupRoleResourceList = [{
         group: 'public',
@@ -80,7 +75,7 @@ describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
 
       this.selectStub.returns(expAllUserGroupRoleResourceList);
 
-      const result = await xiaochengxuAuthorization(this.ctx);
+      const result = await socketAuthorization(this.ctx);
 
       assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(result, this.ctx);
@@ -103,13 +98,9 @@ describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        user: {
-          userId: expUserId,
-          username: 'username',
-          deviceId: expDeviceId,
-          userStatus: 'inactive',
-          md5Salt: 'test',
-        },
+        deviceId: expDeviceId,
+        userStatus: 'inactive',
+        md5Salt: 'test',
 
       };
       const expAllUserGroupRoleResourceList = [{
@@ -133,7 +124,7 @@ describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
 
       let error;
       try {
-        await xiaochengxuAuthorization(this.ctx, this.nextSpy);
+        await socketAuthorization(this.ctx, this.nextSpy);
       } catch (err) {
         error = err;
       }
@@ -161,17 +152,12 @@ describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        user: {
-          userId: expUserId,
-          username: 'username',
-          deviceId: expDeviceId,
-          userStatus: 'active',
-          md5Salt: 'test',
-        },
-
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
       };
       const expAllUserGroupRoleResourceList = [{
-        group: 'public',
+        group: 'notPublic',
         role: '*',
         resource: expResourceId,
       }];
@@ -195,7 +181,7 @@ describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
 
       let error;
       try {
-        await xiaochengxuAuthorization(this.ctx, this.nextSpy);
+        await socketAuthorization(this.ctx, this.nextSpy);
       } catch (err) {
         error = err;
       }

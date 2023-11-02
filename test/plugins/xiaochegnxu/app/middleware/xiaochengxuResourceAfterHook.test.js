@@ -4,11 +4,10 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const xiaochengxuUserInfo = require('../../../plugins/xiaochengxu/app/middleware/xiaochengxuUserInfo');
-const userInfoUtil = require('../../../app/middleware/middlewareUtil/userInfoUtil');
+const utils = require('../../../../utils');
+const xiaochengxuResourceAfterHook = require('../../../../../plugins/xiaochengxu/app/middleware/xiaochengxuResourceAfterHook');
 
-describe('test/app/middleware/xiaochengxuUserInfo.test.js', () => {
+describe('test/app/middleware/xiaochengxuResourceAfterHook.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -19,7 +18,7 @@ describe('test/app/middleware/xiaochengxuUserInfo.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware xiaochengxuUserInfo', () => {
+  describe('Test middleware xiaochengxuResourceAfterHook', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         where: () => {},
@@ -28,12 +27,20 @@ describe('test/app/middleware/xiaochengxuUserInfo.test.js', () => {
       mock(this.app, 'jianghuKnex', () => {
         return jianghuKnexResult;
       });
-      // this.xiaochengxuUserInfo = xiaochengxuUserInfo();
+      // this.xiaochengxuResourceAfterHook = xiaochengxuResourceAfterHook();
       this.nextSpy = sinon.spy();
-      this.getUserInfoStub = sinon.stub(userInfoUtil, 'getUserInfo');
+      this.ctx.service.beforeService = {
+        beforeFunction: () => {},
+      };
+      this.ctx.service.afterService = {
+        afterFunction: () => {},
+      };
+      this.beforeFunctionStub = sinon.stub(this.ctx.service.beforeService, 'beforeFunction');
+      this.afterFunctionStub = sinon.stub(this.ctx.service.afterService, 'afterFunction');
     });
     afterEach(() => {
-      this.getUserInfoStub.restore();
+      this.beforeFunctionStub.restore();
+      this.afterFunctionStub.restore();
       mock.restore();
     });
     it('should success', async () => {
@@ -58,9 +65,14 @@ describe('test/app/middleware/xiaochengxuUserInfo.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        deviceId: expDeviceId,
-        userStatus: 'active',
-        md5Salt: 'test',
+        user: {
+          userId: expUserId,
+          username: 'username',
+          deviceId: expDeviceId,
+          userStatus: 'active',
+          md5Salt: 'test',
+        },
+
       };
 
       this.ctx.userInfo = {
@@ -75,11 +87,11 @@ describe('test/app/middleware/xiaochengxuUserInfo.test.js', () => {
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
 
-      this.getUserInfoStub.returns(expUser);
+      const result = await xiaochengxuResourceAfterHook(this.ctx);
 
-      await xiaochengxuUserInfo(this.ctx);
-
-      assert.deepEqual(this.ctx.userInfo, expUser);
+      assert.deepEqual(this.beforeFunctionStub.callCount, 0);
+      assert.deepEqual(this.ctx, result);
+      assert.deepEqual(this.afterFunctionStub.callCount, 1);
     });
   });
 });

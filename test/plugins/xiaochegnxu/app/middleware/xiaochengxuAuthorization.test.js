@@ -4,10 +4,10 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const socketAuthorization = require('../../../plugins/socket-io/app/middleware/socketAuthorization');
+const utils = require('../../../../utils');
+const xiaochengxuAuthorization = require('../../../../../plugins/xiaochengxu/app/middleware/xiaochengxuAuthorization');
 
-describe('test/app/middleware/socketAuthorization.test.js', () => {
+describe('test/app/middleware/xiaochengxuAuthorization.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -18,7 +18,7 @@ describe('test/app/middleware/socketAuthorization.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware socketAuthorization', () => {
+  describe('Test middleware xiaochengxuAuthorization', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         select: () => {},
@@ -80,7 +80,7 @@ describe('test/app/middleware/socketAuthorization.test.js', () => {
 
       this.selectStub.returns(expAllUserGroupRoleResourceList);
 
-      const result = await socketAuthorization(this.ctx);
+      const result = await xiaochengxuAuthorization(this.ctx);
 
       assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(result, this.ctx);
@@ -133,7 +133,7 @@ describe('test/app/middleware/socketAuthorization.test.js', () => {
 
       let error;
       try {
-        await socketAuthorization(this.ctx, this.nextSpy);
+        await xiaochengxuAuthorization(this.ctx, this.nextSpy);
       } catch (err) {
         error = err;
       }
@@ -195,7 +195,7 @@ describe('test/app/middleware/socketAuthorization.test.js', () => {
 
       let error;
       try {
-        await socketAuthorization(this.ctx, this.nextSpy);
+        await xiaochengxuAuthorization(this.ctx, this.nextSpy);
       } catch (err) {
         error = err;
       }

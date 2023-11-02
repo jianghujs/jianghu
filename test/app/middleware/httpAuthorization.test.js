@@ -20,19 +20,11 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
 
   describe('Test middleware httpAuthorization', () => {
     beforeEach(() => {
-      const jianghuKnexResult = {
-        select: () => {},
-      };
       this.ctx = this.app.mockContext({});
-      mock(this.app, 'jianghuKnex', () => {
-        return jianghuKnexResult;
-      });
       this.httpAuthorization = httpAuthorization();
       this.nextSpy = sinon.spy();
-      this.selectStub = sinon.stub(jianghuKnexResult, 'select');
     });
     afterEach(() => {
-      this.selectStub.restore();
       mock.restore();
     });
     it('should success', async () => {
@@ -53,24 +45,19 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        user: {
-          userId: expUserId,
-          username: 'username',
-          deviceId: expDeviceId,
-          userStatus: 'active',
-          md5Salt: 'test',
-        },
-
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
       };
-      const expAllUserGroupRoleResourceList = [{
-        group: 'public',
-        role: '*',
-        resource: expResourceId,
-      }];
-
       this.ctx.userInfo = {
         user: expUser,
         allowResourceList: [{ resourceId: expResourceId }],
+        userAppList: [],
+        userGroupRoleList: [{
+          group: 'public',
+          role: '*',
+          resource: expResourceId,
+        }],
       };
       this.ctx.packageResource = {
         resourceId: expResourceId,
@@ -79,11 +66,9 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
 
-      this.selectStub.returns(expAllUserGroupRoleResourceList);
 
       await this.httpAuthorization(this.ctx, this.nextSpy);
 
-      assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(this.nextSpy.callCount, 1);
     });
     it('should failed, user_status not active', async () => {
@@ -104,24 +89,20 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        user: {
-          userId: expUserId,
-          username: 'username',
-          deviceId: expDeviceId,
-          userStatus: 'inactive',
-          md5Salt: 'test',
-        },
-
+        deviceId: expDeviceId,
+        userStatus: 'inactive',
+        md5Salt: 'test',
       };
-      const expAllUserGroupRoleResourceList = [{
-        group: 'public',
-        role: 'role1',
-        resource: expResourceId,
-      }];
 
       this.ctx.userInfo = {
         user: expUser,
         allowResourceList: [{ resourceId: expResourceId }],
+        userAppList: [],
+        userGroupRoleList: [{
+          group: 'public',
+          role: '*',
+          resource: expResourceId,
+        }],
       };
       this.ctx.packageResource = {
         resourceId: expResourceId,
@@ -130,7 +111,55 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
 
-      this.selectStub.returns(expAllUserGroupRoleResourceList);
+      let error;
+      try {
+        await this.httpAuthorization(this.ctx, this.nextSpy);
+      } catch (err) {
+        error = err;
+      }
+
+      assert.deepEqual(this.nextSpy.callCount, 0);
+      assert.deepEqual(error.errorCode, 'user_status_error');
+    });
+    it('should failed, user_status banned', async () => {
+      const expUserId = 'test101';
+      const expDeviceId = `${Date.now()}`;
+      const expResourceId = 'page.index';
+      const expResponseStatus = 200;
+      const expPackageId = `package_${Date.now()}`;
+      const expRequestBody = {
+        packageId: expPackageId,
+        appData: {
+          actionData: {},
+        },
+      };
+      const expResponseBody = {
+        status: expResponseStatus,
+      };
+      const expUser = {
+        userId: expUserId,
+        username: 'username',
+        deviceId: expDeviceId,
+        userStatus: 'banned',
+        md5Salt: 'test',
+      };
+
+      this.ctx.userInfo = {
+        user: expUser,
+        allowResourceList: [{ resourceId: expResourceId }],
+        userAppList: [],
+        userGroupRoleList: [{
+          group: 'public',
+          role: '*',
+          resource: expResourceId,
+        }],
+      };
+      this.ctx.packageResource = {
+        resourceId: expResourceId,
+        resourceData: {},
+      };
+      this.ctx.request.body = expRequestBody;
+      this.ctx.body = expResponseBody;
 
       let error;
       try {
@@ -139,9 +168,8 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
         error = err;
       }
 
-      assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(this.nextSpy.callCount, 0);
-      assert.deepEqual(error.errorCode, 'user_status_error');
+      assert.deepEqual(error.errorCode, 'user_banned');
     });
     it('should failed, request group forbidden', async () => {
       const expUserId = 'test101';
@@ -163,20 +191,10 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        user: {
-          userId: expUserId,
-          username: 'username',
-          deviceId: expDeviceId,
-          userStatus: 'active',
-          md5Salt: 'test',
-        },
-
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
       };
-      const expAllUserGroupRoleResourceList = [{
-        group: 'public',
-        role: '*',
-        resource: expResourceId,
-      }];
 
       this.ctx.userInfo = {
         user: expUser,
@@ -193,8 +211,6 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
 
-      this.selectStub.returns(expAllUserGroupRoleResourceList);
-
       let error;
       try {
         await this.httpAuthorization(this.ctx, this.nextSpy);
@@ -202,7 +218,6 @@ describe('test/app/middleware/httpAuthorization.test.js', () => {
         error = err;
       }
 
-      assert.deepEqual(this.selectStub.callCount, 1);
       assert.deepEqual(this.nextSpy.callCount, 0);
       assert.deepEqual(error.errorCode, 'request_group_forbidden');
     });

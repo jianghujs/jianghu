@@ -63,7 +63,6 @@ describe('test/app/service/user.test.js', () => {
         deviceId: expDeviceId,
         userAgent: '',
         userIp: '127.0.0.1',
-        userIpRegion: '',
         deviceType: expDeviceType,
         authToken: expToken,
       };

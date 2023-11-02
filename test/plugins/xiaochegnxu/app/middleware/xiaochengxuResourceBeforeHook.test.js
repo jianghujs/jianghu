@@ -4,11 +4,10 @@ const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const mock = require('egg-mock');
-const utils = require('../../utils');
-const socketUserInfo = require('../../../plugins/socket-io/app/middleware/socketUserInfo');
-const userInfoUtil = require('../../../app/middleware/middlewareUtil/userInfoUtil');
+const utils = require('../../../../utils');
+const xiaochengxuResourceBeforeHook = require('../../../../../plugins/xiaochengxu/app/middleware/xiaochengxuResourceBeforeHook');
 
-describe('test/app/middleware/socketUserInfo.test.js', () => {
+describe('test/app/middleware/xiaochengxuResourceBeforeHook.test.js', () => {
   before(() => {
     this.app = utils.app('apps/jianghu-config');
     return this.app.ready();
@@ -19,7 +18,7 @@ describe('test/app/middleware/socketUserInfo.test.js', () => {
     this.app.close();
   });
 
-  describe('Test middleware socketUserInfo', () => {
+  describe('Test middleware xiaochengxuResourceBeforeHook', () => {
     beforeEach(() => {
       const jianghuKnexResult = {
         where: () => {},
@@ -28,12 +27,20 @@ describe('test/app/middleware/socketUserInfo.test.js', () => {
       mock(this.app, 'jianghuKnex', () => {
         return jianghuKnexResult;
       });
-      // this.socketUserInfo = socketUserInfo();
+      // this.xiaochengxuResourceBeforeHook = xiaochengxuResourceBeforeHook();
       this.nextSpy = sinon.spy();
-      this.getUserInfoStub = sinon.stub(userInfoUtil, 'getUserInfo');
+      this.ctx.service.beforeService = {
+        beforeFunction: () => {},
+      };
+      this.ctx.service.afterService = {
+        afterFunction: () => {},
+      };
+      this.beforeFunctionStub = sinon.stub(this.ctx.service.beforeService, 'beforeFunction');
+      this.afterFunctionStub = sinon.stub(this.ctx.service.afterService, 'afterFunction');
     });
     afterEach(() => {
-      this.getUserInfoStub.restore();
+      this.beforeFunctionStub.restore();
+      this.afterFunctionStub.restore();
       mock.restore();
     });
     it('should success', async () => {
@@ -58,9 +65,14 @@ describe('test/app/middleware/socketUserInfo.test.js', () => {
       const expUser = {
         userId: expUserId,
         username: 'username',
-        deviceId: expDeviceId,
-        userStatus: 'active',
-        md5Salt: 'test',
+        user: {
+          userId: expUserId,
+          username: 'username',
+          deviceId: expDeviceId,
+          userStatus: 'active',
+          md5Salt: 'test',
+        },
+
       };
 
       this.ctx.userInfo = {
@@ -75,12 +87,11 @@ describe('test/app/middleware/socketUserInfo.test.js', () => {
       this.ctx.request.body = expRequestBody;
       this.ctx.body = expResponseBody;
 
-      this.getUserInfoStub.returns(expUser);
+      const result = await xiaochengxuResourceBeforeHook(this.ctx);
 
-      const result = await socketUserInfo(this.ctx);
-
-      assert.deepEqual(this.ctx.userInfo, expUser);
+      assert.deepEqual(this.beforeFunctionStub.callCount, 1);
       assert.deepEqual(this.ctx, result);
+      assert.deepEqual(this.afterFunctionStub.callCount, 0);
     });
   });
 });
