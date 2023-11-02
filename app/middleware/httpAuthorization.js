@@ -7,7 +7,7 @@ module.exports = option => {
   return async (ctx, next) => {
 
     const { packageResource, userInfo } = ctx;
-    const { user, userAppList, allowResourceList } = userInfo;
+    const { user, userGroupRoleList, userAppList, allowResourceList } = userInfo;
     const { resourceId } = packageResource;
     const { config } = ctx.app;
     const { appType, appId } = config;
@@ -35,7 +35,20 @@ module.exports = option => {
       throw new BizError(errorInfoEnum.user_status_error);
     }
 
-    // 3. 判断用户是否有当前app的权限
+    // 3. 判断当前请求groupId 是否在用户 group列表中
+    const { isGroupIdRequired } = ctx.packageResource.resourceData;
+    const { groupId } = ctx.request.body.appData.actionData;
+    if (isGroupIdRequired === true) {
+      if (!groupId) {
+        throw new BizError({ ...errorInfoEnum.request_data_invalid, errorReason: 'groupId is required' });
+      }
+      const currentUserGroupRole = userGroupRoleList.find(userGroupRole => userGroupRole.groupId === groupId);
+      if (!currentUserGroupRole) {
+        throw new BizError(errorInfoEnum.request_group_forbidden);
+      }
+    }
+
+    // 4. 判断用户是否有当前app的权限
     if (appType === 'multiApp') {
       const targetUserApp = userAppList && userAppList.find(x => x.appId === appId);
       if (!targetUserApp) {
@@ -43,7 +56,7 @@ module.exports = option => {
       }
     }
 
-    // 4. 判断用户是否有 当前 packageResource 的权限
+    // 5. 判断用户是否有 当前 packageResource 的权限
     const isNotAllow = !allowResourceList.some(resource => resource.resourceId === resourceId);
     if (isNotAllow) {
       throw new BizError(errorInfoEnum.resource_forbidden);

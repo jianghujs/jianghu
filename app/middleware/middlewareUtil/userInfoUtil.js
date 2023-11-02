@@ -43,6 +43,7 @@ module.exports = {
     config,
     body,
     jianghuKnex,
+    isGroupIdRequired,
     appType,
     xiaochengxuUserId = null,
     mockBody = false,
@@ -58,16 +59,17 @@ module.exports = {
         },
       };
     }
-    const { authToken } = body.appData;
+    const { authToken, actionData = {} } = body.appData;
     // 取到 authToken 后不再需要保留在 actionData 中
     delete body.appData.authToken;
 
     // 获取用户信息
     const user = await getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId);
     const { userId, username } = user;
+    const groupId = isGroupIdRequired ? actionData.groupId : '';
 
     // 如果有缓存，则直接返回缓存
-    if (userId && config.jianghuConfig.enableUserInfoCache) {
+    if (userId && config.jianghuConfig.enableUserInfoCache && !isGroupIdRequired) {
       const otherUserRuleData = await this.getUserRuleDataFromCache(
         jianghuKnex,
         userId
@@ -85,6 +87,7 @@ module.exports = {
         jianghuKnex,
         appType,
         userId,
+        groupId,
       })),
     };
   },
@@ -110,9 +113,13 @@ module.exports = {
     let userGroupRoleList = [];
     if (userId) {
       // Tip: resource指定groupId后 ===> 只能取当前的groupId ===> params: { groupId }
-      userGroupRoleList = await jianghuKnex('_user_group_role')
-        .where({ userId })
-        .select();
+      userGroupRoleList = groupId
+        ? await jianghuKnex('_user_group_role')
+          .where({ userId, groupId })
+          .select() :
+        await jianghuKnex('_user_group_role')
+          .where({ userId })
+          .select();
     }
 
     const { userIdList, groupIdList, roleIdList } = this.getRuleIdList(
