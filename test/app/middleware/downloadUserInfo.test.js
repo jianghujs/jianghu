@@ -33,26 +33,20 @@ describe('test/app/middleware/downloadUserInfo.test.js', () => {
       const pathObj = {
         join: () => {},
       };
-      const staticObj = {
-        static: () => {},
-      };
       this.pathJoinStub = sinon.stub(pathObj, 'join');
-      this.staticStub = sinon.stub(staticObj, 'static');
-      this.eggStaticMiddlewareStub = sinon.spy();
-      this.staticStub.returns(this.eggStaticMiddlewareStub);
+      this.eggStaticMiddlewareStub = sinon.stub();
+      this.staticStub = sinon.stub().returns(this.eggStaticMiddlewareStub);
       this.downloadUserInfo = proxyquire('../../../app/middleware/downloadUserInfo', {
         path: pathObj,
-        'egg-static/app/middleware/static': staticObj,
+        'egg-static/app/middleware/static': this.staticStub,
       })({}, this.app);
       this.redirectStub = sinon.stub(this.ctx, 'redirect');
       this.getUserInfoStub = sinon.stub(userInfoUtil, 'getUserInfo');
     });
     afterEach(() => {
       this.pathJoinStub.restore();
-      this.staticStub.restore();
       this.getUserInfoStub.restore();
       this.redirectStub.restore();
-      this.eggStaticMiddlewareStub.restore();
       mock.restore();
     });
     it('should success', async () => {
@@ -99,6 +93,7 @@ describe('test/app/middleware/downloadUserInfo.test.js', () => {
 
       await this.downloadUserInfo(this.ctx, this.nextSpy);
       assert.deepEqual(this.getUserInfoStub.callCount, 1);
+      assert.deepEqual(this.staticStub.callCount, 1);
       assert.deepEqual(this.eggStaticMiddlewareStub.callCount, 1);
       assert.deepEqual(this.eggStaticMiddlewareStub.getCall(0).args[0], this.ctx);
       assert.deepEqual(this.eggStaticMiddlewareStub.getCall(0).args[1], this.nextSpy);
