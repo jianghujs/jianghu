@@ -37,9 +37,9 @@ module.exports = app => {
           // 大于保留日期则删除
           await fs.promises.unlink(fullPath);
         }
-      }
+      };
 
-      const walk = async (dirName) => {
+      const walk = async dirName => {
         dirName = path.resolve(dirName);
         const files = await fs.promises.readdir(dirName);
         let fullPath = '';
@@ -53,7 +53,7 @@ module.exports = app => {
             await deleteLogFile(file, fullPath);
           }
         }
-      }
+      };
 
       await walk(path.join(app.baseDir, 'logs'));
 

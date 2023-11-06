@@ -43,19 +43,34 @@ describe('test/app/schedule/clearOldLogFile.test.js', () => {
     });
 
     it('should success', async () => {
-      let appId = this.ctx.app.config.appId;
+      const appId = this.ctx.app.config.appId;
       this.ctx.app.config.jianghuConfig = {
         autoClearOldLogFile: true,
         autoClearOldLogBeforeDays: this.autoClearOldLogBeforeDays,
         autoClearOldLogFilePrefixList: [
           'common-error', 'egg-web', 'egg-schedule', 'egg-knex', 'egg-agent', '_resource_request_log',
           `${appId}.html`, `${appId}.resource`, `${appId}-web`, `${appId}.html`,
-        ]
+        ],
       };
 
       await this.clearOldLogFile.task(this.ctx);
 
       assert.equal(fs.existsSync(this.logFile), false);
+      assert.equal(fs.existsSync(this.logFileShouldExist), true);
+    });
+    it('autoClearOldLogFile is false, should success', async () => {
+      const appId = this.ctx.app.config.appId;
+      this.ctx.app.config.jianghuConfig = {
+        autoClearOldLogFile: false,
+        autoClearOldLogBeforeDays: this.autoClearOldLogBeforeDays,
+        autoClearOldLogFilePrefixList: [
+          'common-error', 'egg-web', 'egg-schedule', 'egg-knex', 'egg-agent', '_resource_request_log',
+          `${appId}.html`, `${appId}.resource`, `${appId}-web`, `${appId}.html`,
+        ],
+      };
+
+      await this.clearOldLogFile.task(this.ctx);
+      assert.equal(fs.existsSync(this.logFile), true);
       assert.equal(fs.existsSync(this.logFileShouldExist), true);
     });
   });
