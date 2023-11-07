@@ -168,7 +168,7 @@ class FileService extends Service {
     // 将分片文件 merge 成一个文件
     if (chunks.length === 1) {
       await fileUtil.copyFile(chunksPathList[0], filePath);
-      await fileUtil.unlink(chunksPathList[0], filePath);
+      await fileUtil.unlink(chunksPathList[0]);
     } else {
       await fileUtil.streamMerge(chunksPathList, filePath, chunkSize);
     }
