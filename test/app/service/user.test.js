@@ -28,6 +28,7 @@ describe('test/app/service/user.test.js', () => {
       };
       const whereResult = {
         first: () => {},
+        jhUpdate: () => {},
       };
       this.ctx = this.app.mockContext({});
       mock(this.app, 'jianghuKnex', () => {
@@ -36,6 +37,7 @@ describe('test/app/service/user.test.js', () => {
       this.whereStub = sinon.stub(jianghuKnexResult, 'where').returns(whereResult);
       this.jhInsertStub = sinon.stub(jianghuKnexResult, 'jhInsert');
       this.jhUpdateStub = sinon.stub(jianghuKnexResult, 'jhUpdate');
+      this.whereJhUpdateStub = sinon.stub(whereResult, 'jhUpdate');
       this.firstStub = sinon.stub(whereResult, 'first');
       this.uuidStub = sinon.stub(idGenerateUtil, 'uuid');
     });
@@ -43,6 +45,7 @@ describe('test/app/service/user.test.js', () => {
       this.whereStub.restore();
       this.jhInsertStub.restore();
       this.jhUpdateStub.restore();
+      this.whereJhUpdateStub.restore();
       this.firstStub.restore();
       this.uuidStub.restore();
     });
@@ -90,10 +93,59 @@ describe('test/app/service/user.test.js', () => {
       const result = await this.ctx.service.user.passwordLogin();
       assert.equal(this.firstStub.callCount, 2);
       assert.equal(this.jhInsertStub.callCount, 1);
+      assert.equal(this.whereJhUpdateStub.callCount, 0);
+      assert.equal(this.jhUpdateStub.callCount, 0);
       assert.deepEqual(this.jhInsertStub.getCall(0).args[0], expUserSession);
       assert.deepEqual(result, expResult);
     });
+    it('should success, update user session', async () => {
+      const expUserId = 'test101';
+      const expDeviceId = `${Date.now()}`;
+      const expPassword = '123456';
+      const expDeviceType = 'pc';
+      const expUser = {
+        userId: expUserId,
+        userStatus: 'active',
+        md5Salt: 'test',
+      };
+      expUser.password = md5(`${expPassword}_${expUser.md5Salt}`);
+      const expToken = `tokenadf_${Date.now()}`;
+      const expUserSession = {
+        id: '1',
+        userId: expUserId,
+        deviceId: expDeviceId,
+        userAgent: '',
+        userIp: '127.0.0.1',
+        deviceType: expDeviceType,
+        authToken: expToken,
+      };
+      const expResult = {
+        authToken: expToken,
+        userId: expUserId,
+        deviceId: expDeviceId,
+      };
 
+      this.ctx.request.body = {
+        appData: {
+          actionData: {
+            userId: expUserId,
+            password: expPassword,
+            deviceId: expDeviceId,
+            deviceType: expDeviceType,
+          },
+        },
+      };
+
+      this.uuidStub.returns(expToken);
+      this.firstStub.onCall(0).returns(expUser);
+      this.firstStub.onCall(1).returns(expUserSession);
+
+      const result = await this.ctx.service.user.passwordLogin();
+      assert.equal(this.firstStub.callCount, 2);
+      assert.equal(this.jhInsertStub.callCount, 0);
+      assert.equal(this.whereJhUpdateStub.callCount, 1);
+      assert.deepEqual(result, expResult);
+    });
     it('should failed, user status is banned', async () => {
       const expUserId = 'test101';
       const expDeviceId = `${Date.now()}`;
@@ -131,6 +183,120 @@ describe('test/app/service/user.test.js', () => {
       assert.equal(this.firstStub.callCount, 1);
       assert.equal(this.jhInsertStub.callCount, 0);
       assert.equal(error.errorCode, 'user_banned');
+    });
+    it('should failed, user_status_error', async () => {
+      const expUserId = 'test101';
+      const expDeviceId = `${Date.now()}`;
+      const expPassword = '123456';
+      const expDeviceType = 'pc';
+      const expUser = {
+        userId: expUserId,
+        userStatus: 'other status',
+        md5Salt: 'test',
+      };
+      expUser.password = md5(`${expPassword}_${expUser.md5Salt}`);
+      const expToken = `tokenadf_${Date.now()}`;
+
+      this.ctx.request.body = {
+        appData: {
+          actionData: {
+            userId: expUserId,
+            password: expPassword,
+            deviceId: expDeviceId,
+            deviceType: expDeviceType,
+          },
+        },
+      };
+
+      this.uuidStub.returns(expToken);
+      this.firstStub.onCall(0).returns(expUser);
+      this.firstStub.onCall(1).returns(null);
+      let error;
+      try {
+        await this.ctx.service.user.passwordLogin();
+      } catch (err) {
+        error = err;
+      }
+
+      assert.equal(this.firstStub.callCount, 1);
+      assert.equal(this.jhInsertStub.callCount, 0);
+      assert.equal(error.errorCode, 'user_status_error');
+    });
+    it('should failed, user_not_exist', async () => {
+      const expUserId = 'test101';
+      const expDeviceId = `${Date.now()}`;
+      const expPassword = '123456';
+      const expDeviceType = 'pc';
+      const expUser = {
+        userId: expUserId,
+        userStatus: 'active',
+        md5Salt: 'test',
+      };
+      expUser.password = md5(`${expPassword}_${expUser.md5Salt}`);
+      const expToken = `tokenadf_${Date.now()}`;
+
+      this.ctx.request.body = {
+        appData: {
+          actionData: {
+            userId: expUserId,
+            password: expPassword,
+            deviceId: expDeviceId,
+            deviceType: expDeviceType,
+          },
+        },
+      };
+
+      this.uuidStub.returns(expToken);
+      this.firstStub.onCall(0).returns(null);
+      this.firstStub.onCall(1).returns(null);
+      let error;
+      try {
+        await this.ctx.service.user.passwordLogin();
+      } catch (err) {
+        error = err;
+      }
+
+      assert.equal(this.firstStub.callCount, 1);
+      assert.equal(this.jhInsertStub.callCount, 0);
+      assert.equal(error.errorCode, 'request_user_not_exist');
+    });
+    it('should failed, user_password_error', async () => {
+      const expUserId = 'test101';
+      const expDeviceId = `${Date.now()}`;
+      const expPassword = '123456';
+      const expDeviceType = 'pc';
+      const expUser = {
+        userId: expUserId,
+        userStatus: 'active',
+        md5Salt: 'test',
+      };
+      expUser.password = md5(`${expPassword}11_${expUser.md5Salt}`);
+      const expToken = `tokenadf_${Date.now()}`;
+
+      this.ctx.request.body = {
+        appData: {
+          actionData: {
+            userId: expUserId,
+            password: expPassword,
+            deviceId: expDeviceId,
+            deviceType: expDeviceType,
+          },
+        },
+      };
+
+      this.uuidStub.returns(expToken);
+      this.firstStub.onCall(0).returns(expUser);
+      this.firstStub.onCall(1).returns(null);
+      let error;
+      try {
+        await this.ctx.service.user.passwordLogin();
+      } catch (err) {
+        error = err;
+      }
+
+      assert.equal(this.firstStub.callCount, 1);
+      assert.equal(this.jhInsertStub.callCount, 0);
+      assert.equal(error.errorCode, 'user_password_error');
     });
 
   });
@@ -209,6 +375,91 @@ describe('test/app/service/user.test.js', () => {
       assert.deepEqual(this.jhUpdateStub.getCall(0).args[0], { authToken: '' });
       assert.deepEqual(result, {});
     });
+    it('should failed, user_not_exist', async () => {
+      const expUserId = 'test101';
+      const expDeviceId = `${Date.now()}`;
+      const expDeviceType = 'pc';
+      const expUser = {
+        userId: expUserId,
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
+      };
+      const expToken = `tokenadf_${Date.now()}`;
+      const expUserSession = {
+        id: 1,
+        userId: expUserId,
+        deviceId: expDeviceId,
+        userAgent: '',
+        userIp: '127.0.0.1',
+        userIpRegion: '',
+        deviceType: expDeviceType,
+        authToken: expToken,
+      };
+
+      this.ctx.userInfo = {
+        user: expUser,
+      };
+      this.ctx.request.body = {
+        appData: {
+          actionData: {},
+        },
+      };
+
+      this.uuidStub.returns(expToken);
+      this.firstStub.onCall(0).returns(null);
+      this.firstStub.onCall(1).returns(expUserSession);
+
+      try {
+        await this.ctx.service.user.logout();
+      } catch (err) {
+        assert.equal(err.errorCode, 'request_user_not_exist');
+      }
+
+
+      assert.equal(this.firstStub.callCount, 1);
+      assert.equal(this.jhUpdateStub.callCount, 0);
+      assert.equal(this.whereStub.callCount, 1);
+
+      assert.deepEqual(this.whereStub.getCall(0).args[0], { userId: expUserId });
+    });
+    it('should failed, request_token_invalid', async () => {
+      const expUserId = 'test101';
+      const expDeviceId = `${Date.now()}`;
+      const expUser = {
+        userId: expUserId,
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
+      };
+      const expToken = `tokenadf_${Date.now()}`;
+
+      this.ctx.userInfo = {
+        user: expUser,
+      };
+      this.ctx.request.body = {
+        appData: {
+          actionData: {},
+        },
+      };
+
+      this.uuidStub.returns(expToken);
+      this.firstStub.onCall(0).returns(expUser);
+      this.firstStub.onCall(1).returns(null);
+
+      try {
+        await this.ctx.service.user.logout();
+      } catch (err) {
+        assert.equal(err.errorCode, 'request_token_invalid');
+      }
+
+
+      assert.equal(this.firstStub.callCount, 2);
+      assert.equal(this.jhUpdateStub.callCount, 0);
+      assert.equal(this.whereStub.callCount, 2);
+      assert.deepEqual(this.whereStub.getCall(0).args[0], { userId: expUserId });
+      assert.deepEqual(this.whereStub.getCall(1).args[0], { userId: expUserId, deviceId: expDeviceId });
+    });
   });
 
   describe('Test service user, userInfo', () => {
@@ -277,6 +528,40 @@ describe('test/app/service/user.test.js', () => {
 
       assert.deepEqual(this.whereStub.getCall(0).args[0], { userId: expUserId, socketStatus: 'online' });
       assert.deepEqual(result, { user: expUser, socketList: expSocketList });
+    });
+    it('should success, no socketList', async () => {
+      const expDeviceId = `${Date.now()}`;
+      const expUser = {
+        deviceId: expDeviceId,
+        userStatus: 'active',
+        md5Salt: 'test',
+        socketStatus: 'online',
+      };
+      const expSocketList = [
+        {
+          userId: '123',
+          deviceId: '33333',
+          socketStatus: 'online',
+        },
+      ];
+
+      this.ctx.userInfo = {
+        user: expUser,
+      };
+      this.ctx.request.body = {
+        appData: {
+          actionData: {},
+        },
+      };
+
+      this.selectStub.returns(expSocketList);
+
+      const result = await this.ctx.service.user.userInfo();
+
+      assert.equal(this.whereStub.callCount, 0);
+      assert.equal(this.selectStub.callCount, 0);
+
+      assert.deepEqual(result, { user: expUser });
     });
   });
 
@@ -400,6 +685,48 @@ describe('test/app/service/user.test.js', () => {
       assert.equal(this.jhUpdateStub.callCount, 0);
       assert.deepEqual(this.whereStub.getCall(0).args[0], { userId: expUser.userId });
       assert.deepEqual(error.errorCode, 'user_password_reset_old_error');
+    });
+    it('should failed, user_password_reset_same_error', async () => {
+      const expUserId = 'test101';
+      const expOldPassword = '123456';
+      const expNewSalt = '122fasdf23s';
+      const expCtxUser = {
+        userId: expUserId,
+      };
+      const expUser = {
+        userId: expUserId,
+        userStatus: 'active',
+        md5Salt: 'test',
+      };
+      expUser.password = md5(`${expOldPassword}_${expUser.md5Salt}`);
+
+      this.ctx.userInfo = {
+        user: expCtxUser,
+      };
+      this.ctx.request.body = {
+        appData: {
+          actionData: {
+            oldPassword: expOldPassword,
+            newPassword: expOldPassword,
+          },
+        },
+      };
+
+      this.uuidStub.returns(expNewSalt);
+      this.firstStub.onCall(0).returns(expUser);
+
+      let error;
+      try {
+        await this.ctx.service.user.resetPassword();
+      } catch (err) {
+        error = err;
+      }
+
+      assert.equal(this.whereStub.callCount, 1);
+      assert.equal(this.firstStub.callCount, 1);
+      assert.equal(this.jhUpdateStub.callCount, 0);
+      assert.deepEqual(this.whereStub.getCall(0).args[0], { userId: expUser.userId });
+      assert.deepEqual(error.errorCode, 'user_password_reset_same_error');
     });
   });
 });
