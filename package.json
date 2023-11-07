@@ -1,6 +1,6 @@
 {
     "name": "@jianghujs/jianghu",
-    "version": "4.1.6",
+    "version": "4.1.7",
     "description": "Progressive Enterprise Framework",
     "dependencies": {
         "ajv": "^8.7.1",
