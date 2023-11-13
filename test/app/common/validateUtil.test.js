@@ -21,21 +21,21 @@ describe('test/app/common/validateUtil.test.js', () => {
           deviceType: { type: 'string' },
           needSetCookies: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
         },
-      }
+      };
       const parameters = {
-        userId: "userid1",
-        password: "password1",
-        deviceId: "deviceId1",
-        deviceType: "deviceType1",
+        userId: 'userid1',
+        password: 'password1',
+        deviceId: 'deviceId1',
+        deviceType: 'deviceType1',
         needSetCookies: true,
-      }
-      let err = null
+      };
+      let err = null;
       try {
-        validateUtil.validate(schema, parameters)
+        validateUtil.validate(schema, parameters);
       } catch (error) {
-        err = error
+        err = error;
       }
-      assert.equal(err, null)
+      assert.equal(err, null);
     });
     it('invalid parameters, should failed', async () => {
       const schema = {
@@ -49,22 +49,22 @@ describe('test/app/common/validateUtil.test.js', () => {
           deviceType: { type: 'string' },
           needSetCookies: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
         },
-      }
+      };
       const parameters = {
-        userId: "us",
-        password: "password1",
-        deviceId: "deviceId1",
-        deviceType: "deviceType1",
+        userId: 'us',
+        password: 'password1',
+        deviceId: 'deviceId1',
+        deviceType: 'deviceType1',
         needSetCookies: true,
-      }
-      let err = null
+      };
+      let err = null;
       try {
-        validateUtil.validate(schema, parameters)
+        validateUtil.validate(schema, parameters);
       } catch (error) {
-        err = error
+        err = error;
       }
-      assert.equal(err.errorCode, 'request_body_invalid')
-      assert.equal(err.errorReason, '请求数据不符合规范')
+      assert.equal(err.errorCode, 'request_body_invalid');
+      assert.equal(err.errorReason, '请求数据不符合规范');
     });
   });
 });
