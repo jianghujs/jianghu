@@ -7,12 +7,15 @@ const userInfoUtil = require('./middlewareUtil/userInfoUtil');
 module.exports = (options, app) => {
 
   // 构造新的 static 配置，生成新的 egg-static 中间件
-  const staticOptions = Object.assign({}, app.config.static, {
+  const staticOptions = {
+    maxAge: 0,
+    buffer: false,
+    preload: false,
     dir: [
       { prefix: `/${app.config.appId}/upload/`, dir: path.join(app.config.baseDir, 'upload') },
       { prefix: '/upload/', dir: path.join(app.config.baseDir, 'upload') },
     ],
-  });
+  };
   const eggStaticMiddleware = eggStatic(staticOptions, app);
 
   // 进行鉴权，鉴权成功后，使用 static 中间件返回静态资源
