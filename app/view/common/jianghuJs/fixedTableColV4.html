@@ -1,6 +1,12 @@
 <!-- fixedTableColV4.html >>>>>>>>> -->
 <script>
-  function reFixedTableCol() {
+  async function reFixedTableCol() {
+    // 阻塞等待 100ms
+    const delay = (ms) => {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    await delay(100);
+    
     // remove old style
     let fixedTableColStyle = document.getElementById('fixedTableColV4Style');
     if(fixedTableColStyle) {
