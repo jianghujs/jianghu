@@ -115,8 +115,8 @@
     callback: (errorMessage) => {
       try {
         const errorTime = dayjs().format();
-        const userId = localStorage.getItem(`${window.appInfo.appLoginId||window.appInfo.appId}_userId`);
-        const deviceId = localStorage.getItem(`${window.appInfo.appLoginId||window.appInfo.appId}_deviceId`);
+        const userId = localStorage.getItem(`${window.appInfo.loginAppId||window.appInfo.appId}_userId`);
+        const deviceId = localStorage.getItem(`${window.appInfo.loginAppId||window.appInfo.appId}_deviceId`);
         pushErrorLogToLocalStorageFunc({ userId, deviceId, errorTime, errorMessage });
       } catch (error) {
         console.log("[errorCollection.html] 异常日志记录异常!", error)

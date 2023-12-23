@@ -9,7 +9,7 @@ module.exports = appInfo => {
 
   const config = {
     appId: appPackageName,
-    appLoginId: null,
+    loginAppId: null,  // localStorage.setItem(`${window.appInfo.loginAppId||window.appInfo.appId}_authToken`, this.loginResult.authToken);
     keys: `${appPackageName}_1638108566009`,
     appTitle: '第一个应用',
     appLogo: `${appPackageName}/public/img/logo.svg`,

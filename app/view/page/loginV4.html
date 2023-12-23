@@ -149,9 +149,9 @@
         }
       },
       async setLocalStorage() {
-        localStorage.setItem(`${window.appInfo.appLoginId||window.appInfo.appId}_authToken`, this.loginResult.authToken);
-        localStorage.setItem(`${window.appInfo.appLoginId||window.appInfo.appId}_userId`, this.loginResult.userId);
-        localStorage.setItem(`${window.appInfo.appLoginId||window.appInfo.appId}_deviceId`, this.deviceId);
+        localStorage.setItem(`${window.appInfo.loginAppId||window.appInfo.appId}_authToken`, this.loginResult.authToken);
+        localStorage.setItem(`${window.appInfo.loginAppId||window.appInfo.appId}_userId`, this.loginResult.userId);
+        localStorage.setItem(`${window.appInfo.loginAppId||window.appInfo.appId}_deviceId`, this.deviceId);
       },
       async redirectToPreLoginURL() {
         let redirectTo = `/${window.appInfo.appId}`;

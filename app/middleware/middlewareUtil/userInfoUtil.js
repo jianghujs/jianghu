@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const dayjs = require('dayjs');
 
-async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, appLoginId) {
+async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, loginAppId) {
   let user = {};
   if (!authToken) {
     return user;
@@ -18,16 +18,9 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
       operationAt: dayjs().format(),
     };
   } else {
-    if (appLoginId) {
-      userSession = await jianghuKnex('_enterprise_user_session')
-        .where({ authToken })
-        .first();
-    }
-    if (!userSession) {
-      userSession = await jianghuKnex('_user_session')
-        .where({ authToken })
-        .first();
-    }  
+    userSession = await jianghuKnex('_user_session')
+      .where({ authToken })
+      .first();
   }
   if (userSession && userSession.userId) {
     const userResult = await jianghuKnex('_view01_user')
@@ -59,7 +52,7 @@ module.exports = {
       // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
       body = {
         appData: {
-          authToken: ctx.cookies.get(`${config.appLoginId||config.appId}_authToken`, {
+          authToken: ctx.cookies.get(`${config.loginAppId||config.appId}_authToken`, {
             httpOnly: false,
             signed: false,
           }),
@@ -71,7 +64,7 @@ module.exports = {
     delete body.appData.authToken;
 
     // 获取用户信息
-    const user = await getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, config.appLoginId);
+    const user = await getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, config.loginAppId);
     const { userId, username } = user;
     const groupId = isGroupIdRequired ? actionData.groupId : '';
 
