@@ -22,6 +22,9 @@ class AppBootHook {
   configDidLoad() {
     // 挂载jianghuKnex
     this.app.jianghuKnex = createJianghuKnex(this.app.knex, this.app.config.jianghuConfig.jhIdConfig);
+    if (!this.app.config.authTokenKey) {
+      this.app.config.authTokenKey = this.app.config.appId;
+    }
   }
 
   async didLoad() {

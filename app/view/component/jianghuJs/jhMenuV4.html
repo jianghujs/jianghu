@@ -449,9 +449,9 @@
       },
       // 导航到登陆页
       routeToLoginPage() {
-        localStorage.removeItem(`${window.appInfo.loginAppId||window.appInfo.appId}_authToken`);
+        localStorage.removeItem(`${window.appInfo.authTokenKey}_authToken`);
         setTimeout(() => {
-          location.href = `/${window.appInfo.appId}/page/login`;
+          location.href = '<$ ctx.app.config.loginPage $>';
         }, 700);
       }
     },

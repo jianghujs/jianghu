@@ -9,7 +9,7 @@ module.exports = appInfo => {
 
   const config = {
     appId: appPackageName,
-    loginAppId: null,  // localStorage.setItem(`${window.appInfo.loginAppId||window.appInfo.appId}_authToken`, this.loginResult.authToken);
+    authTokenKey: null,
     keys: `${appPackageName}_1638108566009`,
     appTitle: '第一个应用',
     appLogo: `${appPackageName}/public/img/logo.svg`,
@@ -225,7 +225,7 @@ module.exports = appInfo => {
           errorCode === 'request_app_forbidden' ||
           errorCode === 'user_banned'
         ) {
-          ctx.cookies.set(`${ctx.app.config.appId}_authToken`, null);
+          ctx.cookies.set(`${ctx.app.config.authTokenKey}_authToken`, null);
         }
         const errorReasonSupplement = err.errorReasonSupplement || null;
         ctx.body = httpResponse.fail({

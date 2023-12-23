@@ -102,7 +102,7 @@ class UserService extends Service {
 
     // 设置 cookies，用于 page 鉴权
     if (needSetCookies) {
-      this.ctx.cookies.set(`${config.loginAppId||config.appId}_authToken`, authToken, {
+      this.ctx.cookies.set(`${config.authTokenKey}_authToken`, authToken, {
         httpOnly: false,
         signed: false,
         maxAge: 1000 * 60 * 60 * 24 * 1080,
@@ -121,7 +121,7 @@ class UserService extends Service {
     const { needSetCookies = true } = actionData;
     const { userId, deviceId } = userInfo.user;
     if (needSetCookies) {
-      this.ctx.cookies.set(`${config.loginAppId||config.appId}_authToken`, null);
+      this.ctx.cookies.set(`${config.authTokenKey}_authToken`, null);
     }
     const user = await jianghuKnex('_view01_user')
       .where({ userId })
@@ -139,7 +139,7 @@ class UserService extends Service {
       .where({ id: userSession.id })
       .jhUpdate({ authToken: '' });
     if (needSetCookies) {
-      this.ctx.cookies.set(`${config.loginAppId||config.appId}_authToken`, null);
+      this.ctx.cookies.set(`${config.authTokenKey}_authToken`, null);
     }
 
     return {};
