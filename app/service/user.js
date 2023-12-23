@@ -44,7 +44,7 @@ class UserService extends Service {
   async passwordLogin() {
     const app = this.app;
     const { jianghuKnex } = app;
-    const { appId } = app.config;
+    const config = app.config;
 
     const { actionData } = this.ctx.request.body.appData;
     validateUtil.validate(actionDataaScheme.passwordLogin, actionData);
@@ -102,7 +102,7 @@ class UserService extends Service {
 
     // 设置 cookies，用于 page 鉴权
     if (needSetCookies) {
-      this.ctx.cookies.set(`${appId}_authToken`, authToken, {
+      this.ctx.cookies.set(`${config.appLoginId||config.appId}_authToken`, authToken, {
         httpOnly: false,
         signed: false,
         maxAge: 1000 * 60 * 60 * 24 * 1080,
@@ -113,10 +113,7 @@ class UserService extends Service {
   }
 
   async logout() {
-    const {
-      config: { appId },
-      jianghuKnex,
-    } = this.app;
+    const { config, jianghuKnex } = this.app;
     const { userInfo } = this.ctx;
 
     const { actionData } = this.ctx.request.body.appData;
@@ -124,7 +121,7 @@ class UserService extends Service {
     const { needSetCookies = true } = actionData;
     const { userId, deviceId } = userInfo.user;
     if (needSetCookies) {
-      this.ctx.cookies.set(`${appId}_authToken`, null);
+      this.ctx.cookies.set(`${config.appLoginId||config.appId}_authToken`, null);
     }
     const user = await jianghuKnex('_view01_user')
       .where({ userId })
@@ -142,7 +139,7 @@ class UserService extends Service {
       .where({ id: userSession.id })
       .jhUpdate({ authToken: '' });
     if (needSetCookies) {
-      this.ctx.cookies.set(`${appId}_authToken`, null);
+      this.ctx.cookies.set(`${config.appLoginId||config.appId}_authToken`, null);
     }
 
     return {};

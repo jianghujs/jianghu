@@ -44,7 +44,7 @@
     const { appId, userAgent } = window.appInfo;
     if (!data.appData.appId) { data.appData.appId = appId; }
     if (!data.appData.userAgent) { data.appData.userAgent = userAgent; }
-    const authToken = localStorage.getItem(`${window.appInfo.appId}_authToken`);
+    const authToken = localStorage.getItem(`${window.appInfo.appLoginId||window.appInfo.appId}_authToken`);
     if (!data.appData.authToken) { data.appData.authToken = authToken; }
 
 
@@ -66,7 +66,7 @@
     const {errorCode, errorReason} = responseData;
     if (errorCode === 'request_token_invalid' || errorCode === 'request_user_not_exist' ||
         errorCode === 'request_token_expired' || errorCode === 'user_banned') {
-      localStorage.removeItem(`${window.appInfo.appId}_authToken`);
+      localStorage.removeItem(`${window.appInfo.appLoginId||window.appInfo.appId}_authToken`);
       window.vtoast.fail({ message: errorReason });
       if (location.pathname === `/${window.appInfo.appId}/page/login`) {
         throw new BizError({
@@ -195,7 +195,7 @@
           pageId: 'allPage',
           actionId: 'httpUploadByStream',
           userAgent,
-          authToken: localStorage.getItem(`${window.appInfo.appId}_authToken`),
+          authToken: localStorage.getItem(`${window.appInfo.appLoginId||window.appInfo.appId}_authToken`),
           actionData: {
             chunFile, chunkSize, indexString, hash, total,
             filename,

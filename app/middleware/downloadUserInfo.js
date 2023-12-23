@@ -29,7 +29,7 @@ module.exports = (options, app) => {
       // 由于 userInfoUtil 针对的是 post 请求，所以需要构造一个结构一致的 body
       const mockBody = {
         appData: {
-          authToken: ctx.cookies.get(`${appId}_authToken`, {
+          authToken: ctx.cookies.get(`${config.appLoginId||config.appId}_authToken`, {
             httpOnly: false,
             signed: false,
           }),
