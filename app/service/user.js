@@ -132,16 +132,11 @@ class UserService extends Service {
     const userSession = await jianghuKnex('_user_session')
       .where({ userId, deviceId })
       .first();
-    if (!userSession) {
-      throw new BizError({ ...errorInfoEnum.request_token_invalid });
+    if (userSession) {
+      await jianghuKnex('_user_session', this.ctx)
+        .where({ id: userSession.id })
+        .jhUpdate({ authToken: '' });
     }
-    await jianghuKnex('_user_session', this.ctx)
-      .where({ id: userSession.id })
-      .jhUpdate({ authToken: '' });
-    if (needSetCookies) {
-      this.ctx.cookies.set(`${config.authTokenKey}_authToken`, null);
-    }
-
     return {};
   }
 
@@ -149,11 +144,19 @@ class UserService extends Service {
     const { userInfo } = this.ctx;
     const { user } = userInfo;
     const { userId } = user;
-    const { jianghuKnex } = this.app;
+    const { jianghuKnex, config } = this.app;
+
     if (userId) {
-      userInfo.socketList = await jianghuKnex('_user_session')
-        .where({ userId, socketStatus: 'online' })
-        .select('userId', 'deviceId', 'socketStatus');
+      if (config.authTokenKey == config.appId) {
+        userInfo.socketList = await jianghuKnex('_user_session')
+          .where({ userId, socketStatus: 'online' })
+          .select('userId', 'deviceId', 'socketStatus');
+      }
+      if (config.authTokenKey != config.appId) {
+        userInfo.socketList = await jianghuKnex(`_${config.authTokenKey}_user_session`)
+          .where({ userId, socketStatus: 'online' })
+          .select('userId', 'deviceId', 'socketStatus');
+      }
     }
     return userInfo;
   }
