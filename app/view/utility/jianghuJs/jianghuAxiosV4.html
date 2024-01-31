@@ -410,6 +410,9 @@
             try {
               const {indexString, chunFile} = item;
               const result = await uploadFunc({chunFile, chunkSize, indexString, hash, total});
+              if (result.data.status != 'success') {
+                throw new BizError(result.data.appData);
+              }
               success();
               resolve(result);
               break;
