@@ -395,6 +395,18 @@
         background: #F6F6F6 !important;
     }
 
+    /* table行点击背景色 */
+    .theme--light.v-data-table>.v-data-table__wrapper>table>tbody>tr.v-data-table__clicked:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+    .theme--light.v-data-table>.v-data-table__wrapper>table>tbody>tr.v-data-table__clicked td.fixed,
+    .theme--light.v-data-table.fixed-first-column>.v-data-table__wrapper>table>tbody>tr.v-data-table__clicked td:nth-child(1) {
+        background: #E7F9E5 !important;
+    }
+    .theme--light.v-data-table>.v-data-table__wrapper>table>tbody>tr:nth-child(even).v-data-table__clicked:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper),
+    .theme--light.v-data-table>.v-data-table__wrapper>table>tbody>tr:nth-child(even).v-data-table__clicked td.fixed,
+    .theme--light.v-data-table.fixed-first-column>.v-data-table__wrapper>table>tbody>tr:nth-child(even).v-data-table__clicked td:nth-child(1) {
+        background: #E7F9E5 !important;
+    }
+
     /* table 定高 */
     .jh-fixed-table-height {
         display: flex;

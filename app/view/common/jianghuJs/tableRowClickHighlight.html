@@ -1,0 +1,40 @@
+<!-- tableRowClickHighlight.html >>>>>>>>>>>>> -->
+<script>
+tableRowClickHighlight = (param) => {
+  const {className = 'jh-fixed-table-height'} = param ? param : {};
+  const tables = document.getElementsByClassName(className);
+  if (_.isEmpty(tables)) {
+    window.requestAnimationFrame(() => {
+      tableRowClickHighlight(param);
+    })
+  } else {
+    for (const table of tables) {
+      table.addEventListener('click', function(event) {
+        let target = event.target;
+        // 递归查找最近的父<tr>元素
+        while (target && target.tagName !== 'TR') {
+            target = target.parentNode;
+        }
+        if (target && target.tagName === 'TR') {
+            let rows = this.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i] === target) {
+                    rows[i].classList.add('v-data-table__clicked');
+                } else {
+                    rows[i].classList.remove('v-data-table__clicked');
+                }
+            }
+        }
+      });
+    }
+   
+  }
+}
+
+window.onresize = () => {
+  tableRowClickHighlight();
+}
+tableRowClickHighlight();
+
+</script>
+<!-- <<<<<<<<<<<<< tableRowClickHighlight.html -->
