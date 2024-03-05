@@ -146,7 +146,12 @@ module.exports = {
       appType === 'multiApp'
         ? await this.captureAppList({ jianghuKnex, userId })
         : [];
-    return { userGroupRoleList, allowResourceList, allowPageList, userAppList };
+    // Tip: 需要把 groupName 和 roleName 带出来, 而且public和login不需要带出来
+    let userGroupRoleListForShow = [];
+    if (userId) {
+      userGroupRoleListForShow = await jianghuKnex('_view01_user_group_role').where({ userId }).select();
+    }
+    return { userGroupRoleList: userGroupRoleListForShow, allowResourceList, allowPageList, userAppList };
   },
 
   async captureAppList({ jianghuKnex, userId }) {

@@ -181,6 +181,15 @@
               <v-divider class="my-1 jh-divider"></v-divider>
             </template>
 
+            <template>
+              <v-list-item>
+                <v-list-item-content>
+                  <p class="jh-font-size-12 black--text mb-0" v-for="(userGroupRole, i) of userInfo.userGroupRoleList" :key="i">{{ userGroupRole.groupName }} | {{ userGroupRole.roleName }}</p>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider class="my-1 jh-divider"></v-divider>
+            </template>
+
             <v-list-item v-for="avatarMenu of inAvatarMenuList" :key="avatarMenu.path" @click="openUrl(avatarMenu.path)">
               <v-list-item-icon class="mr-1 mt-1">
                 <v-icon size="16" color="grey darken-3">mdi-account-cog-outline</v-icon>
