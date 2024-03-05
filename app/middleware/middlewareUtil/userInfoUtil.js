@@ -130,9 +130,9 @@ module.exports = {
           .where({ userId })
           .select();
     }
-    userGroupRoleList.push({ userId, groupId: 'public', roleId: '--'});
+    userGroupRoleList.push({ userId, groupId: 'public', roleId: '--' });
     if (userId) {
-      userGroupRoleList.push({ userId, groupId: 'login', roleId: '--'})
+      userGroupRoleList.push({ userId, groupId: 'login', roleId: '--' });
     }
     const allowResourceList = await this.captureAllowResourceList({
       jianghuKnex,
@@ -292,7 +292,7 @@ module.exports = {
     return !!ruleParts.find(ruleValue => {
       // 将后缀通配符转成正常正则
       const ruleReg =
-        '^' + ruleValue.replace(/\./g, '\\.').replace('*', '.*') + '$';
+        '^' + ruleValue.replace(/\./g, '\\.').replace(/\|/g, '\\\\|').replace('*', '.*') + '$';
       const regExp = new RegExp(ruleReg);
       return regExp.test(checkResource);
     });
