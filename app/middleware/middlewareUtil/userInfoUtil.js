@@ -130,6 +130,10 @@ module.exports = {
           .where({ userId })
           .select();
     }
+    userGroupRoleList.push({ userId, groupId: 'public', roleId: '--'});
+    if (userId) {
+      userGroupRoleList.push({ userId, groupId: 'login', roleId: '--'})
+    }
     const allowResourceList = await this.captureAllowResourceList({
       jianghuKnex,
       userGroupRoleList,
