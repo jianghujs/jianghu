@@ -2,7 +2,6 @@
 
 const _ = require('lodash');
 const dayjs = require('dayjs');
-const { BizError, errorInfoEnum } = require('../../constant/error');
 
 async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, authTokenKey, appId) {
   let user = {};
@@ -19,12 +18,12 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
       operationAt: dayjs().format(),
     };
   } else {
-    if (authTokenKey == appId) {
+    if (authTokenKey === appId) {
       userSession = await jianghuKnex('_user_session')
         .where({ authToken })
         .first();
-    }  
-    if (authTokenKey != appId) {
+    }
+    if (authTokenKey !== appId) {
       userSession = await jianghuKnex(`_${authTokenKey}_user_session`)
         .where({ authToken })
         .first();
@@ -73,7 +72,7 @@ module.exports = {
     delete body.appData.authToken;
 
     // 获取用户信息
-    const { authTokenKey, appId } = config
+    const { authTokenKey, appId } = config;
     const user = await getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, authTokenKey, appId);
     const { userId, username } = user;
     const groupId = isGroupIdRequired ? actionData.groupId : '';
@@ -131,23 +130,13 @@ module.exports = {
           .where({ userId })
           .select();
     }
-
-    const { userIdList, groupIdList, roleIdList } = this.getRuleIdList(
-      groupId,
-      userId,
-      userGroupRoleList
-    );
     const allowResourceList = await this.captureAllowResourceList({
       jianghuKnex,
-      userIdList,
-      groupIdList,
-      roleIdList,
+      userGroupRoleList,
     });
     const allowPageList = await this.captureAllowPageList({
       jianghuKnex,
-      userIdList,
-      groupIdList,
-      roleIdList,
+      userGroupRoleList,
     });
     const userAppList =
       appType === 'multiApp'
@@ -165,48 +154,9 @@ module.exports = {
       .select();
   },
 
-  getRuleIdList(groupId, userId, userGroupRoleList) {
-    const getGroupIdList = (groupId, userId, userGroupRoleList) => {
-      const groupIdList = userGroupRoleList.map(
-        userGroupRole => userGroupRole.groupId
-      );
-      groupIdList.push('*');
-      if (groupId) {
-        return groupIdList;
-      }
-      groupIdList.push('public');
-      if (userId) {
-        groupIdList.push('login');
-      }
-      return groupIdList;
-    };
-    const getRoleIdList = (userId, userGroupRoleList) => {
-      const roleIdList = userGroupRoleList.map(
-        userGroupRole => userGroupRole.roleId
-      );
-      roleIdList.push('*');
-      return roleIdList;
-    };
-    const getUserIdList = userId => {
-      const userIdList = [];
-      if (userId) {
-        userIdList.push(userId);
-      }
-      userIdList.push('*');
-      return userIdList;
-    };
-
-    const userIdList = getUserIdList(userId);
-    const groupIdList = getGroupIdList(groupId, userId, userGroupRoleList);
-    const roleIdList = getRoleIdList(userId, userGroupRoleList);
-    return { userIdList, groupIdList, roleIdList };
-  },
-
   async captureAllowResourceList({
     jianghuKnex,
-    userIdList,
-    groupIdList,
-    roleIdList,
+    userGroupRoleList,
   }) {
     const allResourceList = await jianghuKnex('_resource').select();
     allResourceList.forEach(resource => {
@@ -218,9 +168,7 @@ module.exports = {
       'resource',
       allResourceList,
       allUserGroupRoleResourceList,
-      userIdList,
-      groupIdList,
-      roleIdList
+      userGroupRoleList
     );
     return allowResourceList.map(resource => {
       return {
@@ -235,9 +183,7 @@ module.exports = {
 
   async captureAllowPageList({
     jianghuKnex,
-    userIdList,
-    groupIdList,
-    roleIdList,
+    userGroupRoleList,
   }) {
     const allPageList = await jianghuKnex('_page').select();
     const allUserGroupRolePageList = await jianghuKnex('_user_group_role_page').select();
@@ -245,9 +191,7 @@ module.exports = {
       'page',
       allPageList,
       allUserGroupRolePageList,
-      userIdList,
-      groupIdList,
-      roleIdList
+      userGroupRoleList
     );
     return allowPageList;
   },
@@ -260,14 +204,13 @@ module.exports = {
    * @param userIdList
    * @param groupIdList 用户有权限的 groupId 列表
    * @param roleIdList 用户所属的 roleId 列表
+   * @param userGroupRoleList
    */
   computeAllowList(
     fieldKey,
     allItemList,
     allRuleList,
-    userIdList,
-    groupIdList,
-    roleIdList
+    userGroupRoleList
   ) {
     const idFieldKey = `${fieldKey}Id`;
     const allowItemList = [];
@@ -289,19 +232,15 @@ module.exports = {
         if (resultAllowOrDeny === 'deny') {
           return;
         }
-
-        // 判断这条规则是否和当前用户匹配
-        if (
-          !this.checkRule(userIdList, rule.user) ||
-          !this.checkRule(groupIdList, rule.group) ||
-          !this.checkRule(roleIdList, rule.role)
-        ) {
-          return;
-        }
-        // 判断这条规则的资源是否和当前资源匹配
         if (!this.checkResource(item[idFieldKey], rule[fieldKey])) {
           return;
         }
+
+        // 判断这条规则是否和当前用户匹配
+        if (!this.checkRule({ userGroupRoleList, rule })) {
+          return;
+        }
+
         if (rule.group === 'public') {
           isPublic = true;
         }
@@ -315,22 +254,28 @@ module.exports = {
     });
     return allowItemList;
   },
+
+
   /**
-   * 判断具体字段是否符合规则
-   * 如果 checkValueList 中的数据有一条在 ruleFieldValue 中，则返回 true
-   *
-   * @param checkValueList 待检查的数据列表，如 ['*', '10001']
-   * @param ruleFieldValue 规则字段值，支持逗号，如 '*,10001,10002'
+   * userGroupRoleList 是否和当前 rule匹配
+   * @param userGroupRoleList.userGroupRoleList
+   * @param userGroupRoleList  [{ userId, groupId, roleId }]
+   * @param rule  {user:'*', group: 'login', role:'*'}
+   * @param userGroupRoleList.rule
    */
-  checkRule(checkValueList, ruleFieldValue) {
-    const ruleParts = ruleFieldValue.split(',');
-    if (ruleParts.includes('*')) {
+  checkRule({ userGroupRoleList, rule }) {
+    const userGroupRoleListRule = userGroupRoleList
+      .filter(userGroupRole => this.checkResource(userGroupRole.userId, rule.user))
+      .filter(userGroupRole => this.checkResource(userGroupRole.groupId, rule.group))
+      .filter(userGroupRole => this.checkResource(userGroupRole.roleId, rule.role));
+    if (userGroupRoleListRule.length === 0) {
+      return false;
+    }
+    if (userGroupRoleListRule.length > 0) {
       return true;
     }
-    return !!checkValueList.find(checkValue =>
-      ruleParts.includes(checkValue)
-    );
   },
+
 
   /**
    * @description 判断资源是否符合规则，支持逗号及后缀通配符

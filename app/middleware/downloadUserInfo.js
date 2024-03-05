@@ -19,7 +19,7 @@ module.exports = (options, app) => {
   return async (ctx, next) => {
 
     const { jianghuKnex, logger, db, config } = ctx.app;
-    const { appId, appType, jianghuConfig = {} } = config;
+    const { appType, jianghuConfig = {} } = config;
 
     if (!jianghuConfig.enableUploadStaticFileCache) {
       return;
