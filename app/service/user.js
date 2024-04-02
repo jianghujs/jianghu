@@ -8,7 +8,8 @@ const validateUtil = require('../common/validateUtil');
 const idGenerateUtil = require('../common/idGenerateUtil');
 // ========================================常用 require end=============================================
 const md5 = require('md5-node');
-const actionDataaScheme = Object.freeze({
+const { ApiConfigKit, SnsAccessTokenApi, ApiConfig } = require('tnwx');
+const actionDataScheme = Object.freeze({
   passwordLogin: {
     type: 'object',
     additionalProperties: true,
@@ -16,6 +17,17 @@ const actionDataaScheme = Object.freeze({
     properties: {
       userId: { type: 'string', minLength: 3 },
       password: { type: 'string' },
+      deviceId: { type: 'string' },
+      deviceType: { type: 'string' },
+      needSetCookies: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
+    },
+  },
+  wxLogin: {
+    type: 'object',
+    additionalProperties: true,
+    required: [ 'code', 'deviceId' ],
+    properties: {
+      code: { type: 'string' },
       deviceId: { type: 'string' },
       deviceType: { type: 'string' },
       needSetCookies: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
@@ -47,7 +59,7 @@ class UserService extends Service {
     const config = app.config;
 
     const { actionData } = this.ctx.request.body.appData;
-    validateUtil.validate(actionDataaScheme.passwordLogin, actionData);
+    validateUtil.validate(actionDataScheme.passwordLogin, actionData);
 
     const {
       userId,
@@ -112,12 +124,92 @@ class UserService extends Service {
     return { authToken, deviceId, userId };
   }
 
+  async wxLogin() {
+    const app = this.app;
+    const { jianghuKnex } = app;
+    const { actionData } = this.ctx.request.body.appData;
+    validateUtil.validate(actionDataScheme.wxLogin, actionData);
+
+    const { code, deviceId, deviceType, needSetCookies = true } = actionData;
+
+    if (!this.app.config.wechat) {
+      // 微信登录配置不存在
+      throw new BizError(errorInfoEnum.wx_login_config_error);
+    }
+    const { appId, appSecret } = this.app.config.wechat;
+
+    if (!appId || !appSecret) {
+      // 微信登录配置不存在
+      throw new BizError(errorInfoEnum.wx_login_config_error);
+    }
+
+    const apiConfig = new ApiConfig(appId, appSecret);
+    ApiConfigKit.putApiConfig(apiConfig);
+    ApiConfigKit.devMode = true;
+    ApiConfigKit.setCurrentAppId(apiConfig.getAppId);
+    // 微信登录
+    const accessTokenRes = await SnsAccessTokenApi.getSnsAccessToken(code);
+    if (accessTokenRes.errcode) {
+      // 微信登录失败
+      throw new BizError({ ...errorInfoEnum.wx_login_error, errorReason: accessTokenRes.errmsg });
+    }
+    const { openid } = accessTokenRes;
+
+    const user = await jianghuKnex('_view01_user', this.ctx)
+      .where({ openid })
+      .first();
+
+    if (!user) {
+      // '尚未绑定用户账号'
+      throw new BizError(errorInfoEnum.user_not_exist);
+    }
+
+    const { userId } = user;
+
+    const authToken = idGenerateUtil.uuid(36);
+    // 存session 的目的是为了
+    //   1. 系统可以根据这个判断是否是自己生成的token
+    //   2. 有时候系统升级需要 用户重新登陆/重新登陆，这时候可以通过清理旧session达到目的
+    const userSession = await jianghuKnex('_user_session')
+      .where({ userId, deviceId })
+      .first();
+
+    const userAgent = this.ctx.request.body.appData.userAgent || '';
+    const userIp = this.ctx.header['x-real-ip'] || this.ctx.request.ip || '';
+
+    if (userSession && userSession.id) {
+      await jianghuKnex('_user_session', this.ctx)
+        .where({ id: userSession.id })
+        .jhUpdate({ authToken, deviceType, userAgent, userIp });
+    } else {
+      await jianghuKnex('_user_session', this.ctx).jhInsert({
+        userId,
+        deviceId,
+        userAgent,
+        userIp,
+        deviceType,
+        authToken,
+      });
+    }
+
+    // 设置 cookies，用于 page 鉴权
+    if (needSetCookies) {
+      this.ctx.cookies.set(`${this.ctx.app.config.appId}_authToken`, authToken, {
+        httpOnly: false,
+        signed: false,
+        maxAge: 1000 * 60 * 60 * 24 * 1080,
+      }); // 1080天
+    }
+
+    return { authToken, deviceId, userId };
+  }
+
   async logout() {
     const { config, jianghuKnex } = this.app;
     const { userInfo } = this.ctx;
 
     const { actionData } = this.ctx.request.body.appData;
-    validateUtil.validate(actionDataaScheme.logout, actionData);
+    validateUtil.validate(actionDataScheme.logout, actionData);
     const { needSetCookies = true } = actionData;
     const { userId, deviceId } = userInfo.user;
     if (needSetCookies) {
@@ -163,7 +255,7 @@ class UserService extends Service {
 
   async resetPassword() {
     const { actionData } = this.ctx.request.body.appData;
-    validateUtil.validate(actionDataaScheme.resetPassword, actionData);
+    validateUtil.validate(actionDataScheme.resetPassword, actionData);
     const app = this.app;
     const { jianghuKnex } = app;
     const { oldPassword, newPassword } = actionData;
