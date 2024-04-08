@@ -1,5 +1,5 @@
 <!-- jhMenu.html >>>>>>>>>>>>> -->
-<script type="text/html" id="jh-menu">
+<script type="text/html" id="jh-menu-side">
 <div>
   <!-- 左边栏菜单 >>>>>>>>>>>>> -->
   <v-navigation-drawer
@@ -101,7 +101,7 @@
     
     <!-- 移动端抽屉关闭按钮 -->
     <v-btn
-      elevation="0" color="success" fab absolute top left small tile class="jh-menu-drawer-close-float-btn"
+      elevation="0" color="success" fab absolute top left small tile class="jh-menu-side-drawer-close-float-btn"
       @click="isMobileMenuDrawerShown = !isMobileMenuDrawerShown" v-if="isMobile">
       <v-icon>mdi-close</v-icon>
     </v-btn>
@@ -170,9 +170,9 @@
 </script>
 
 <script>
-  Vue.component('jh-menu', {
-    template: "#jh-menu",
-    vueComponent: 'jh-menu',
+  Vue.component('jh-menu-side', {
+    template: "#jh-menu-side",
+    vueComponent: 'jh-menu-side',
     vuetify: new Vuetify(),
     data() {
       return {
@@ -448,7 +448,7 @@
     line-height: 60px;
   }
 
-  .jh-menu-drawer-close-float-btn {
+  .jh-menu-side-drawer-close-float-btn {
     top: 120px !important;
     right: -40px;
     position: fixed;
