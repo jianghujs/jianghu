@@ -136,6 +136,14 @@ const errorInfoEnum = Object.freeze({
     errorCode: 'user_password_reset_same_error',
     errorReason: '新旧密码不能一样, 请重新输入!',
   },
+  wx_login_config_error: {
+    errorCode: 'wx_login_config_error',
+    errorReason: '微信登录配置异常',
+  },
+  wx_login_error: {
+    errorCode: 'wx_login_error',
+    errorReason: '微信登录异常',
+  },
 
   // =============================file: 文件错误===========================================
   file_directory: { errorCode: 'file_directory', errorReason: '文件目录异常' },
