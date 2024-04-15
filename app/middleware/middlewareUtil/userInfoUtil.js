@@ -119,13 +119,13 @@ module.exports = {
           .select()
         : await jianghuKnex('_user_group_role as a')
           .innerJoin('_group as b', 'b.groupId', 'a.groupId')
-          .innerJoin('_role as c', 'c.roleId', 'a.roleId')
+          .leftJoin('_role as c', 'c.roleId', 'a.roleId')
           .where({ 'a.userId': userId })
           .select(
             'a.*',
             'b.groupName',
-            'b.groupAvatar',
-            'b.groupExtend',
+            // 'b.groupAvatar',
+            // 'b.groupExtend',
             'c.roleName'
           );
     }

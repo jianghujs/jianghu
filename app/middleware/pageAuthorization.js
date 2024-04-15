@@ -8,65 +8,69 @@ module.exports = option => {
     const { packagePage, userInfo } = ctx;
     const { user, userAppList, allowPageList } = userInfo;
     const { pageId } = packagePage;
-    const isLoginUser = user && user.userId;
-    const { config, jianghuKnex } = ctx.app;
+    const { config } = ctx.app;
     const { appType, appId } = config;
-    // 对于 public page ====》不需要做 用户状态的校验
-    // public: { user: "*", group: "public", role: "*" }
-    const isNotAllow = !allowPageList.some((page) => page.pageId === pageId);
-    const isPublic = allowPageList.find((page) => page.pageId === pageId)?.isPublic || false;
-    // const pageIsNotPublic = 
-    const { originalUrl } = ctx.request;
-    const originalUrlEncode = encodeURIComponent(originalUrl);
 
-    const goToErrorPage = ({ isLoginUser, error }) => {
-      if (!isLoginUser) {
-        ctx.redirect(
-          ctx.app.config.loginPage + `?redirectUrl=${originalUrlEncode}`
-        );
-      } else {
-        const { errorCode, errorReason } = error;
-        ctx.redirect(
-          `${ctx.app.config.helpPage}?errorCode=${errorCode}&errorReason=${errorReason}`
-        );
-      }
+    const goToErrorPage = ({ error }) => {
+      const { errorCode, errorReason } = error;
+      ctx.redirect(
+        `${ctx.app.config.helpPage}?errorCode=${errorCode}&errorReason=${errorReason}`
+      );
     };
 
-    // 1. 判断用户是否有当前app的权限
-    if (appType === "multiApp" && !isPublic) {
-      const targetUserApp =
-        userAppList && userAppList.find((x) => x.appId === appId);
+    // 对于 public page ====》不需要做 用户状态的校验
+    // public: { user: "*", group: "public", role: "*" }
+    const isPublic = allowPageList.find(page => page.pageId === pageId)?.isPublic || false;
+    if (isPublic) {
+      await next();
+      return;
+    }
+
+    // 1. 判断用户是否登录
+    const isLoginUser = user && user.userId;
+    if (!isLoginUser) {
+      const { originalUrl } = ctx.request;
+      const originalUrlEncode = encodeURIComponent(originalUrl);
+      ctx.redirect(
+        ctx.app.config.loginPage + `?redirectUrl=${originalUrlEncode}`
+      );
+      return;
+    }
+
+    // 2 判断用户状态
+    const { userStatus } = user;
+    if (userStatus === userStatusObj.banned) {
+      goToErrorPage({ error: errorInfoEnum.user_banned });
+      return;
+    }
+    if (userStatus !== userStatusObj.active) {
+      goToErrorPage({ error: errorInfoEnum.user_status_error });
+      return;
+    }
+
+    // 3. 判断用户是否有当前app的权限
+    if (appType === 'multiApp') {
+      const targetUserApp = userAppList && userAppList.find(x => x.appId === appId);
       if (!targetUserApp) {
         const { errorCode, errorReason } = errorInfoEnum.request_app_forbidden;
         ctx.redirect(
           `${ctx.app.config.loginPage}?errorCode=${errorCode}&errorReason=${errorReason}`
         );
-      }  
-    }
-
-    // 2 判断用户状态
-    if (isNotAllow && isLoginUser) {
-      const { userStatus } = user;
-      if (userStatus === userStatusObj.banned) {
-        goToErrorPage({ isLoginUser, error: errorInfoEnum.user_banned });
-        return;
-      }
-      if (userStatus !== userStatusObj.active) {
-        goToErrorPage({ isLoginUser, error: errorInfoEnum.user_status_error });
         return;
       }
     }
 
-    // 3. 判断用户是否有 当前 packagePage 的权限
+    // 4. 判断用户是否有 当前 packagePage 的权限
+    const isNotAllow = !allowPageList.some(page => page.pageId === pageId);
     if (isNotAllow) {
-      goToErrorPage({ isLoginUser, error: errorInfoEnum.page_forbidden });
+      goToErrorPage({ error: errorInfoEnum.page_forbidden });
       return;
     }
 
-    // 4. 已登录 则重定向到首页
-    if (pageId === "login" && isLoginUser && !ctx.request.query.errorCode) {
+    // 5. 已登录 从登录页自动则重定向到首页
+    if (pageId === 'login' && isLoginUser && !ctx.request.query.errorCode) {
       ctx.redirect(ctx.app.config.indexPage);
-  }
+    }
     await next();
   };
 };
