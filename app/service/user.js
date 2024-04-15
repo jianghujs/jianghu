@@ -72,7 +72,7 @@ class UserService extends Service {
       .where({ userId })
       .first();
     if (!user || !user.userId || user.userId !== userId) {
-      throw new BizError(errorInfoEnum.user_not_exist);
+      throw new BizError(errorInfoEnum.login_user_not_exist);
     }
     const { userStatus } = user;
     if (userStatus !== userStatusObj.active) {

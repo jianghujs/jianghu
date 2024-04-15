@@ -116,6 +116,10 @@ const errorInfoEnum = Object.freeze({
     errorCode: 'request_user_not_exist',
     errorReason: '用户不存在',
   },
+  login_user_not_exist: {
+    errorCode: 'login_user_not_exist',
+    errorReason: '用户不存在',
+  },
   user_password_error: {
     errorCode: 'user_password_error',
     errorReason: '用户名 或 密码错误, 请重新输入!',
