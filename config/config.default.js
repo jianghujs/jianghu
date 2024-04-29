@@ -122,10 +122,11 @@ module.exports = appInfo => {
       csrf: { enable: false },
     },
     // egg-cors 插件，https://github.com/eggjs/egg-cors
-    cors: {
-      origin: '*',
-      allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
-    },
+    // 禁止跨域请求, 若有需要请配置 origin
+    // cors: {
+    //   origin: 'https://xxx.xxx.xxx',
+    //   allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+    // },
     // egg-view-nunjucks 插件，https://github.com/eggjs/egg-view-nunjucks
     nunjucks: {
       cache: false,
