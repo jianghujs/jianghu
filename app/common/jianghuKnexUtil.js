@@ -15,8 +15,8 @@ async function backupNewDataListToRecordHistory({ ids, table, knex, requestBody,
   }
   const recordHistoryList = newDataList.map(newData => {
 
+    newData.operation = operation;
     if (operation === 'jhDelete') {
-      newData.operation = operation;
       newData.operationByUserId = operationByUserId;
       newData.operationByUser = operationByUser;
       newData.operationAt = operationAt;
