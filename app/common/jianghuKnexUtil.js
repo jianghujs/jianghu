@@ -139,7 +139,7 @@ function buildJianghuKnexFunc(knex, jhIdConfig = {}) {
     [ 'count', 'first', 'select', 'delete' ].forEach(method => {
       builder[method] = (...args) => {
         if (jhId) {
-          target.where({ jhId });
+          target.where(`${table}.jhId`, jhId);
         }
         return target[method](...args);
       };

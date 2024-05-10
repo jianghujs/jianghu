@@ -149,13 +149,17 @@ module.exports = {
     // Tip: 需要把 groupName 和 roleName 带出来, 而且public和login不需要带出来
     let userGroupRoleListForShow = [];
     if (userId) {
-      const rawResult = await jianghuKnex.raw(`SELECT _user_group_role.userId AS userId,_user_group_role.groupId AS groupId,
-                              _group.groupName AS groupName, _user_group_role.roleId AS roleId, _role.roleName AS roleName 
-        FROM _user_group_role 
-          LEFT JOIN _role ON _user_group_role.roleId = _role.roleId 
-          LEFT JOIN _group ON _user_group_role.groupId = _group.groupId
-          where userId = "${userId}";`);
-      userGroupRoleListForShow = rawResult[0];
+      userGroupRoleListForShow = await jianghuKnex('_user_group_role')
+        .leftJoin('_role', '_user_group_role.roleId', '_role.roleId')
+        .leftJoin('_group', '_user_group_role.groupId', '_group.groupId')
+        .where('userId', userId)
+        .select(
+          '_user_group_role.userId AS userId',
+          '_user_group_role.groupId AS groupId',
+          '_group.groupName AS groupName',
+          '_user_group_role.roleId AS roleId',
+          '_role.roleName AS roleName'
+        );
     }
     return { userGroupRoleList: userGroupRoleListForShow, allowResourceList, allowPageList, userAppList };
   },
