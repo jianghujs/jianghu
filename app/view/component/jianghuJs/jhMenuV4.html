@@ -15,7 +15,7 @@
         <span class="text-h7 font-weight-bold">{{ appTitle }}</span>
       </v-toolbar-title>
       <v-divider class="jh-divider"></v-divider>
-  
+      
       <!-- 菜单 -->
       <v-list flat class="mx-2">
         <v-list-item-group :value="currentMenuTabIndex">
@@ -259,7 +259,10 @@
     methods: {
       // 获取当前页面PageId
       computedPageId() {
-        const urlPathList = window.location.pathname.split('/');
+        let urlPathList = window.location.pathname.split('/');
+        if (window.location.pathname.includes('/page/')) {
+          urlPathList = window.location.pathname.split('/page/');
+        }
         this.currentPageId = urlPathList && urlPathList[urlPathList.length - 1];
       },
       // 动态计算菜单栏目的最大宽度，按照实际的标题宽度计算
