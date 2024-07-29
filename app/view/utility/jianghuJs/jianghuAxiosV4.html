@@ -75,7 +75,7 @@
           response
         });
       }
-      location.href = `/${window.appInfo.appId}/page/login`;
+      location.href = '<$ ctx.app.config.loginPage $>' || `/${window.appInfo.appId}/page/login`;
       return response;
     }
 
