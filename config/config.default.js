@@ -29,6 +29,7 @@ module.exports = appInfo => {
       //   { sourcePath: '/appId/upload',   query: {},                                                      targetHost: 'https://proxy.jianghujs.org' },
       //   { sourcePath: '/appId/resource', query: { resourceId: 'allPage.httpUploadByBase64', },           targetHost: 'https://proxy.jianghujs.org' },
       //   { sourcePath: '/appId/resource', query: { resourceId: 'allPage.uploadFileDone', },               targetHost: 'https://proxy.jianghujs.org' },
+      //   { sourcePath: '/appId/resource', query: { resourceId: 'userManagement.*', },                     targetHost: 'https://proxy.jianghujs.org' },
       // ],
 
       // 页面日志收集
