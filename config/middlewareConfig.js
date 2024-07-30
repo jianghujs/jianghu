@@ -8,7 +8,7 @@ module.exports.middleware = [
   // /pageDoc/*
   'pageDocUserInfo',
   // /resource/*
-  'httpPackage', 'httpUserInfo', 'httpAuthorization', 'httpResourceHook' ];
+  'httpPackage',  'httpUserInfo', 'httpAuthorization', 'httpProxy', 'httpResourceHook' ];
 
 module.exports.middlewareMatch = {
   pagePackage: {

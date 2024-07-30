@@ -225,6 +225,51 @@
     return await upload({file, uploadFunc, uploadDoneFunc, onProgress});
   };
 
+  // http base64上传
+  window.jianghuAxios.httpUploadByBase64 = async({ file, fileDirectory, fileDesc, filenameStorage,  onProgress = () =>{} }) => {
+    const filename = file.name.replace(/ /g, '').replace(/\([^\)]*\)/g,"");
+    const uploadFunc = async ({ chunFile, chunkSize, indexString, hash, total }) => {
+      const fileBase64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(chunFile);
+        reader.error = function(err) {
+          reject(err);
+        }
+        reader.onload = function() {
+          resolve(this.result);
+        }
+      })
+      return await window.jianghuAxios({
+        data: {
+          appData: {
+            pageId: 'allPage',
+            actionId: 'httpUploadByBase64',
+            actionData: {
+              chunkSize, indexString, hash, total,
+              filename,
+              fileBase64,
+            }
+          }
+        }
+      });
+    };
+
+    const uploadDoneFunc = async ({ hash, total, chunkSize }) => {
+      return await window.jianghuAxios({
+        data: {
+          appData: {
+            pageId: 'allPage',
+            actionId: 'uploadFileDone',
+            actionData: { hash, total, chunkSize, filename, filenameStorage, fileDirectory, fileDesc }
+          }
+        }
+      });
+    }
+
+    return await upload({file, uploadFunc, uploadDoneFunc, onProgress});
+  };
+
+
   // websocket 使用 base64 编码上传
   window.jianghuAxios.socketUploadByBase64 = async({ file, fileDirectory, fileDesc, filenameStorage, onProgress = () =>{}}) => {
     const filename = file.name.replace(/ /g, '').replace(/\([^\)]*\)/g,"");

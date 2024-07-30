@@ -69,7 +69,7 @@ module.exports = {
     }
     const { authToken, actionData = {} } = body.appData;
     // 取到 authToken 后不再需要保留在 actionData 中
-    delete body.appData.authToken;
+    // delete body.appData.authToken;
 
     // 获取用户信息
     const { authTokenKey, appId } = config;

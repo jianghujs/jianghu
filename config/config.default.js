@@ -25,6 +25,12 @@ module.exports = appInfo => {
     primaryColor: '#1867c0',
 
     jianghuConfig: {
+      // httpProxyConfigList: [
+      //   { sourcePath: '/appId/upload',   query: {},                                                      targetHost: 'https://proxy.jianghujs.org' },
+      //   { sourcePath: '/appId/resource', query: { resourceId: 'allPage.httpUploadByBase64', },           targetHost: 'https://proxy.jianghujs.org' },
+      //   { sourcePath: '/appId/resource', query: { resourceId: 'allPage.uploadFileDone', },               targetHost: 'https://proxy.jianghujs.org' },
+      // ],
+
       // 页面日志收集
       enableHtmlErrorLogRecord: false,
       htmlErrorLogRecordInterval: 60000,
