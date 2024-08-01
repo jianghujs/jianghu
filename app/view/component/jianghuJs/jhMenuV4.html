@@ -58,7 +58,7 @@
   
       <!-- 抽屉关闭按钮 -->
       <v-btn
-        elevation="0" color="success" fab absolute top left small tile class="jh-menu-drawer-close-float-btn"
+        elevation="0" color="primary" fab absolute top left small tile class="jh-menu-drawer-close-float-btn"
         @click="isMobileMenuDrawerShown = !isMobileMenuDrawerShown">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -74,7 +74,7 @@
       flat
     >
       <!-- 手机端左侧菜单开启按钮 -->
-      <v-app-bar-nav-icon color="success" @click.stop="isMobileMenuDrawerShown = !isMobileMenuDrawerShown" v-if="isMobile"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon color="primary" @click.stop="isMobileMenuDrawerShown = !isMobileMenuDrawerShown" v-if="isMobile"></v-app-bar-nav-icon>
       <!-- 页面标题 -->
       <v-toolbar-title ref="toolbarTitle" class="mr-5 pl-0">
         <span class="text-h7 font-weight-bold">{{ appTitle }}</span>
@@ -474,7 +474,7 @@
   /* <<<<< 侧边栏菜单 */
 
   .second-active .v-list-item__title {
-    color: #4caf50 !important;
+    color: var(--cPrimaryColor) !important;
   }
 
   .jh-avatar-menu-btn {
@@ -490,8 +490,8 @@
   }
 
   .second-active {
-    caret-color: #4caf50 !important;
-    background-color: rgba(76, 175, 80, 0.1) !important;
+    caret-color: var(--cPrimaryColor) !important;
+    background-color: rgb(from var(--cPrimaryColor) r g b / 10%);
   }
 
   .jh-toolbar-title {
@@ -511,7 +511,7 @@
     color: var(--gray-900) !important;
   }
   .jh-header-tab.jh-header-tab-active{
-    color: #4caf50 !important;
+    color: var(--cPrimaryColor) !important;
   }
 
   /* 右上角菜单 */

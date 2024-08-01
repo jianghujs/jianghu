@@ -8,7 +8,7 @@
       <v-main>
         <v-row class="align-center" style="height: 100vh">
           <v-col cols="12" align="center">
-            <div class="mb-10 text-h7 font-weight-bold success--text"><$ ctx.app.config.appTitle $></div>
+            <div class="mb-10 text-h7 font-weight-bold primary--text"><$ ctx.app.config.appTitle $></div>
             <v-card class="login-form-card pa-8">
               <v-card-text class="pa-0">
                 <div class="title">登录您的账户</div>
@@ -32,12 +32,12 @@
                       </div>
                     </v-col>
                     <v-col cols="12">
-                      <v-checkbox class="jh-v-input" dense single-line filled v-model="isRememberPassword" color="success" label="记住密码"/>
+                      <v-checkbox class="jh-v-input" dense single-line filled v-model="isRememberPassword" color="primary" label="记住密码"/>
                     </v-col>
                   </v-row>
                   <!-- 操作按钮 -->
                   <v-row class="my-0 px-3">
-                    <v-btn block color="success" @click="doUiAction('login')" small>登录</v-btn>
+                    <v-btn block color="primary" @click="doUiAction('login')" small>登录</v-btn>
                   </v-row>
                 </v-form>
               </v-card-text>
@@ -184,7 +184,7 @@
   .jh-cus-input:focus,
   .jh-cus-input:focus-visible,
   input:focus-visible {
-    border: thin solid #4caf50 !important;
+    border: thin solid var(--cPrimaryColor) !important;
   }
 
   /* ---------- <<<<<<<<<<< 输入框 -------- */
