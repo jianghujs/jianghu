@@ -48,7 +48,7 @@ npm run dev
 
 - 默认密码：123456
 
-![image-20240821171903572](C:\Users\yedsn\AppData\Roaming\Typora\typora-user-images\image-20240821171903572.png)
+![image-20240821171903572](https://s21.ax1x.com/2024/08/21/pAi8ryd.png)
 
 
 
