@@ -12,6 +12,7 @@
 
 
 
+
 ---
 
 ## 开始使用
@@ -51,8 +52,12 @@ npm run dev
 ![image-20240821171903572](https://s21.ax1x.com/2024/08/21/pAi8ryd.png)
 
 
+> \> 更多框架文档 内容请移步 [江湖开发平台文档页](https://www.openjianghu.org/doc/page/article/11101)!
 
-> 更多内容请移步江湖官网 [江湖框架文档页](https://www.openjianghu.org/)!
+> \> 面向小白的学习课程请移步 [江湖开发平台培训页](https://www.openjianghu.org/doc/page/article/10001)!
+
+
+
 
 ## 反馈
 
