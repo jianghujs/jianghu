@@ -51,9 +51,9 @@ npm run dev
 
 ![image-20240821171903572](https://s21.ax1x.com/2024/08/21/pAi8ryd.png)
 
-> 更多框架文档 内容请移步 [江湖开发平台文档页](https://www.openjianghu.org/doc/page/article/11101)!
+> 更多框架文档 内容请移步 [江湖开发平台-文档页](https://www.openjianghu.org/doc/page/article/11101)!
 
-> 面向小白的学习课程请移步 [江湖开发平台培训页](https://www.openjianghu.org/doc/page/article/10001)!
+> 面向小白的学习课程请移步 [江湖开发平台-培训页](https://www.openjianghu.org/doc/page/article/10001)!
 
 
 ## 反馈
