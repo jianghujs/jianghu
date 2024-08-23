@@ -16,7 +16,6 @@
 ---
 
 ## 开始使用
-<iframe src="//player.bilibili.com/player.html?bvid=BV1DwWUeuEdz&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
 
 > 在开始使用前，请确保本地已经安装了 [NodeJS](https://nodejs.org/zh-cn) 和 [MySQL5.7](https://downloads.mysql.com/archives/community/) 环境
 
