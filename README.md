@@ -18,7 +18,7 @@
 ## 开始使用
 > 👉[JianghuJS：一款面向小白的企业级全栈开发框架之快速入门视频教程](https://www.bilibili.com/video/BV1DwWUeuEdz/)
 
-<span style="color: red">提示: 在开始使用前，请确保本地已经安装了 [NodeJS](https://nodejs.org/zh-cn) 和 [MySQL5.7](https://downloads.mysql.com/archives/community/) 环境</span>
+<p color="red" style="color: red">提示: 在开始使用前，请确保本地已经安装了 [NodeJS](https://nodejs.org/zh-cn) 和 [MySQL5.7](https://downloads.mysql.com/archives/community/) 环境</p>
 
 ### 安装
 
