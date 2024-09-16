@@ -12,6 +12,43 @@
 
 
 
+---
+
+## 特性
+
+- ✨ **简化协议** ：JianghuJS 规范了前后端的数据通讯协议，通过简单的配置即可完成前后端开发，开发者只需专注于业务逻辑。
+- 🛠 **内置常用功能** ：开箱即用的功能，包括登录、用户管理、页面权限、数据权限、访问日志和操作日志等，极大地减少了开发时间。
+- ⚙ **配置驱动开发** ：业务相关配置保存在数据库中，通过简单的数据库配置即可实现业务逻辑的开发和配置。
+- 💡 **快速生成工具** ：`jianghu-init` 是 JianghuJS 框架的官方命令行工具，专为简化和加速项目和页面的创建而设计。它可以快速生成项目脚手架和页面模板。
+- 🔍 **全源码生成** ：其他框架生成的代码通常会封装起来，但JianghuJS 生成的是全源码。这使得开发者可以直接查看和修改生成的源代码，拥有更高的灵活性和控制权。
+- 📦 **企业级模板** ：JianghuJS 提供了一系列专为企业级应用定制的开源和可定制项目模板，如 ERP、CRM、企业官网、聊天和在线学习等。
+- 👩‍🏫 **全栈培训课程** ：江湖平台提供从零到一的全栈开发入门培训课程，包括技术文档、模块演示和开源应用，帮助初学者快速掌握企业应用开发。
+
+---
+
+## 快速预览
+
+##### 生成HTML页面源码
+
+```
+jianghu-init page --type=1table-page
+```
+
+![image-20240916135112615](https://s21.ax1x.com/2024/09/16/pAuTflF.png)
+
+![image-20240916141444461](https://s21.ax1x.com/2024/09/16/pAuThy4.png)
+
+##### 数据库配置页面和接口
+
+```sql
+-- 添加页面
+INSERT INTO `_page`(`pageId`, `pageName`) VALUES ('studentManagement', '学生管理');
+-- 增加简单CRUD接口
+INSERT INTO `_resource`(`pageId`, `actionId`, `desc`, `resourceType`, `resourceData`) VALUES ('studentManagement', 'selectItemList', '✅查询列表', 'sql', '{ \"table\": \"student\", \"operation\": \"select\" }');
+-- 增加复杂逻辑接口，调用service处理逻辑
+INSERT INTO `_resource`(`pageId`, `actionId`, `desc`, `resourceType`, `resourceData`) VALUES ('login', 'passwordLogin', '✅登陆', 'service', '{\"service\": \"user\", \"serviceFunction\": \"passwordLogin\"}');
+```
+
 
 ---
 
