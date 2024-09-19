@@ -319,7 +319,7 @@ async function sqlResource({ jianghuKnex, ctx }) {
   // 2. 翻页场景需要 count 计算
   let count;
   if (limit) {
-    let knexCommandCountString = `return await jianghuKnex('${table}')${whereCondition}.count('*', {as: 'count'});`;
+    let knexCommandCountString = `return await jianghuKnex('${table}', ctx)${whereCondition}.count('*', {as: 'count'});`;
     // 去掉 limit, offset, orderBy
     knexCommandCountString = knexCommandCountString.replace(/\.limit\([^\)]+\)/, '').replace(/\.offset\([^\)]+\)/, '').replace(/\.orderBy\([^\)]+\)/, '');
     const result = await runKnexFunction(knexCommandCountString, { jianghuKnex, actionData, ctx });

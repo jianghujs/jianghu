@@ -16,7 +16,10 @@ module.exports = options => {
             if (!queryIsMatch) { continue; }
             return proxy({ host: targetHost, yieldNext: false })(ctx, next)
         }
-
+        // 用完 authToken 后不再需要保留在 actionData 中
+        if (ctx.request && ctx.request.body && ctx.request.body.appData) {
+            delete ctx.request.body.appData.authToken;
+        }
         await next();
     };
 };
