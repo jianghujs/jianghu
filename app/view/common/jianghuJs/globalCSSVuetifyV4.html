@@ -266,6 +266,12 @@
     td:not(.v-picker td),
     th:not(.v-picker th) {
         border-bottom: thin solid rgba(0, 0, 0, .06) !important;
+        border-right: thin solid rgba(0, 0, 0, .06) !important;
+    }
+
+    table>tbody>tr>td:nth-last-child(1),
+    table>thead>tr>th:nth-last-child(1) {
+        border-right: none !important;
     }
 
     .theme--light.v-data-table .v-data-footer {
@@ -343,12 +349,7 @@
         color: #333C44;
         font-size: .8125rem;
     }
-
-    td:not(.v-picker td),
-    th:not(.v-picker th) {
-        border-bottom: thin solid #F4F5F6 !important;
-    }
-
+    
     .theme--light.v-data-table>.v-data-table__wrapper>table>thead>tr>th {
         color: #505A62 !important;
         font-weight: normal;
