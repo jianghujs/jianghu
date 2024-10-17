@@ -18,6 +18,13 @@ module.exports = option => {
       );
     };
 
+    const goToErrorLoginPage = ({ error }) => {
+      const { errorCode, errorReason } = error;
+      ctx.redirect(
+        `${ctx.app.config.loginPage}?errorCode=${errorCode}&errorReason=${errorReason}`
+      );
+    };
+
     // 对于 public page ====》不需要做 用户状态的校验
     // public: { user: "*", group: "public", role: "*" }
     const isPublic = allowPageList.find(page => page.pageId === pageId)?.isPublic || false;
@@ -40,11 +47,11 @@ module.exports = option => {
     // 2 判断用户状态
     const { userStatus } = user;
     if (userStatus === userStatusObj.banned) {
-      goToErrorPage({ error: errorInfoEnum.user_banned });
+      goToErrorLoginPage({ error: errorInfoEnum.user_banned });
       return;
     }
     if (userStatus !== userStatusObj.active) {
-      goToErrorPage({ error: errorInfoEnum.user_status_error });
+      goToErrorLoginPage({ error: errorInfoEnum.user_status_error });
       return;
     }
 
@@ -52,10 +59,7 @@ module.exports = option => {
     if (appType === 'multiApp') {
       const targetUserApp = userAppList && userAppList.find(x => x.appId === appId);
       if (!targetUserApp) {
-        const { errorCode, errorReason } = errorInfoEnum.request_app_forbidden;
-        ctx.redirect(
-          `${ctx.app.config.loginPage}?errorCode=${errorCode}&errorReason=${errorReason}`
-        );
+        goToErrorLoginPage({ error: errorInfoEnum.request_app_forbidden });
         return;
       }
     }
