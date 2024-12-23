@@ -1,6 +1,7 @@
 'use strict';
 
 const { createJianghuKnex } = require('./app/common/jianghuKnexUtil');
+const { createCacheStorage } = require('./app/common/cacheStorage');
 
 /**
  * 配置文件即将加载，这是最后动态修改配置的时机（configWillLoad）
@@ -22,6 +23,10 @@ class AppBootHook {
   configDidLoad() {
     // 挂载jianghuKnex
     this.app.jianghuKnex = createJianghuKnex(this.app.knex, this.app.config.jianghuConfig.jhIdConfig);
+    
+    // 挂载cacheStorage
+    this.app.cacheStorage = createCacheStorage(this.app);
+    
     if (!this.app.config.authTokenKey) {
       this.app.config.authTokenKey = this.app.config.appId;
     }

@@ -110,7 +110,23 @@ const errorInfoEnum = Object.freeze({
 
   // =============================data error: 数据错误===========================================
   data_not_found: { errorCode: 'data_not_found', errorReason: '数据不存在' },
-
+  // =============================login error: 登录错误===========================================
+  login_captcha_required: {
+    errorCode: 'login_captcha_required',
+    errorReason: '请输入验证码',
+  },
+  login_captcha_error: {
+    errorCode: 'login_captcha_error',
+    errorReason: '验证码错误',
+  },
+  login_captcha_expired: {
+    errorCode: 'login_captcha_expired',
+    errorReason: '验证码已失效，请重新获取',
+  },
+  login_locked: {
+    errorCode: 'login_locked',
+    errorReason: '重试次数过多，已暂时锁定，请稍后再试',
+  },
   // =============================user error: 用户错误===========================================
   user_not_exist: {
     errorCode: 'request_user_not_exist',

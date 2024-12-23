@@ -106,6 +106,12 @@ module.exports = appInfo => {
           '_view01_user',
         ],
       },
+
+      // 登录配置
+      enableLoginCaptcha: false,      // 启用验证码
+      loginLimitAttemptCount: 5,     // 限制登录尝试次数
+      loginLimitTime: 300,           // 锁定时间（秒）
+      
     },
 
     // https://eggjs.org/zh-cn/plugins/multipart.html

@@ -31,6 +31,25 @@
                         <v-icon @click="isPasswordShown = !isPasswordShown" small class="mdi-eye">{{isPasswordShown ? 'mdi-eye-off-outline' : 'mdi-eye-outline'}}</v-icon>
                       </div>
                     </v-col>
+                    <v-col cols="12" v-if="captchaSvg">
+                      <div class="captcha-wrapper">
+                        
+                        <div 
+                          class="captcha-image" 
+                          @click="getCaptcha" 
+                          title="点击刷新验证码"
+                        >
+                          <img :src="captchaSvg" class="captcha-img" alt="验证码" />
+                        </div>
+                        <div>=</div>
+                        <input
+                          class="jh-cus-input captcha-input"
+                          v-model="captchaCode"
+                          type="text"
+                          placeholder="验证码"
+                        />
+                      </div>
+                    </v-col>
                     <v-col cols="12">
                       <v-checkbox class="jh-v-input" dense single-line filled v-model="isRememberPassword" color="primary" label="记住密码"/>
                     </v-col>
@@ -78,16 +97,25 @@
         password: '',
         isPasswordShown: false,
         isRememberPassword: true,
+
+        // 验证码
+        enableLoginCaptcha: '<$ ctx.app.config.jianghuConfig.enableLoginCaptcha $>' === 'true',
+        captchaCode: '',
+        captchaSvg: ''
       };
     },
     mounted() {
       this.doUiAction('getUrlObj');
+      this.doUiAction('getCaptcha');
     },
     methods: {
       async doUiAction(uiActionId, uiActionData) {
         switch (uiActionId) {
           case 'getUrlObj':
             await this.getUrlObj();
+            break;
+          case 'getCaptcha':
+            await this.getCaptcha();
             break;
           case 'login':
             await this.prepareLoginData();
@@ -129,6 +157,7 @@
                 actionData: {
                   userId: this.userId,
                   password: this.password,
+                  captchaCode: this.captchaCode,
                   deviceId: this.deviceId
                 },
               }
@@ -138,6 +167,7 @@
 
           window.vtoast.success('登录成功');
         } catch (error) {
+          this.getCaptcha();
           const { errorCode, errorReason } = error || {};
           if (errorCode) {
             window.vtoast.fail(errorReason);
@@ -146,6 +176,27 @@
             window.vtoast.fail('登录失败');
             throw new Error("登录失败");
           }
+        }
+      },
+      async getCaptcha() {
+        if (!this.enableLoginCaptcha) {
+          return;
+        }
+        const result = await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'login',
+              actionId: 'getLoginCaptcha',
+              actionData: {
+                deviceId: window.deviceId
+              }
+            }
+          }
+        });
+        let captchaSvg = result.data.appData.resultData;
+        if (captchaSvg) {
+          this.captchaSvg = captchaSvg;
+          this.captchaCode = '';
         }
       },
       async setLocalStorage() {
@@ -201,5 +252,32 @@
   }
 
   /* ---------- <<<<<<<<<<< 密码框 -------- */
+
+  /* ---------- 验证码 >>>>>>>>>> -------- */
+  .captcha-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .captcha-input {
+    flex: 1;
+  }
+  .captcha-image {
+    width: 120px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .captcha-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* ---------- <<<<<<<<<<< 验证码 -------- */
 </style>
 {% endblock %}

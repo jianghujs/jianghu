@@ -8,6 +8,7 @@ const validateUtil = require('../common/validateUtil');
 const idGenerateUtil = require('../common/idGenerateUtil');
 // ========================================常用 require end=============================================
 const md5 = require('md5-node');
+const dayjs = require('dayjs');
 const { ApiConfigKit, SnsAccessTokenApi, ApiConfig } = require('tnwx');
 const actionDataScheme = Object.freeze({
   passwordLogin: {
@@ -19,6 +20,7 @@ const actionDataScheme = Object.freeze({
       password: { type: 'string' },
       deviceId: { type: 'string' },
       deviceType: { type: 'string' },
+      captchaCode: { type: 'string' },
       needSetCookies: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
     },
   },
@@ -56,7 +58,9 @@ class UserService extends Service {
   async passwordLogin() {
     const app = this.app;
     const { jianghuKnex } = app;
-    const config = app.config;
+    const { cacheStorage, config } = app;
+    const { appId } = config;
+    const { enableLoginCaptcha } = config.jianghuConfig;
 
     const { actionData } = this.ctx.request.body.appData;
     validateUtil.validate(actionDataScheme.passwordLogin, actionData);
@@ -66,12 +70,48 @@ class UserService extends Service {
       password,
       deviceType,
       deviceId,
+      captchaCode,
       needSetCookies = true,
     } = actionData;
+
+
+    // 检查是否被锁定
+    const lockUntil = await cacheStorage.get(`${appId}_${deviceId}_loginLockUntil`);
+    
+    if (lockUntil) {
+      const now = new Date().getTime();
+      if (now < parseInt(lockUntil)) {
+        throw new BizError(errorInfoEnum.login_locked);
+      } else {
+        await cacheStorage.del(`${appId}_${deviceId}_loginLockUntil`);
+        await cacheStorage.del(`${appId}_${deviceId}_loginAttemptCount`);
+      }
+    }
+
+    // 检查是否需要验证码
+    const loginAttemptCount = parseInt(await cacheStorage.get(`${appId}_${deviceId}_loginAttemptCount`) || '0');
+    if (enableLoginCaptcha && loginAttemptCount > 0) {
+      // 未填写验证码
+      if (!captchaCode) {
+        throw new BizError(errorInfoEnum.login_captcha_required);
+      }
+      // 检查验证码
+      const savedCode = await cacheStorage.get(`${appId}_${deviceId}_loginVerifyCode`);
+      if (!savedCode) {
+        throw new BizError(errorInfoEnum.login_captcha_expired);
+      }
+      if (!savedCode || savedCode.toLowerCase() !== captchaCode.toLowerCase()) {
+        throw new BizError(errorInfoEnum.login_captcha_error);
+      }
+      // 正确后清除验证码
+      await cacheStorage.del(`${appId}_${deviceId}_loginVerifyCode`);
+    }
+
     const user = await jianghuKnex('_view01_user')
       .where({ userId })
       .first();
     if (!user || !user.userId || user.userId !== userId) {
+      await this.handleLoginFailure(deviceId);
       throw new BizError(errorInfoEnum.login_user_not_exist);
     }
     const { userStatus } = user;
@@ -83,6 +123,7 @@ class UserService extends Service {
     }
     const passwordMd5 = md5(`${password}_${user.md5Salt}`);
     if (passwordMd5 !== user.password) {
+      await this.handleLoginFailure(deviceId);
       throw new BizError(errorInfoEnum.user_password_error);
     }
 
@@ -111,6 +152,11 @@ class UserService extends Service {
         authToken,
       });
     }
+    
+    // 清除登录失败计数和锁定时间
+    await cacheStorage.del(`${appId}_${deviceId}_loginAttemptCount`);
+    await cacheStorage.del(`${appId}_${deviceId}_loginLockUntil`);
+    await cacheStorage.del(`${appId}_${deviceId}_loginVerifyCode`);
 
     // 设置 cookies，用于 page 鉴权
     if (needSetCookies) {
@@ -122,6 +168,22 @@ class UserService extends Service {
     }
 
     return { authToken, deviceId, userId };
+  }
+
+  // 处理登录失败
+  async handleLoginFailure(deviceId) {
+    const { cacheStorage, config } = this.app;
+    const { appId } = config;
+    const { loginLimitTime, loginLimitAttemptCount } = config.jianghuConfig;
+    const loginAttemptCount = parseInt(await cacheStorage.get(`${appId}_${deviceId}_loginAttemptCount`) || '0');
+    const newAttemptCount = loginAttemptCount + 1;
+    await cacheStorage.set(`${appId}_${deviceId}_loginAttemptCount`, newAttemptCount);
+
+    if (newAttemptCount >= loginLimitAttemptCount) {
+      const now = dayjs();
+      const lockUntil = now.add(loginLimitTime, 'second');
+      await cacheStorage.set(`${appId}_${deviceId}_loginLockUntil`, lockUntil.valueOf());
+    }
   }
 
   async wxLogin() {
