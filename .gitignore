@@ -11,6 +11,7 @@ node_modules/
 logs/
 run/
 typings/
+upload/
 
 package-lock.json
 yarn.lock
