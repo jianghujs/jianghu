@@ -15,8 +15,7 @@ module.exports = app => {
   if (config.socketIO.redis) {
     const pubClient = new Redis(config.socketIO.redis);
     const subClient = pubClient.duplicate();
-    // subClient.set('____test', 'b');
-    socketIO.adapter(createAdapter(pubClient, subClient));
+    socketIO.adapter(createAdapter(pubClient, subClient, { key: config.socketIO.path }));
     logger.info('[egg-socket.io] init socket.io redis ready!');
   }
 
