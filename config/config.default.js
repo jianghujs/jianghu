@@ -65,7 +65,7 @@ module.exports = appInfo => {
       // /appPackageName/upload 上传文件的鉴权、缓存配置
       // 参考 downloadUserInfo 中间件
       enableUploadStaticFileCache: true,
-      enableUploadStaticFileAuthorization: false,
+      enableUploadStaticFileAuthorization: true,
       uploadFileMaxAge: 30 * 24 * 60 * 60 * 1000, // 30d
 
       // WAF: 限流
