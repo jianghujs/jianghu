@@ -10,6 +10,7 @@ module.exports = option => {
     const { pageId } = packagePage;
     const { config } = ctx.app;
     const { appType, appId } = config;
+    const isLoginUser = user && user.userId;
 
     const goToErrorPage = ({ error }) => {
       const { errorCode, errorReason } = error;
@@ -29,12 +30,15 @@ module.exports = option => {
     // public: { user: "*", group: "public", role: "*" }
     const isPublic = allowPageList.find(page => page.pageId === pageId)?.isPublic || false;
     if (isPublic) {
+      // 5. 已登录 从登录页自动则重定向到首页
+      if (pageId === 'login' && isLoginUser && !ctx.request.query.errorCode) {
+        ctx.redirect(ctx.app.config.indexPage);
+      }
       await next();
       return;
     }
 
     // 1. 判断用户是否登录
-    const isLoginUser = user && user.userId;
     if (!isLoginUser) {
       const { originalUrl } = ctx.request;
       const originalUrlEncode = encodeURIComponent(originalUrl);
