@@ -30,6 +30,15 @@ class AppBootHook {
     if (!this.app.config.authTokenKey) {
       this.app.config.authTokenKey = this.app.config.appId;
     }
+
+    if (this.app.config.jianghuConfig.enableUploadStaticFileAuthorization) {
+      const uploadDir = `/${this.app.config.appId}/upload/`;
+      const existIndex = this.app.config.static.dir.findIndex(item => item.prefix === uploadDir);
+      if (existIndex !== -1) {
+        // 删除
+        this.app.config.static.dir.splice(existIndex, 1);
+      }
+    }
   }
 
   async didLoad() {

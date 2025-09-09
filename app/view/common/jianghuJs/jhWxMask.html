@@ -1,0 +1,158 @@
+<!--jhWxMask.html >>>>>>>>>>>>> -->
+<!-- 微信遮罩层-使用方法：在需要的页面中 include 'common/jhWxMask.html' -->
+<script>
+    var JhWxMask = {
+        // 遮罩层HTML模板
+        maskHtml: `
+            <div id="jh-wx-mask" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.8);
+                z-index: 9999;
+                display: none;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            ">
+                <!-- 顶部标题 -->
+                <div style="
+                    width: 100vw;
+                    text-align: center;
+                    color: #fff;
+                    font-size: 20px;
+                    font-weight: bold;
+                    letter-spacing: 2px;
+                    padding: 104px 0 0 0;
+                ">请在浏览器中打开</div>
+                <!-- 右上角箭头SVG -->
+                <span style="
+                    position: absolute;
+                    top: 32px;
+                    right: 32px;
+                    width: 70px;
+                    height: 70px;
+                    z-index: 10001;
+                    display: block;
+                ">
+                    <svg t="1751442578452" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9381" width="70" height="70"><path d="M860.672 260.096s-70.656-56.832-84.48-52.736c-13.824 4.608-108.544 64-182.784 171.52-87.552 126.464 66.56 214.528 101.376 214.528-33.28-23.552-43.52-153.088 81.408-132.096 108.032 17.92 86.016 158.208-4.096 170.496 139.776 96.768 171.52 287.744-14.336 354.304-329.728 118.272-557.056-160.768-557.056-160.768s267.264 293.376 588.8 123.392c180.736-132.096-35.84-297.472-67.584-317.44-36.864-3.072-217.088-43.52-193.536-214.528 8.192-59.904 47.616-120.832 82.944-158.72 44.544-48.64 84.48-86.016 93.184-90.624C719.36 158.72 609.28 103.936 609.28 103.936L911.36 0l-50.688 260.096zM773.12 487.936c-109.056-17.92-74.752 105.472-30.208 118.272 61.44 12.288 129.536-90.112 30.208-118.272z" fill="#ffffff" p-id="9382"></path></svg>
+                </span>
+                <!-- 中间提示内容 -->
+                <div style="
+                    position: absolute;
+                    top: 38%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 260px;
+                    text-align: center;
+                ">
+                    <div style="
+                        border: 2px dashed #fff;
+                        border-radius: 18px;
+                        padding: 18px 10px 18px 10px;
+                        color: #fff;
+                        font-size: 18px;
+                        margin-bottom: 38px;
+                        background: rgba(0,0,0,0.1);
+                    ">
+                        点击右上角选择<br>在浏览器打开~~
+                    </div>
+                    <!-- ...图标和按钮，仅做展示，无交互 -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                        <div style="
+                            width: 32px;
+                            height: 32px;
+                            background: #fff;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">
+                            <span style="font-size: 22px; color: #232323; transform: translateY(-7px);">...</span>
+                        </div>
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            background: #fff;
+                            color: #232323;
+                            border: none;
+                            padding: 0 18px;
+                            height: 36px;
+                            border-radius: 6px;
+                            font-size: 15px;
+                            font-weight: 500;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                            user-select: none;
+                        ">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#232323" style="vertical-align: middle;">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                            </svg>
+                            在浏览器中打开
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        
+        // 初始化
+        init() {
+            // 检测是否在微信浏览器中
+            if (this.isWechatBrowser()) {
+                this.createMask();
+                this.show();
+            }
+        },
+        
+        // 检测是否为微信浏览器
+        isWechatBrowser() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf('micromessenger') !== -1;
+        },
+        
+        // 创建遮罩层
+        createMask() {
+            // 如果已经存在，先移除
+            const existingMask = document.getElementById('jh-wx-mask');
+            if (existingMask) {
+                existingMask.remove();
+            }
+            
+            // 创建新的遮罩层
+            const maskContainer = document.createElement('div');
+            maskContainer.innerHTML = this.maskHtml;
+            document.body.appendChild(maskContainer.firstElementChild);
+        },
+        
+        
+        // 显示遮罩层
+        show() {
+            const mask = document.getElementById('jh-wx-mask');
+            if (mask) {
+                mask.style.display = 'block';
+                // 禁止背景滚动
+                document.body.style.overflow = 'hidden';
+            }
+        },
+        
+        // 手动显示（供外部调用）
+        showMask() {
+            if (this.isWechatBrowser()) {
+                this.createMask();
+                this.show();
+            }
+        },
+        
+    };
+    
+    // 页面加载完成后自动初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            JhWxMask.init();
+        });
+    } else {
+        JhWxMask.init();
+    }
+</script>
+<!-- <<<<<<<<<<<<< jhWxMask.html -->
+  
