@@ -3,11 +3,13 @@
 const _ = require('lodash');
 const dayjs = require('dayjs');
 
-async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, authTokenKey, appId) {
+async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, authTokenKey, appId, enableAutoRenewAuthToken, authTokenMaxAge) {
   let user = {};
   if (!authToken) {
     return user;
   }
+
+  const userSessionTableName = authTokenKey === appId ? '_user_session' : `_${authTokenKey}_user_session`;
 
   let userSession;
   // 如果是小程序用户，则不从 userSession 查数据，而是 mock 一个 userUession
@@ -18,17 +20,9 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
       operationAt: dayjs().format(),
     };
   } else {
-    if (authTokenKey === appId) {
-      userSession = await jianghuKnex('_user_session')
-        .where({ authToken })
-        .first();
-    }
-    if (authTokenKey !== appId) {
-      userSession = await jianghuKnex(`_${authTokenKey}_user_session`)
-        .where({ authToken })
-        .first();
-    }
-
+    userSession = await jianghuKnex(userSessionTableName)
+      .where({ authToken })
+      .first();
   }
   if (userSession && userSession.userId) {
     const userResult = await jianghuKnex('_view01_user')
@@ -42,6 +36,25 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
       user.loginTime = userSession.operationAt;
     }
   }
+
+  // 检查非小程序用户的authToken是否即将过期：有效期不到一半，就更新authToken
+  if (enableAutoRenewAuthToken && userSession.deviceId !== 'from_xiaochengxu') {
+
+    // 计算userSession.operationAt与当前时间的差值，如果差值大于authTokenMaxAge的一半，则更新authToken，否则不更新
+    const diff = dayjs().diff(dayjs(userSession.operationAt || ''), 'ms');
+    const timeStamp = dayjs().format();
+    // console.log('before: ', userSession.operationAt);
+    if (!userSession.operationAt || diff > authTokenMaxAge / 2) {
+      await jianghuKnex(userSessionTableName)
+        .where({ authToken })
+        .update({ operationAt: timeStamp });      
+      userSession.operationAt = timeStamp;
+    }
+    // console.log('after: ', userSession.operationAt);
+    // const newRecord = await jianghuKnex(userSessionTableName).where({ authToken }).first();
+    // console.log('newRecord: ', newRecord.operationAt);
+  }
+
   return user;
 }
 
@@ -72,8 +85,9 @@ module.exports = {
     // delete body.appData.authToken;
 
     // 获取用户信息
-    const { authTokenKey, appId } = config;
-    const user = await getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, authTokenKey, appId);
+    const { authTokenKey, appId, jianghuConfig } = config;
+    const { enableAutoRenewAuthToken, authTokenMaxAge } = jianghuConfig;
+    const user = await getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId, authTokenKey, appId, enableAutoRenewAuthToken, authTokenMaxAge);
     const { userId, username } = user;
     const groupId = isGroupIdRequired ? actionData.groupId : '';
 
