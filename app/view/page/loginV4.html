@@ -8,57 +8,113 @@
       <v-main>
         <v-row class="align-center" style="height: 100vh">
           <v-col cols="12" align="center">
-            <div class="mb-10 text-h7 font-weight-bold primary--text"><$ ctx.app.config.appTitle $></div>
+            <div class="mb-10 text-h7 font-weight-bold success--text"><$ ctx.app.config.appTitle $>11</div>
             <v-card class="login-form-card pa-8">
               <v-card-text class="pa-0">
-                <div class="title">登录您的账户</div>
-                <v-form ref="loginForm" lazy-validation>
-                  <!-- 表单 [注：登录表单包含密码输入框，chrome密码自动填充的时候会与vuetify的v-input组件样式冲突，使用原生input避免冲突] -->
-                  <v-row class="my-0">
-                    <v-col cols="12">
-                      <input class="jh-cus-input" v-model="userId" placeholder="用户名"/>
-                    </v-col>
-                    <v-col cols="12">
-                      <div class="password-wrapper">
-                        <input
-                          class="jh-cus-input"
-                          v-model="password"
-                          :type="isPasswordShown ? 'text' : 'password'"
-                          data-type="password"
-                          @keyup.enter.exact="doUiAction('login')"
-                          placeholder="密码"
-                        />
-                        <v-icon @click="isPasswordShown = !isPasswordShown" small class="mdi-eye">{{isPasswordShown ? 'mdi-eye-off-outline' : 'mdi-eye-outline'}}</v-icon>
-                      </div>
-                    </v-col>
-                    <v-col cols="12" v-if="captchaSvg">
-                      <div class="captcha-wrapper">
-                        
-                        <div 
-                          class="captcha-image" 
-                          @click="getCaptcha" 
-                          title="点击刷新验证码"
-                        >
-                          <img :src="captchaSvg" class="captcha-img" alt="验证码" />
+                
+                <!-- 第一步：用户名密码登录 -->
+                <div v-if="loginStep === 1">
+                  <div class="title">登录您的账户</div>
+                  <v-form ref="loginForm" lazy-validation>
+                    <!--表单 [注：登录表单包含密码输入框，chrome密码自动填充的时候会与vuetify的v-input组件样式冲突，使用原生input避免冲突]-->
+                    <v-row class="my-0">
+                      <v-col cols="12">
+                        <input class="jh-cus-input" v-model="userId" placeholder="用户名"/>
+                      </v-col>
+                      <v-col cols="12">
+                        <div class="password-wrapper">
+                          <input
+                            class="jh-cus-input"
+                            v-model="password"
+                            :type="isPasswordShown ? 'text' : 'password'"
+                            data-type="password"
+                            @keyup.enter.exact="doUiAction('login')"
+                            placeholder="密码"
+                          />
+                          <v-icon @click="isPasswordShown = !isPasswordShown" small class="mdi-eye">{{isPasswordShown ? 'mdi-eye-off-outline' : 'mdi-eye-outline'}}</v-icon>
                         </div>
-                        <div>=</div>
-                        <input
-                          class="jh-cus-input captcha-input"
-                          v-model="captchaCode"
-                          type="text"
-                          placeholder="验证码"
-                        />
-                      </div>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-checkbox class="jh-v-input" dense single-line filled v-model="isRememberPassword" color="primary" label="记住密码"/>
-                    </v-col>
+                      </v-col>
+                      <v-col cols="12" v-if="captchaSvg">
+                        <div class="captcha-wrapper">
+                          <div 
+                            class="captcha-image" 
+                            @click="getCaptcha" 
+                            title="点击刷新验证码"
+                          >
+                            <img :src="captchaSvg" class="captcha-img" alt="验证码" />
+                          </div>
+                          <div>=</div>
+                          <input
+                            class="jh-cus-input captcha-input"
+                            v-model="captchaCode"
+                            type="text"
+                            placeholder="验证码"
+                          />
+                        </div>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-checkbox class="jh-v-input" dense single-line filled v-model="isRememberPassword" color="success" label="记住密码"/>
+                      </v-col>
+                    </v-row>
+                    <!--操作按钮-->
+                    <v-row class="my-0 px-3">
+                      <v-btn block color="success" @click="doUiAction('login')" small :loading="isLoggingIn">登录</v-btn>
+                    </v-row>
+                  </v-form>
+                </div>
+
+                <!-- 第二步：MFA验证 -->
+                <div v-if="loginStep === 2">
+                  <div class="title mb-4">二次验证</div>
+                  <div class="text-center mb-4">
+                    <v-icon large color="primary">mdi-shield-key-outline</v-icon>
+                    <div class="mt-2 text-body-2">请输入Microsoft Authenticator中的验证码</div>
+                    <div class="mt-1 text-caption text--secondary">验证码每30秒更新一次</div>
+                  </div>
+                  
+                  <!-- MFA验证组件 -->
+                  <mfa-verification-component
+                    :challenge-id="mfaChallengeId"
+                    page-id="login"
+                    action-id="verifyMfaLogin"
+                    submit-button-text="登录"
+                    :show-timer="false"
+                    @verification-success="onMfaLoginSuccess"
+                    @verification-failed="onMfaLoginFailed"
+                    @challenge-expired="onMfaLoginExpired"
+                    @max-retry-exceeded="onMfaLoginExpired"
+                    @system-error="onMfaLoginFailed"
+                  ></mfa-verification-component>
+                  
+                  <v-row class="my-2 px-3">
+                    <v-btn block text small @click="doUiAction('backToStep1')">
+                      <v-icon left small>mdi-arrow-left</v-icon>
+                      返回重新输入密码
+                    </v-btn>
                   </v-row>
-                  <!-- 操作按钮 -->
+                </div>
+
+                <!-- 需要绑定MFA提示 -->
+                <div v-if="loginStep === 3">
+                  <div class="title mb-4">需要绑定MFA</div>
+                  <v-alert type="info" class="mb-4">
+                    <div class="text-h6">🛡️ 安全提醒</div>
+                    <div class="mt-2">系统已启用多因子认证(MFA)，请先绑定Microsoft Authenticator应用。</div>
+                  </v-alert>
+                  
                   <v-row class="my-0 px-3">
-                    <v-btn block color="primary" @click="doUiAction('login')" small>登录</v-btn>
+                    <v-btn block color="primary" @click="redirectToPreMfaLoginURL" small>
+                      前往绑定MFA
+                    </v-btn>
                   </v-row>
-                </v-form>
+                  <v-row class="my-2 px-3">
+                    <v-btn block text small @click="doUiAction('backToStep1')">
+                      <v-icon left small>mdi-arrow-left</v-icon>
+                      返回登录
+                    </v-btn>
+                  </v-row>
+                </div>
+
               </v-card-text>
             </v-card>
           </v-col>
@@ -77,12 +133,13 @@
 
 {% endblock %}
 
-
 {% block vueScript %}
 
-<!-- 加载页面组件 >>>>>>>>>>>>> -->
+<!-- 加载页面组件 -->
 {% include 'utility/jianghuJs/prepareDeviceIdV4.html' %}
-<!-- <<<<<<<<<<<<< 加载页面组件 -->
+
+<!-- 引入MFA验证组件 -->
+{% include 'component/mfaVerification.html' %}
 
 <script type="module">
   new Vue({
@@ -93,20 +150,30 @@
     components: {},
     data() {
       return {
+        // 登录步骤: 1-用户名密码, 2-MFA验证, 3-需要绑定MFA
+        loginStep: 1,
         userId: '',
         password: '',
         isPasswordShown: false,
         isRememberPassword: true,
-
+        isLoggingIn: false,
+        
+        // MFA相关数据
+        mfaChallengeId: null,
+        loginResult: null,
+        redirectUrl: null,
+        
+        // 验证码相关数据
         // 验证码
         enableLoginCaptcha: '<$ ctx.app.config.jianghuConfig.enableLoginCaptcha $>' === 'true',
-        captchaCode: '',
-        captchaSvg: ''
+
+        captchaSvg: '',
+        captchaCode: ''
       };
     },
-    mounted() {
-      this.doUiAction('getUrlObj');
-      this.doUiAction('getCaptcha');
+    async mounted() {
+      await this.doUiAction('getUrlObj');
+      await this.doUiAction('getCaptcha');
     },
     methods: {
       async doUiAction(uiActionId, uiActionData) {
@@ -119,17 +186,20 @@
             break;
           case 'login':
             await this.prepareLoginData();
-            await this.doLogin();
-            await this.setLocalStorage();
-            await this.redirectToPreLoginURL();
+            await this.doMfaPasswordLogin();
+            break;
+          case 'backToStep1':
+            await this.backToStep1();
             break;
           default:
-            console.error("[doUiAction] uiActionId not find", { uiActionId });
+            console.error("[doUiAction] uiActionId not found", { uiActionId });
             break;
         }
       },
 
-      // ---------- getUrlObj uiAction >>>>>>>>>> --------
+      /**
+       * 获取URL参数
+       */
       async getUrlObj() {
         const urlObj = new URLSearchParams(location.search);
 
@@ -139,17 +209,24 @@
 
         this.redirectUrl = urlObj.get('redirectUrl');
       },
-      // ---------- <<<<<<<<<<< getUrlObj uiAction  --------
 
-      // ---------- login uiAction >>>>>>>>>> --------
+      /**
+       * 准备登录数据
+       */
       async prepareLoginData() {
         this.deviceId = window.deviceId;
-        this.userId = _.replace(this.userId, /\s+/g, '');;
+        this.userId = _.replace(this.userId, /\s+/g, '');
         this.password = _.toString(this.password);
       },
-      async doLogin() {
+
+      /**
+       * 执行MFA密码登录
+       */
+      async doMfaPasswordLogin() {
+        this.isLoggingIn = true;
+        
         try {
-          const resultData = (await window.jianghuAxios({
+          const result = (await window.jianghuAxios({
             data: {
               appData: {
                 pageId: 'login',
@@ -157,64 +234,144 @@
                 actionData: {
                   userId: this.userId,
                   password: this.password,
-                  captchaCode: this.captchaCode,
-                  deviceId: this.deviceId
+                  deviceId: this.deviceId,
+                  captchaCode: this.captchaCode
                 },
               }
             }
           })).data.appData.resultData;
-          this.loginResult = resultData;
 
-          window.vtoast.success('登录成功');
+          if (result.success && !result.needBind) {
+            // 情况A: 直接登录成功（无需MFA）
+            this.loginResult = result;
+            await this.setLocalStorage();
+            await this.redirectToPreLoginURL();
+            window.vtoast.success('登录成功');
+          } else if (result.success && result.needBind) {
+            // 情况B: 登录成功但需要绑定MFA - 先保存登录信息，然后跳转到绑定页面
+            this.loginResult = result;
+            await this.setLocalStorage();
+            await this.redirectToPreMfaLoginURL();
+            window.vtoast.success('登录成功，请绑定MFA');
+          } else if (result.needMfa) {
+            // 情况C: 需要MFA验证
+            this.mfaChallengeId = result.challengeId;
+            this.loginStep = 2;
+            window.vtoast.success('密码验证成功，请输入MFA验证码');
+          } else {
+            // 其他错误情况
+            window.vtoast.fail(result.message || '登录失败');
+          }
         } catch (error) {
+          console.error('登录失败:', error);
           this.getCaptcha();
           const { errorCode, errorReason } = error || {};
           if (errorCode) {
             window.vtoast.fail(errorReason);
-            throw new Error("登录失败", { errorCode, errorReason });
           } else {
-            window.vtoast.fail('登录失败');
-            throw new Error("登录失败");
+            window.vtoast.fail('登录失败，请检查用户名和密码');
           }
+        } finally {
+          this.isLoggingIn = false;
         }
       },
+      
+      /**
+       * 获取验证码
+       */
       async getCaptcha() {
         if (!this.enableLoginCaptcha) {
           return;
         }
-        const result = await window.jianghuAxios({
-          data: {
-            appData: {
-              pageId: 'login',
-              actionId: 'getLoginCaptcha',
-              actionData: {
-                deviceId: window.deviceId
+        try {
+          const result = await window.jianghuAxios({
+            data: {
+              appData: {
+                pageId: 'login',
+                actionId: 'getLoginCaptcha',
+                actionData: {
+                  deviceId: window.deviceId
+                }
               }
             }
+          });
+          let captchaSvg = result.data.appData.resultData;
+          if (captchaSvg) {
+            this.captchaSvg = captchaSvg;
+            this.captchaCode = '';
           }
-        });
-        let captchaSvg = result.data.appData.resultData;
-        if (captchaSvg) {
-          this.captchaSvg = captchaSvg;
-          this.captchaCode = '';
+        } catch (error) {
+          console.error('获取验证码失败:', error);
         }
       },
-      async setLocalStorage() {
-        localStorage.setItem(`${window.appInfo.authTokenKey}_authToken`, this.loginResult.authToken);
-        localStorage.setItem(`${window.appInfo.authTokenKey}_userId`, this.loginResult.userId);
-        localStorage.setItem(`${window.appInfo.authTokenKey}_deviceId`, this.deviceId);
+
+      /**
+       * 返回第一步
+       */
+      async backToStep1() {
+        this.loginStep = 1;
+        this.mfaChallengeId = null;
+        this.password = ''; // 清空密码，增加安全性
       },
+
+      /**
+       * 设置本地存储
+       */
+      async setLocalStorage() {
+        if (this.loginResult) {
+          localStorage.setItem(`${window.appInfo.appId}_authToken`, this.loginResult.authToken);
+          localStorage.setItem(`${window.appInfo.appId}_userId`, this.loginResult.userId);
+          localStorage.setItem(`${window.appInfo.appId}_deviceId`, this.deviceId);
+        }
+      },
+
+      /**
+       * 重定向到登录前页面
+       */
       async redirectToPreLoginURL() {
         let redirectTo = `/${window.appInfo.appId}`;
         if (this.redirectUrl) {
           redirectTo = decodeURIComponent(this.redirectUrl);
         }
         window.location.href = redirectTo;
-      }
-      // ---------- <<<<<<<<<<< login uiAction  --------
+      },
+
+      async redirectToPreMfaLoginURL() {
+        let redirectTo = `/${window.appInfo.appId}`;
+        if (this.redirectUrl) {
+          redirectTo = decodeURIComponent(this.redirectUrl);
+          // 添加MFA参数到重定向URL
+          if (redirectTo.indexOf('?') > -1) {
+            redirectTo += '&mfa=true';
+          } else {
+            redirectTo += '?mfa=true';
+          }
+        }
+        window.location.href = redirectTo;
+      },
+
+      // ========== MFA组件事件处理器 ==========
+      onMfaLoginSuccess(result) {
+        this.loginResult = result;
+        this.setLocalStorage();
+        this.redirectToPreLoginURL();
+        window.vtoast.success('登录成功');
+      },
+
+      onMfaLoginFailed(error) {
+        console.error('MFA验证失败:', error);
+        // MFA验证失败，用户可以重试，不需要特殊处理
+      },
+
+      onMfaLoginExpired() {
+        window.vtoast.fail('验证已过期，请重新登录');
+        this.doUiAction('backToStep1');
+      },
+
     }
   });
 </script>
+
 <style scoped>
   .login-form-card {
     width: 400px;
@@ -235,7 +392,7 @@
   .jh-cus-input:focus,
   .jh-cus-input:focus-visible,
   input:focus-visible {
-    border: thin solid var(--cPrimaryColor) !important;
+    border: thin solid #4caf50 !important;
   }
 
   /* ---------- <<<<<<<<<<< 输入框 -------- */
@@ -253,31 +410,33 @@
 
   /* ---------- <<<<<<<<<<< 密码框 -------- */
 
-  /* ---------- 验证码 >>>>>>>>>> -------- */
+  /* ---------- 验证码框 >>>>>>>>>> -------- */
   .captcha-wrapper {
     display: flex;
-    gap: 10px;
     align-items: center;
+    gap: 8px;
   }
-  .captcha-input {
-    flex: 1;
-  }
+
   .captcha-image {
-    width: 120px;
-    height: 32px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f5f5f5;
+    border: 1px solid rgba(0, 0, 0, .06);
     border-radius: 4px;
     overflow: hidden;
+    min-width: 80px;
+    height: 32px;
   }
+
   .captcha-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  /* ---------- <<<<<<<<<<< 验证码 -------- */
+
+  .captcha-input {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  /* ---------- <<<<<<<<<<< 验证码框 -------- */
 </style>
 {% endblock %}
