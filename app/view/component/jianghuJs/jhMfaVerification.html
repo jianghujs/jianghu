@@ -1,0 +1,204 @@
+<!-- MFA验证组件 -->
+<script type="text/html" id="mfa-verification-component">
+<div>
+  <v-form @submit.prevent="submitMfaCode" ref="mfaForm">
+    <div class="text-center">
+      <v-text-field
+        v-model="mfaCode"
+        prepend-inner-icon="mdi-shield-key"
+        prefix="验证码"
+        placeholder="请输入6位验证码"
+        placeholder="000000"
+        :rules="mfaCodeRules"
+        maxlength="6"
+        outlined
+        class="text-center"
+        :disabled="isSubmitting"
+      >
+      </v-text-field>
+      
+      <!-- 倒计时显示 -->
+      <div v-if="timeRemaining > 0 && showTimer" class="text-caption text--secondary mb-2">
+        验证码有效期：{{ Math.floor(timeRemaining / 60) }}:{{ (timeRemaining % 60).toString().padStart(2, '0') }}
+      </div>
+      
+      <!-- 重试次数显示 -->
+      <div v-if="retryMessage" class="text-caption text--warning mb-2">
+        {{ retryMessage }}
+      </div>
+      
+      <v-btn 
+        type="submit"
+        :color="submitButtonColor"
+        :loading="isSubmitting"
+        :disabled="!mfaCode || mfaCode.length !== 6"
+        :block="submitButtonBlock"
+      >
+        {{ submitButtonText }}
+      </v-btn>
+    </div>
+  </v-form>
+</div>
+</script>
+
+<script>
+// MFA验证组件
+Vue.component('mfa-verification-component', {
+  template: '#mfa-verification-component',
+  props: {
+    challengeId: {
+      type: String,
+      required: true
+    },
+    pageId: {
+      type: String,
+      default: 'bindMfaApp'
+    },
+    actionId: {
+      type: String,
+      default: 'verifyMfaCode'
+    },
+    showTimer: {
+      type: Boolean,
+      default: true
+    },
+    timerDuration: {
+      type: Number,
+      default: 300 // 5分钟
+    },
+    submitButtonText: {
+      type: String,
+      default: '验证并绑定'
+    },
+    submitButtonColor: {
+      type: String,
+      default: 'primary'
+    },
+    submitButtonBlock: {
+      type: Boolean,
+      default: true
+    }
+  },
+  data() {
+    return {
+      mfaCode: '',
+      isSubmitting: false,
+      retryMessage: '',
+      timeRemaining: this.timerDuration,
+      timer: null,
+      mfaCodeRules: [
+        v => !!v || '请输入6位验证码',
+        v => (v && v.length === 6) || '验证码必须是6位数字',
+        v => /^\d+$/.test(v) || '验证码只能包含数字'
+      ]
+    }
+  },
+  mounted() {
+    if (this.showTimer) {
+      this.startTimer();
+    }
+  },
+  beforeDestroy() {
+    this.clearTimer();
+  },
+  watch: {
+    challengeId(newVal) {
+      // 当challengeId变化时，重置组件状态
+      if (newVal) {
+        this.resetComponent();
+      }
+    }
+  },
+  methods: {
+    startTimer() {
+      this.timeRemaining = this.timerDuration;
+      this.clearTimer(); // 确保没有重复的timer
+      
+      this.timer = setInterval(() => {
+        this.timeRemaining--;
+        if (this.timeRemaining <= 0) {
+          this.clearTimer();
+          this.$emit('timer-expired');
+        }
+      }, 1000);
+    },
+    
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
+    
+    resetComponent() {
+      this.mfaCode = '';
+      this.isSubmitting = false;
+      this.retryMessage = '';
+      
+      if (this.showTimer) {
+        this.startTimer();
+      }
+    },
+    
+    async submitMfaCode() {
+      if (!this.$refs.mfaForm.validate()) {
+        return;
+      }
+      
+      this.isSubmitting = true;
+      this.retryMessage = '';
+      
+      try {
+        // 使用props传入的pageId和actionId，提供更好的灵活性
+        const result = (await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: this.pageId,
+              actionId: this.actionId,
+              actionData: {
+                challengeId: this.challengeId,
+                mfaCode: this.mfaCode
+              }
+            }
+          }
+        })).data.appData.resultData;
+        
+        if (result.success) {
+          this.clearTimer();
+          this.$emit('verification-success', result);
+        } else {
+          // 处理验证失败
+          if (result.errorType === 'CHALLENGE_EXPIRED') {
+            this.clearTimer();
+            this.$emit('challenge-expired', result);
+          } else if (result.errorType === 'MAX_RETRY_EXCEEDED') {
+            this.clearTimer();
+            this.$emit('max-retry-exceeded', result);
+          } else {
+            this.retryMessage = result.errorReason || result.message || '验证失败';
+            this.mfaCode = ''; // 清空输入框
+            this.$emit('verification-failed', result);
+          }
+        }
+      } catch (error) {
+        console.error('MFA验证失败:', error);
+        this.retryMessage = '系统错误，请稍后重试';
+        this.$emit('system-error', error);
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+    
+    // 公共方法：重置验证码输入
+    clearMfaCode() {
+      this.mfaCode = '';
+      this.retryMessage = '';
+    },
+    
+    // 公共方法：设置错误消息
+    setErrorMessage(message) {
+      this.retryMessage = message;
+    }
+  }
+});
+</script>
