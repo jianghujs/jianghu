@@ -29,11 +29,15 @@ module.exports.idPlus = async ({ knex, tableName, columnName, startValue=10000, 
   if (!knex || !tableName || !columnName) {
     throw new Error("idPlus, 数据异常");
   }
-  const maxBizIdResult = await knex(tableName)
-    .max(columnName, {
-      as: "maxBizId",
-    })
-    .first();
+  // const maxBizIdResult = await knex(tableName)
+  //   .max(columnName, {
+  //     as: "maxBizId",
+  //   })
+  //   .first();
+  
+  // Knex的max某些情况获取不到最大id值，改成原生写法
+  const [maxBizIdResultRaw] = await knex.raw(`SELECT MAX(??) as maxBizId FROM ??`, [columnName, tableName]);
+  const maxBizIdResult = Array.isArray(maxBizIdResultRaw) ? maxBizIdResultRaw[0] : maxBizIdResultRaw;
 
   if (!maxBizIdResult.maxBizId) {
     return startValue;
