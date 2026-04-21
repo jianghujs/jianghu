@@ -218,7 +218,12 @@ async function buildWhereConditionFromAppData({
     whereOrOptionsPart += '.where(function() { this';
     whereOrOptions.forEach(whereOrOption => {
       if (whereOrOption.length === 3) {
-        whereOrOptionsPart += `.orWhere('${whereOrOption[0]}', '${whereOrOption[1]}', '${whereOrOption[2]}')`;
+        // 如果 whereOrOption[2] 是非字符串
+        if (whereOrOption[1] === 'in' && _.isArray(whereOrOption[2])) {
+          whereOrOptionsPart += `.orWhere('${whereOrOption[0]}', '${whereOrOption[1]}', [${whereOrOption[2].map(item => "'" + item + "'").join(',')}])`;
+        } else {
+          whereOrOptionsPart += `.orWhere('${whereOrOption[0]}', '${whereOrOption[1]}', '${whereOrOption[2]}')`;
+        }
       } else if (whereOrOption.length === 2) {
         whereOrOptionsPart += `.orWhere('${whereOrOption[0]}', '${whereOrOption[1]}')`;
       } else {
