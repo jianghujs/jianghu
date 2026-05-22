@@ -77,8 +77,8 @@ module.exports.middlewareMatch = {
     },
   },
   accessAuth: {
-    match() {
-      return true;
+    match(ctx) {
+      return ctx.app.config.jianghuConfig.enableAccessAuth;
     }
   }
 };
