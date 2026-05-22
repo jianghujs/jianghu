@@ -77,7 +77,7 @@ module.exports.middlewareMatch = {
     },
   },
   accessAuth: {
-    match(ctx) {
+    match() {
       return true;
     }
   }
