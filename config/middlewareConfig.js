@@ -78,8 +78,7 @@ module.exports.middlewareMatch = {
   },
   accessAuth: {
     match(ctx) {
-      return (ctx.request.method === 'GET' || ctx.request.method === 'HEAD')
-        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/page/`);
+      return true;
     }
   }
 };
