@@ -8,7 +8,10 @@ module.exports.middleware = [
   // /pageDoc/*
   'pageDocUserInfo',
   // /resource/*
-  'httpPackage',  'httpUserInfo', 'httpAuthorization', 'httpProxy', 'httpResourceHook' ];
+  'httpPackage',  'httpUserInfo', 'httpAuthorization', 'httpProxy', 'httpResourceHook',
+  // /*
+  'accessAuth'
+];
 
 module.exports.middlewareMatch = {
   pagePackage: {
@@ -73,4 +76,10 @@ module.exports.middlewareMatch = {
       return ctx.request.path === `/${ctx.app.config.appId}/resource`;
     },
   },
+  accessAuth: {
+    match(ctx) {
+      return (ctx.request.method === 'GET' || ctx.request.method === 'HEAD')
+        && ctx.request.path.startsWith(`/${ctx.app.config.appId}/page/`);
+    }
+  }
 };

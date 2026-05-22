@@ -79,6 +79,12 @@ module.exports = appInfo => {
       ipBlocklist: [],
       ipBlocklistFilePath: '',
 
+      // 访问鉴权配置 
+      enableAccessAuth: false,
+      accessAuthSecret: 'dev-secret-change-in-production',
+      accessAuthTimestampWindow: 300, // 签名有效期 5 分钟
+      accessAppName: '指定应用',
+
       // jhId 配置，用于多应用使用同个数据库场景
       jhIdConfig: {
         // 是否开启
