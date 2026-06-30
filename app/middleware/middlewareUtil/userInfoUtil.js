@@ -167,6 +167,7 @@ module.exports = {
         .leftJoin('_role', '_user_group_role.roleId', '_role.roleId')
         .leftJoin('_group', '_user_group_role.groupId', '_group.groupId')
         .where('userId', userId)
+        .distinct()
         .select(
           '_user_group_role.userId AS userId',
           '_user_group_role.groupId AS groupId',
