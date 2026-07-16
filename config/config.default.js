@@ -50,6 +50,14 @@ module.exports = appInfo => {
         `${appPackageName}.html`, `${appPackageName}.resource`, `${appPackageName}-web`, `${appPackageName}.html`,
       ],
 
+      // 自动清理操作记录，仅保留最近 N 天的数据
+      recordHistoryCleanup: {
+        enabled: false,
+        retentionDays: 30,
+        cron: '0 30 3 * * *',
+        batchSize: 1000,
+      },
+
       // websocket 开关
       enableSocket: false,
 
