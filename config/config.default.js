@@ -54,8 +54,11 @@ module.exports = appInfo => {
       recordHistoryCleanup: {
         enabled: false,
         retentionDays: 30,
-        cron: '0 30 3 * * *',
+        cron: '0 30 3 * * 0',
         batchSize: 1000,
+        // 清理前是否将删除内容归档为 JSON 文件
+        archiveEnabled: false,
+        archiveDir: path.join(appInfo.baseDir, 'upload', 'record_history_archive'),
       },
 
       // websocket 开关
