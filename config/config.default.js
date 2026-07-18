@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const { httpResponse } = require('../app/constant/constant');
 const { errorInfoEnum } = require('../app/constant/error');
@@ -9,7 +9,7 @@ module.exports = appInfo => {
 
   const config = {
     appId: appPackageName,
-    authTokenKey: null,
+    authTokenKey: appPackageName,
     keys: `${appPackageName}_1638108566009`,
     appTitle: '第一个应用',
     appLogo: `${appPackageName}/public/img/logo.svg`,
@@ -125,6 +125,14 @@ module.exports = appInfo => {
       enableLoginCaptcha: false,      // 启用验证码
       loginLimitAttemptCount: 5,     // 限制登录尝试次数
       loginLimitTime: 300,           // 锁定时间（秒）
+
+      // MFA 登录认证配置
+      enableMfaVerification: false,      // 启用 MFA
+      enableMfaRecoveryCode: true,       // 启用 MFA 恢复码
+      mfaServiceIssuer: appPackageName,  // MFA 登录认证服务名称
+      mfaTableName: '_user_mfa',         // MFA 登录认证表名
+      mfaSecretEncryptKey: `${appPackageName}_mfa_secret_key`,  // MFA 登录认证密钥加密密钥
+      mfaPendingLoginExpireSeconds: 300,  // MFA 登录认证等待时间（秒）
       
     },
 
@@ -268,3 +276,4 @@ module.exports = appInfo => {
     ...config,
   };
 };
+

@@ -179,6 +179,10 @@
           })).data.appData.resultData;
 
           this.loginResult = result;
+          if (result.needMfaBind || result.needMfaVerify) {
+            await this.redirectToMfaPage(result);
+            return;
+          }
           await this.setLocalStorage();
           await this.redirectToPreLoginURL();
           window.vtoast.success('登录成功');
@@ -245,6 +249,16 @@
           redirectTo = decodeURIComponent(this.redirectUrl);
         }
         window.location.href = redirectTo;
+      },
+
+      async redirectToMfaPage(result) {
+        const pageId = result.needMfaBind ? 'mfaBind' : 'mfaVerify';
+        const query = new URLSearchParams({
+          pendingLoginId: result.pendingLoginId,
+          deviceId: this.deviceId,
+          redirectUrl: this.redirectUrl || `/${window.appInfo.appId}`,
+        });
+        window.location.href = `/${window.appInfo.appId}/page/${pageId}?${query.toString()}`;
       },
 
     }

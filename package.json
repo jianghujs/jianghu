@@ -21,7 +21,9 @@
         "mime": "3.0.0",
         "mysql2": "^2.3.3",
         "nanoid": "3.3.1",
-        "tnwx": "^2.5.6"
+        "tnwx": "^2.5.6",
+        "speakeasy": "^2.0.0",
+        "qrcode": "^1.5.4"
     },
     "devDependencies": {
         "@socket.io/redis-adapter": "^7.1.0",

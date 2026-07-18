@@ -127,6 +127,11 @@ class UserService extends Service {
       throw new BizError(errorInfoEnum.user_password_error);
     }
 
+    const { enableMfaVerification } = config.jianghuConfig;
+    if (enableMfaVerification) {
+      return await this.ctx.service.mfa._buildLoginMfaResult({ user, deviceId, deviceType, needSetCookies });
+    }
+
     return await this.handleLoginSuccess(user, deviceId, deviceType, needSetCookies);
   }
 
@@ -217,7 +222,7 @@ class UserService extends Service {
 
     // 设置 cookies，用于 page 鉴权
     if (needSetCookies) {
-      this.ctx.cookies.set(`${this.ctx.app.config.appId}_authToken`, authToken, {
+      this.ctx.cookies.set(`${config.authTokenKey}_authToken`, authToken, {
         httpOnly: false,
         signed: false,
         maxAge: 1000 * 60 * 60 * 24 * 1080,
@@ -361,3 +366,5 @@ class UserService extends Service {
 }
 
 module.exports = UserService;
+
+
