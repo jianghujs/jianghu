@@ -9,7 +9,7 @@ module.exports = app => {
 
   return {
     schedule: {
-      immediate: true,
+      immediate: !!recordHistoryCleanup.immediate,
       cron: recordHistoryCleanup.cron,
       type: 'worker', // worker: 只有一个 worker 执行
       disable: !recordHistoryCleanup.enabled,

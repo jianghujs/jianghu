@@ -56,8 +56,10 @@ module.exports = appInfo => {
         retentionDays: 30,
         cron: '0 30 3 * * 0',
         batchSize: 1000,
+        // 应用启动后是否立即执行一次
+        immediate: false,
         // 清理前是否将删除内容归档为 JSON 文件
-        archiveEnabled: false,
+        archiveEnabled: true,
         archiveDir: path.join(appInfo.baseDir, 'upload', 'record_history_archive'),
       },
 
