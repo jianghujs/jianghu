@@ -9,7 +9,7 @@ module.exports = appInfo => {
 
   const config = {
     appId: appPackageName,
-    authTokenKey: appPackageName,
+    authTokenKey: null,
     keys: `${appPackageName}_1638108566009`,
     appTitle: '第一个应用',
     appLogo: `${appPackageName}/public/img/logo.svg`,
