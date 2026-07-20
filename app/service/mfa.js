@@ -4,6 +4,7 @@ const Service = require('egg').Service;
 const dayjs = require('dayjs');
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');
+const _ = require('lodash');
 const validateUtil = require('../common/validateUtil');
 const mfaUtil = require('../common/mfaUtil');
 const idGenerateUtil = require('../common/idGenerateUtil');
@@ -123,7 +124,7 @@ class MfaService extends Service {
     }
     const record = {
       userId: pendingLogin.userId,
-      mfaEnabled: 1,
+      mfaEnabled: '是',
       encryptedSecret: mfaUtil.encryptSecret({ encryptKey, secret: pendingLogin.mfaSecret }),
       recoveryCodeHash,
       bindAt: dayjs().format(),
@@ -199,7 +200,7 @@ class MfaService extends Service {
     await jianghuKnex(tableName, this.ctx)
       .where({ userId: pendingLogin.userId })
       .jhUpdate({
-        mfaEnabled: 0,
+        mfaEnabled: '否',
         encryptedSecret: null,
         recoveryCodeHash: null,
         resetAt: dayjs().format(),
@@ -300,7 +301,7 @@ class MfaService extends Service {
 
   // 判断 MFA 记录是否处于可用状态。
   _isEnabledMfaRecord(mfaRecord) {
-    return !!(mfaRecord && Number(mfaRecord.mfaEnabled) === 1 && mfaRecord.encryptedSecret);
+    return !!(mfaRecord && _.includes([ 1, '1', true, 'true', '是' ], mfaRecord.mfaEnabled) && mfaRecord.encryptedSecret);
   }
 
   // 完成 pending login，走 user service 的成功登录流程。
