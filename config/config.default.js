@@ -132,7 +132,7 @@ module.exports = appInfo => {
       loginLimitTime: 300,           // 锁定时间（秒）
 
       // MFA 登录认证配置
-      enableMfaVerification: false,      // 启用 MFA
+      enableMfaVerification: false,      // 启用 MFA，启用前需要配置数据库：node_modules\@jianghujs\jianghu\test\sql-patches\20260718_mfa_backfill.sql
       enableMfaRecoveryCode: false,       // 启用 MFA 恢复码
       mfaServiceIssuer: appPackageName,  // MFA 登录认证服务名称
       mfaTableName: '_user_mfa',         // MFA 登录认证表名
