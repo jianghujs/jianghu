@@ -7,7 +7,7 @@ SET NAMES utf8mb4;
 CREATE TABLE IF NOT EXISTS `_user_mfa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` varchar(255) DEFAULT NULL COMMENT '用户id',
-  `mfaEnabled` int(11) DEFAULT '否' COMMENT '是否启用MFA; 是、否',
+  `mfaEnabled` varchar(255) DEFAULT '否' COMMENT '是否启用MFA; 是、否',
   `encryptedSecret` text COMMENT '加密后的TOTP secret',
   `recoveryCodeHash` varchar(255) DEFAULT NULL COMMENT '恢复码hash',
   `bindAt` varchar(255) DEFAULT NULL COMMENT '绑定时间',
