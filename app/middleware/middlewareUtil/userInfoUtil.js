@@ -38,7 +38,7 @@ async function getUserFromJwtAuthToken(authToken, jianghuKnex, xiaochengxuUserId
   }
 
   // 检查非小程序用户的authToken是否即将过期：有效期不到一半，就更新authToken
-  if (enableAutoRenewAuthToken && userSession.deviceId !== 'from_xiaochengxu') {
+  if (enableAutoRenewAuthToken && userSession && userSession.deviceId !== 'from_xiaochengxu') {
 
     // 计算userSession.operationAt与当前时间的差值，如果差值大于authTokenMaxAge的一半，则更新authToken，否则不更新
     const diff = dayjs().diff(dayjs(userSession.operationAt || ''), 'ms');

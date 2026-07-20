@@ -135,6 +135,10 @@ const errorInfoEnum = Object.freeze({
     errorCode: 'mfa_not_enabled',
     errorReason: 'MFA 未启用',
   },
+  mfa_binding_disabled: {
+    errorCode: 'mfa_binding_disabled',
+    errorReason: '未绑定MFA认证器，请联系管理员绑定',
+  },
   mfa_recovery_code_not_enabled: {
     errorCode: 'mfa_recovery_code_not_enabled',
     errorReason: 'MFA 恢复码未启用',

@@ -232,7 +232,17 @@ class MfaService extends Service {
     if (this._isEnabledMfaRecord(mfaRecord)) {
       return { needMfaVerify: true, pendingLoginId, userId: user.userId, deviceId };
     }
+    if (!mfaConfig.enableBind) {
+      throw this._buildMfaBindDisabledError();
+    }
     return { needMfaBind: true, pendingLoginId, userId: user.userId, deviceId };
+  }
+  _buildMfaBindDisabledError() {
+    const { unboundPrompt } = this._getMfaConfig();
+    return new BizError({
+      ...errorInfoEnum.mfa_binding_disabled,
+      errorReason: unboundPrompt,
+    });
   }
 
   // 读取 pending login，验证是否匹配当前 pendingLoginId。
@@ -264,12 +274,14 @@ class MfaService extends Service {
 
   _getMfaConfig() {
     const { appId, jianghuConfig = {} } = this.app.config;
-    const { mfaServiceIssuer, mfaTableName, mfaSecretEncryptKey, enableMfaRecoveryCode, mfaPendingLoginExpireSeconds } = jianghuConfig;
+    const { mfaServiceIssuer, mfaTableName, mfaSecretEncryptKey, enableMfaRecoveryCode, enableMfaBind, mfaUnboundPrompt, mfaPendingLoginExpireSeconds } = jianghuConfig;
     return {
       tableName: mfaTableName || '_user_mfa',
       viewName: '_view01_user_mfa',
       issuer: mfaServiceIssuer || appId,
       encryptKey: mfaSecretEncryptKey || `${appId}_mfa_secret_key`,
+      enableBind: enableMfaBind !== false,
+      unboundPrompt: mfaUnboundPrompt || errorInfoEnum.mfa_binding_disabled.errorReason,
       enableRecoveryCode: enableMfaRecoveryCode !== false,
       pendingExpireSeconds: mfaPendingLoginExpireSeconds || 300,
     };
