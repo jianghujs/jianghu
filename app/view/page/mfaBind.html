@@ -145,7 +145,7 @@ new Vue({
       authenticatorIphoneUrl: '',
       token: '',
       recoveryCode: '',
-      enableRecoveryCode: '<$ ctx.app.config.jianghuConfig.enableMfaRecoveryCode !== false $>' === 'true',
+      enableRecoveryCode: '<$ ctx.app.config.jianghuConfig.mfaAuthorization.enableRecoveryCode !== false $>' === 'true',
       isSubmitting: false,
       isConfirming: false,
       currentStep: 1,

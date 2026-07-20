@@ -137,15 +137,16 @@ module.exports = appInfo => {
       loginLimitTime: 300,           // 锁定时间（秒）
 
       // MFA 登录认证配置
-      enableMfaBind: true,           // 启用当前应用的 MFA 绑定功能
-      enableMfaVerification: false,      // 启用 MFA，启用前需要配置数据库：node_modules\@jianghujs\jianghu\test\sql-patches\20260718_mfa_backfill.sql
-      enableMfaRecoveryCode: false,       // 启用 MFA 恢复码
-      mfaUnboundPrompt: '未绑定MFA认证器，请联系管理员绑定',  // 当前应用不允许绑定时的未绑定提示词
-      mfaServiceIssuer: appPackageName,  // MFA 登录认证服务名称
-      mfaTableName: '_user_mfa',         // MFA 登录认证表名
-      mfaSecretEncryptKey: `${appPackageName}_mfa_secret_key`,  // MFA 登录认证密钥加密密钥
-      mfaPendingLoginExpireSeconds: 300,  // MFA 登录认证等待时间（秒）
-      
+      mfaAuthorization: {
+        enable: false,      // 启用 MFA，启用前需要配置数据库：node_modules\@jianghujs\jianghu\test\sql-patches\20260718_mfa_backfill.sql
+        enableBind: true,           // 启用当前应用的 MFA 绑定功能
+        enableRecoveryCode: false,       // 启用 MFA 恢复码
+        unboundPrompt: '未绑定MFA认证器，请联系管理员绑定',  // 当前应用不允许绑定时的未绑定提示词
+        serviceIssuer: appPackageName,  // MFA 登录认证服务名称
+        tableName: '_user_mfa',         // MFA 登录认证表名
+        secretEncryptKey: `${appPackageName}_mfa_secret_key`,  // MFA 登录认证密钥加密密钥
+        pendingLoginExpireSeconds: 300,  // MFA 登录认证等待时间（秒）
+      }
     },
 
     // https://eggjs.org/zh-cn/plugins/multipart.html
@@ -288,4 +289,3 @@ module.exports = appInfo => {
     ...config,
   };
 };
-

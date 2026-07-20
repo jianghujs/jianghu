@@ -274,16 +274,17 @@ class MfaService extends Service {
 
   _getMfaConfig() {
     const { appId, jianghuConfig = {} } = this.app.config;
-    const { mfaServiceIssuer, mfaTableName, mfaSecretEncryptKey, enableMfaRecoveryCode, enableMfaBind, mfaUnboundPrompt, mfaPendingLoginExpireSeconds } = jianghuConfig;
+    const { mfaAuthorization = {} } = jianghuConfig;
+    const { serviceIssuer, tableName, secretEncryptKey, enableRecoveryCode, enableBind, unboundPrompt, pendingLoginExpireSeconds } = mfaAuthorization;
     return {
-      tableName: mfaTableName || '_user_mfa',
+      tableName: tableName || '_user_mfa',
       viewName: '_view01_user_mfa',
-      issuer: mfaServiceIssuer || appId,
-      encryptKey: mfaSecretEncryptKey || `${appId}_mfa_secret_key`,
-      enableBind: enableMfaBind !== false,
-      unboundPrompt: mfaUnboundPrompt || errorInfoEnum.mfa_binding_disabled.errorReason,
-      enableRecoveryCode: enableMfaRecoveryCode !== false,
-      pendingExpireSeconds: mfaPendingLoginExpireSeconds || 300,
+      issuer: serviceIssuer || appId,
+      encryptKey: secretEncryptKey || `${appId}_mfa_secret_key`,
+      enableBind: enableBind !== false,
+      unboundPrompt: unboundPrompt || errorInfoEnum.mfa_binding_disabled.errorReason,
+      enableRecoveryCode: enableRecoveryCode !== false,
+      pendingExpireSeconds: pendingLoginExpireSeconds || 300,
     };
   }
 

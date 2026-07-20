@@ -73,7 +73,7 @@ new Vue({
       redirectUrl: '',
       token: '',
       recoveryCode: '',
-      enableRecoveryCode: '<$ ctx.app.config.jianghuConfig.enableMfaRecoveryCode !== false $>' === 'true',
+      enableRecoveryCode: '<$ ctx.app.config.jianghuConfig.mfaAuthorization.enableRecoveryCode !== false $>' === 'true',
       showRecovery: false,
       isSubmitting: false,
       isResetting: false,

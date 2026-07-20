@@ -127,8 +127,8 @@ class UserService extends Service {
       throw new BizError(errorInfoEnum.user_password_error);
     }
 
-    const { enableMfaVerification } = config.jianghuConfig;
-    if (enableMfaVerification) {
+    const { mfaAuthorization = {} } = config.jianghuConfig;
+    if (mfaAuthorization.enable) {
       return await this.ctx.service.mfa._buildLoginMfaResult({ user, deviceId, deviceType, needSetCookies });
     }
 
