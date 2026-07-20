@@ -1,0 +1,240 @@
+{% extends 'template/jhTemplateV4.html'%}
+
+{% block vueTemplate %}
+
+<script type="text/html" id="app-template">
+  <div>
+    <v-app>
+      <v-main>
+        <v-row class="align-center" style="min-height: 100vh">
+          <v-col cols="12" align="center">
+            <v-card class="mfa-card pa-8">
+              <v-card-text class="pa-0">
+                <div class="title font-weight-bold mb-4">MFA 验证</div>
+                <div class="caption grey--text mb-6">请输入验证器应用中当前显示的 6 位验证码。</div>
+
+                <div class="verification-box mb-6">
+                  <div class="code-input-wrap">
+                    <input
+                      class="jh-cus-input code-input"
+                      v-model="token"
+                      maxlength="6"
+                      placeholder="000000"
+                      @keyup.enter.exact="doUiAction('verifyMfaLogin')"
+                      autofocus
+                    />
+                    <div class="countdown-timer">
+                      <v-progress-circular :rotate="-90" :size="40" :width="3" :value="countdownPercent" color="success">
+                        {{ countdown }}
+                      </v-progress-circular>
+                    </div>
+                  </div>
+                </div>
+
+                <v-btn block color="success" @click="doUiAction('verifyMfaLogin')" :loading="isSubmitting" :disabled="token.length !== 6">
+                  验证并登录
+                </v-btn>
+
+                <div v-if="enableRecoveryCode" class="mt-6 text-center">
+                  <a href="javascript:void(0)" class="caption success--text" @click="showRecovery = !showRecovery">使用恢复码重置 MFA</a>
+                </div>
+                <div v-if="enableRecoveryCode && showRecovery" class="recovery-box mt-4">
+                  <input class="jh-cus-input recovery-code-input mb-3" v-model="recoveryCode" placeholder="AAAA-BBBB-CCCC-DDDD" @input="formatRecoveryCodeInput" @keyup.enter.exact="doUiAction('resetMfaByRecoveryCode')" />
+                  <v-btn block outlined color="warning" @click="doUiAction('resetMfaByRecoveryCode')" :loading="isResetting">
+                    重置并重新绑定
+                  </v-btn>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-main>
+    </v-app>
+    <jh-toast/>
+    <jh-mask/>
+    <jh-confirm-dialog/>
+  </div>
+</script>
+
+<div id="app"></div>
+
+{% endblock %}
+
+{% block vueScript %}
+{% include 'utility/jianghuJs/prepareDeviceIdV4.html' %}
+<script type="module">
+new Vue({
+  el: '#app',
+  template: '#app-template',
+  vuetify: new Vuetify(),
+  data() {
+    return {
+      pendingLoginId: '',
+      redirectUrl: '',
+      token: '',
+      recoveryCode: '',
+      enableRecoveryCode: '<$ ctx.app.config.jianghuConfig.enableMfaRecoveryCode !== false $>' === 'true',
+      showRecovery: false,
+      isSubmitting: false,
+      isResetting: false,
+      countdown: 30,
+      countdownPercent: 100,
+      timerInterval: null,
+    };
+  },
+  async mounted() {
+    await this.getUrlObj();
+    this.startCountdown();
+  },
+  beforeDestroy() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  },
+  methods: {
+    async doUiAction(uiActionId) {
+      switch (uiActionId) {
+        case 'verifyMfaLogin':
+          await this.verifyMfaLogin();
+          break;
+        case 'resetMfaByRecoveryCode':
+          await this.resetMfaByRecoveryCode();
+          break;
+        default:
+          console.error('[doUiAction] uiActionId not found', { uiActionId });
+      }
+    },
+    async getUrlObj() {
+      const urlObj = new URLSearchParams(location.search);
+      this.pendingLoginId = urlObj.get('pendingLoginId') || '';
+      this.redirectUrl = urlObj.get('redirectUrl') || `/${window.appInfo.appId}`;
+      if (!this.pendingLoginId) {
+        window.vtoast.fail('页面参数无效');
+      }
+    },
+    async verifyMfaLogin() {
+      if (!this.token || this.token.length !== 6) {
+        window.vtoast.fail('请输入 6 位验证码');
+        return;
+      }
+      this.isSubmitting = true;
+      try {
+        const result = (await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'mfaVerify',
+              actionId: 'verifyMfaLogin',
+              actionData: { pendingLoginId: this.pendingLoginId, deviceId: window.deviceId, token: this.token },
+            },
+          },
+        })).data.appData.resultData;
+        localStorage.setItem(`${window.appInfo.authTokenKey}_authToken`, result.authToken);
+        localStorage.setItem(`${window.appInfo.authTokenKey}_userId`, result.userId);
+        localStorage.setItem(`${window.appInfo.authTokenKey}_deviceId`, result.deviceId || window.deviceId);
+        window.vtoast.success('验证成功');
+        window.location.href = this.redirectUrl;
+      } catch (error) {
+        const { errorCode, errorReason } = error || {};
+        window.vtoast.fail(errorCode ? errorReason : '验证失败');
+        this.token = '';
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+    formatRecoveryCodeInput() {
+      const cleanRecoveryCode = this.recoveryCode.replace(/[^0-9a-zA-Z]/g, '').toUpperCase().slice(0, 16);
+      this.recoveryCode = cleanRecoveryCode.match(/.{1,4}/g)?.join('-') || '';
+    },
+    async resetMfaByRecoveryCode() {
+      if (!this.recoveryCode) {
+        window.vtoast.fail('请输入恢复码');
+        return;
+      }
+      this.isResetting = true;
+      try {
+        const result = (await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'mfaVerify',
+              actionId: 'resetMfaByRecoveryCode',
+              actionData: { pendingLoginId: this.pendingLoginId, deviceId: window.deviceId, recoveryCode: this.recoveryCode },
+            },
+          },
+        })).data.appData.resultData;
+        window.vtoast.success('请重新绑定 MFA');
+        const query = new URLSearchParams({ pendingLoginId: result.pendingLoginId, redirectUrl: this.redirectUrl });
+        window.location.href = `/${window.appInfo.appId}/page/mfaBind?${query.toString()}`;
+      } catch (error) {
+        const { errorCode, errorReason } = error || {};
+        window.vtoast.fail(errorCode ? errorReason : '重置失败');
+      } finally {
+        this.isResetting = false;
+      }
+    },
+    startCountdown() {
+      const refreshCountdown = () => {
+        const now = Math.floor(Date.now() / 1000);
+        const secondsRemaining = 30 - (now % 30);
+        this.countdown = secondsRemaining;
+        this.countdownPercent = (secondsRemaining / 30) * 100;
+      };
+      refreshCountdown();
+      this.timerInterval = setInterval(() => {
+        this.countdown -= 1;
+        this.countdownPercent = (this.countdown / 30) * 100;
+        if (this.countdown <= 0) {
+          refreshCountdown();
+          this.token = '';
+        }
+      }, 1000);
+    },
+  },
+});
+</script>
+
+<style scoped>
+.mfa-card { width: 400px; }
+.verification-box { }
+.code-input-wrap { position: relative; }
+.code-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 58px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 8px;
+  letter-spacing: 12px;
+  text-align: center;
+  font-size: 26px !important;
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  padding-right: 56px;
+}
+.countdown-timer { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.recovery-box { background: #fafafa; border-radius: 6px; padding: 12px; }
+.recovery-code-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-family: monospace;
+  font-size: 16px !important;
+  letter-spacing: 1px;
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.recovery-code-input:focus,
+.recovery-code-input:focus-visible {
+  border-color: rgba(76, 175, 80, 0.75) !important;
+}
+</style>
+
+{% endblock %}
+
+
+

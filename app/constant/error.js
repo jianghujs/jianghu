@@ -127,6 +127,38 @@ const errorInfoEnum = Object.freeze({
     errorCode: 'login_locked',
     errorReason: '重试次数过多，已暂时锁定，请稍后再试',
   },
+  mfa_not_setup: {
+    errorCode: 'mfa_not_setup',
+    errorReason: 'MFA 尚未设置',
+  },
+  mfa_not_enabled: {
+    errorCode: 'mfa_not_enabled',
+    errorReason: 'MFA 未启用',
+  },
+  mfa_recovery_code_not_enabled: {
+    errorCode: 'mfa_recovery_code_not_enabled',
+    errorReason: 'MFA 恢复码未启用',
+  },
+  mfa_verification_failed: {
+    errorCode: 'mfa_verification_failed',
+    errorReason: 'MFA 验证失败',
+  },
+  mfa_pending_login_expired: {
+    errorCode: 'mfa_pending_login_expired',
+    errorReason: 'MFA 登录已过期，请重新登录',
+  },
+  mfa_pending_login_invalid: {
+    errorCode: 'mfa_pending_login_invalid',
+    errorReason: 'MFA 登录状态无效，请重新登录',
+  },
+  mfa_recovery_code_error: {
+    errorCode: 'mfa_recovery_code_error',
+    errorReason: '恢复码错误',
+  },
+  mfa_secret_invalid: {
+    errorCode: 'mfa_secret_invalid',
+    errorReason: 'MFA 密钥格式错误',
+  },
   // =============================user error: 用户错误===========================================
   user_not_exist: {
     errorCode: 'request_user_not_exist',

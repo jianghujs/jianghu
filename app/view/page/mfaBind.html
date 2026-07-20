@@ -1,0 +1,649 @@
+{% extends 'template/jhTemplateV4.html'%}
+
+{% block vueTemplate %}
+
+<script type="text/html" id="app-template">
+  <div class="mfa-page">
+    <v-app>
+      <v-main class="mfa-main">
+        <v-row class="align-center justify-center mfa-layout">
+          <v-col cols="12" class="mfa-col" align="center">
+            <v-card class="mfa-card pa-8">
+              <v-card-text class="pa-0">
+                <div class="title font-weight-bold mb-4">MFA 绑定</div>
+                <div class="caption grey--text mb-6" v-if="enableRecoveryCode">请按步骤完成绑定：先安装验证器，再扫描二维码并输入验证码，最后保存恢复码。</div>
+                <div class="caption grey--text mb-6" v-else>请按步骤完成绑定：先安装验证器，再扫描二维码并输入验证码。</div>
+
+                <v-stepper v-model="currentStep" vertical class="mfa-stepper">
+                  <v-stepper-step :complete="currentStep > 1" step="1" class="stepper-clickable" editable @click.native="goStep(1)">
+                    下载 TOTP 验证器应用
+                  </v-stepper-step>
+                  <v-stepper-content step="1">
+                    <div class="step-panel">
+                      <div class="auth-app-title">下载 TOTP 验证器应用</div>
+                      <div class="caption grey--text mb-3">推荐使用 Microsoft Authenticator，也可以使用其他支持 TOTP 的验证器应用。</div>
+                      <div class="auth-app-download-list">
+                        <div class="auth-app-download-item">
+                          <img :src="authenticatorAndroidUrl" class="download-qrcode-img mx-auto" alt="Google Play 下载二维码" />
+                          <div class="caption mt-2">Google Play</div>
+                        </div>
+                        <div class="auth-app-download-item">
+                          <img :src="authenticatorIphoneUrl" class="download-qrcode-img mx-auto" alt="App Store 下载二维码" />
+                          <div class="caption mt-2">App Store</div>
+                        </div>
+                      </div>
+                    </div>
+                    <v-btn color="primary" @click="currentStep = 2">
+                      继续
+                    </v-btn>
+                  </v-stepper-content>
+
+                  <v-stepper-step :complete="currentStep > 2" step="2" class="stepper-clickable" editable @click.native="goStep(2)">
+                    扫描二维码并输入验证码
+                  </v-stepper-step>
+                  <v-stepper-content step="2">
+                    <div v-if="!otpauthUrl" class="step-panel step-loading">
+                      <v-progress-circular indeterminate color="success"></v-progress-circular>
+                      <div class="mt-3">正在生成绑定信息...</div>
+                    </div>
+                    <template v-else>
+                      <div class="mfa-bind-grid">
+                        <div class="mfa-bind-card scan-panel">
+                          <div class="bind-qrcode-title">打开验证器扫描绑定二维码</div>
+                          <img v-if="qrCodeDataUrl" :src="qrCodeDataUrl" class="qrcode-img mx-auto" alt="MFA 二维码" />
+                          <div class="secret-inline text-center">
+                            <div class="caption grey--text">或者手动输入代码</div>
+                            <div class="secret-row">
+                              <div class="secret-text">{{ secret }}</div>
+                              <v-btn icon small class="copy-secret-btn" :disabled="!secret" @click="copySecretCode">
+                                <v-icon small>mdi-content-copy</v-icon>
+                              </v-btn>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mfa-bind-card form-panel">
+                          <div class="bind-qrcode-title">输入验证码完成绑定</div>
+                          <div class="form-shell">
+                            <input
+                              class="jh-cus-input code-input"
+                              v-model="token"
+                              maxlength="6"
+                              placeholder="6位验证码"
+                              @keyup.enter.exact="doUiAction('bindMfa')"
+                            />
+                            <div class="form-hint caption grey--text">打开验证器输入当前 6 位动态码</div>
+                            <v-btn block color="success" class="bind-submit-btn" @click="doUiAction('bindMfa')" :loading="isSubmitting" :disabled="token.length !== 6 || isSubmitting">
+                              完成绑定
+                            </v-btn>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </v-stepper-content>
+
+                  <template v-if="enableRecoveryCode">
+                    <v-stepper-step :complete="currentStep > 3" step="3" class="stepper-clickable" editable @click.native="goStep(3)">
+                      保存恢复码
+                    </v-stepper-step>
+                    <v-stepper-content step="3">
+                      <div class="step-panel recovery-panel" v-if="recoveryCode">
+                        <div class="bind-qrcode-title">请先保存恢复码</div>
+                        <div class="caption grey--text mt-2">这个恢复码只显示一次，建议立即保存到安全位置。</div>
+                        <div class="recovery-code-box">
+                          <v-btn
+                            icon
+                            small
+                            class="copy-recovery-btn"
+                            :disabled="!recoveryCode"
+                            @click="copyRecoveryCode"
+                          >
+                            <v-icon small>mdi-content-copy</v-icon>
+                          </v-btn>
+                          <div class="recovery-code-text">{{ recoveryCode }}</div>
+                        </div>
+                        <div class="recovery-actions">
+                          <v-btn block color="success" class="bind-submit-btn" @click="confirmMfaBind" :loading="isConfirming">我已保存，继续登录</v-btn>
+                        </div>
+                      </div>
+                      <div class="step-panel" v-else>
+                        <div class="caption grey--text">完成第二步后，这里会显示绑定确认内容。</div>
+                      </div>
+                    </v-stepper-content>
+                  </template>
+                </v-stepper>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-main>
+    </v-app>
+    <jh-toast/>
+    <jh-mask/>
+    <jh-confirm-dialog/>
+  </div>
+</script>
+
+<div id="app"></div>
+
+{% endblock %}
+
+{% block vueScript %}
+{% include "utility/jianghuJs/prepareDeviceIdV4.html" %}
+<script type="module">
+new Vue({
+  el: "#app",
+  template: "#app-template",
+  vuetify: new Vuetify(),
+  data() {
+    return {
+      pendingLoginId: '',
+      redirectUrl: '',
+      otpauthUrl: '',
+      qrCodeDataUrl: '',
+      secret: '',
+      authenticatorAndroidUrl: '',
+      authenticatorIphoneUrl: '',
+      token: '',
+      recoveryCode: '',
+      enableRecoveryCode: '<$ ctx.app.config.jianghuConfig.enableMfaRecoveryCode !== false $>' === 'true',
+      isSubmitting: false,
+      isConfirming: false,
+      currentStep: 1,
+    };
+  },
+  async mounted() {
+    this.prepareAuthenticatorDownloadUrls();
+    await this.getUrlObj();
+    await this.prepareMfaBind();
+  },
+  methods: {
+    prepareAuthenticatorDownloadUrls() {
+      const appId = window.appInfo.appId;
+      this.authenticatorAndroidUrl = '/' + appId + '/public/img/authenticator_android.png';
+      this.authenticatorIphoneUrl = '/' + appId + '/public/img/authenticator_iphone.png';
+    },
+    async doUiAction(uiActionId) {
+      switch (uiActionId) {
+        case 'bindMfa':
+          await this.bindMfa();
+          break;
+        default:
+          console.error('[doUiAction] uiActionId not found', { uiActionId });
+      }
+    },
+    goStep(step) {
+      if (step === 3 && !this.enableRecoveryCode) {
+        return;
+      }
+      this.currentStep = step;
+    },
+
+    async getUrlObj() {
+      const urlObj = new URLSearchParams(location.search);
+      this.pendingLoginId = urlObj.get('pendingLoginId') || '';
+      this.redirectUrl = urlObj.get('redirectUrl') || '/' + window.appInfo.appId;
+      if (!this.pendingLoginId) {
+        window.vtoast.fail('页面参数无效');
+      }
+    },
+    async prepareMfaBind() {
+      try {
+        const result = (await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'mfaBind',
+              actionId: 'prepareMfaBind',
+              actionData: { pendingLoginId: this.pendingLoginId, deviceId: window.deviceId },
+            },
+          },
+        })).data.appData.resultData;
+        this.otpauthUrl = result.otpauthUrl;
+        this.qrCodeDataUrl = result.qrCodeDataUrl;
+        this.secret = result.secret;
+      } catch (error) {
+        const { errorCode, errorReason } = error || {};
+        window.vtoast.fail(errorCode ? errorReason : '获取 MFA 绑定信息失败');
+      }
+    },
+    async bindMfa() {
+      if (this.isSubmitting) {
+        return;
+      }
+      if (!this.token || this.token.length !== 6) {
+        window.vtoast.fail('请输入 6 位验证码');
+        return;
+      }
+      this.isSubmitting = true;
+      try {
+        const result = (await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'mfaBind',
+              actionId: 'bindMfa',
+              actionData: { pendingLoginId: this.pendingLoginId, deviceId: window.deviceId, token: this.token },
+            },
+          },
+        })).data.appData.resultData;
+        this.recoveryCode = result.recoveryCode || '';
+        if (this.recoveryCode) {
+          this.currentStep = 3;
+          window.vtoast.success(this.enableRecoveryCode ? '绑定成功，请先保存恢复码' : '绑定成功');
+          return;
+        }
+        await this.confirmMfaBind();
+      } catch (error) {
+        const { errorCode, errorReason } = error || {};
+        window.vtoast.fail(errorCode ? errorReason : '绑定失败');
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+    async copySecretCode() {
+      if (!this.secret) {
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(this.secret);
+        window.vtoast.success('手动密钥已复制');
+      } catch (error) {
+        window.vtoast.fail('复制失败');
+      }
+    },
+    async copyRecoveryCode() {
+      if (!this.recoveryCode) {
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(this.recoveryCode);
+        window.vtoast.success('恢复码已复制');
+      } catch (error) {
+        window.vtoast.fail('复制失败');
+      }
+    },
+    async confirmMfaBind() {
+      this.isConfirming = true;
+      try {
+        const result = (await window.jianghuAxios({
+          data: {
+            appData: {
+              pageId: 'mfaBind',
+              actionId: 'confirmMfaBind',
+              actionData: { pendingLoginId: this.pendingLoginId, deviceId: window.deviceId },
+            },
+          },
+        })).data.appData.resultData;
+        this.setLoginStorage(result);
+        window.vtoast.success('已确认，正在进入系统');
+        window.location.href = this.redirectUrl;
+      } catch (error) {
+        const { errorCode, errorReason } = error || {};
+        window.vtoast.fail(errorCode ? errorReason : '确认失败');
+      } finally {
+        this.isConfirming = false;
+      }
+    },
+    setLoginStorage(loginResult) {
+      if (!loginResult || !loginResult.authToken) {
+        return;
+      }
+      localStorage.setItem(window.appInfo.authTokenKey + '_authToken', loginResult.authToken);
+      localStorage.setItem(window.appInfo.authTokenKey + '_userId', loginResult.userId);
+      localStorage.setItem(window.appInfo.authTokenKey + '_deviceId', loginResult.deviceId || window.deviceId);
+    },
+  },
+});
+</script>
+
+<style scoped>
+.mfa-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
+}
+
+.mfa-main {
+  min-height: 100vh;
+}
+
+.mfa-layout {
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+
+.mfa-col {
+  max-width: 760px;
+}
+
+.mfa-card {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84) !important;
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.10) !important;
+}
+
+.mfa-stepper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 14px;
+}
+
+.mfa-stepper .v-stepper__header,
+.mfa-stepper .v-stepper__step,
+.mfa-stepper .v-stepper__content,
+.mfa-stepper .v-stepper__wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.mfa-stepper .v-stepper__content,
+.mfa-stepper .v-stepper__wrapper {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.mfa-stepper .v-stepper__header {
+  margin-bottom: 8px;
+}
+
+.mfa-stepper .v-stepper__step {
+  padding: 8px 0;
+}
+
+.stepper-clickable {
+  cursor: pointer;
+}
+
+.stepper-clickable .v-stepper__label,
+.stepper-clickable .v-stepper__step__step {
+  transition: opacity 160ms ease, transform 160ms ease, color 160ms ease;
+}
+
+.stepper-clickable:hover .v-stepper__label,
+.stepper-clickable:hover .v-stepper__step__step {
+  opacity: 0.86;
+}
+
+.stepper-clickable:active .v-stepper__label,
+.stepper-clickable:active .v-stepper__step__step {
+  transform: translateY(1px);
+}
+
+.mfa-stepper .v-stepper__label {
+  font-weight: 600;
+  color: rgba(15, 23, 42, 0.88);
+}
+
+.mfa-stepper .v-stepper__step__step {
+  margin-right: 16px;
+  box-shadow: none;
+}
+
+.mfa-stepper.v-stepper--vertical .v-stepper__content {
+  margin: 0 !important;
+}
+
+.mfa-stepper .v-stepper__content {
+  padding: 4px 0 22px 38px;
+}
+
+.step-panel {
+  padding: 14px 0 16px;
+}
+
+.mfa-bind-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.mfa-bind-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 14px 14px 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.88);
+  display: flex;
+  flex-direction: column;
+}
+
+.scan-panel {
+  text-align: center;
+}
+
+.form-panel {
+  justify-content: center;
+}
+
+.secret-inline {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  text-align: left;
+  flex: 0 0 auto;
+}
+
+.secret-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  margin-top: 6px;
+  max-width: 100%;
+}
+
+.secret-row .secret-text {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.copy-secret-btn {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+}
+
+.form-shell {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.form-hint {
+  margin-top: 8px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.bind-submit-btn {
+  min-height: 42px;
+  border-radius: 12px;
+}
+
+.step-loading {
+  text-align: center;
+  padding: 28px 0 30px;
+}
+
+.auth-app-title,
+.bind-qrcode-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: rgba(15, 23, 42, 0.9);
+}
+
+.auth-app-download-list {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.auth-app-download-item {
+  width: 128px;
+  text-align: center;
+}
+
+.download-qrcode-img {
+  width: 112px;
+  height: 112px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 10px;
+  display: block;
+  object-fit: contain;
+  background: #fff;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.qrcode-img {
+  width: 176px;
+  height: 176px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  display: block;
+  object-fit: contain;
+  background: #fff;
+  margin: 0 auto;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.secret-box {
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(248, 250, 252, 0.96);
+  margin: 12px 0 18px;
+}
+
+.secret-text {
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(15, 23, 42, 0.82);
+}
+
+.code-input {
+  height: 54px;
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  border-radius: 12px;
+  letter-spacing: 10px;
+  text-align: center;
+  font-size: 22px !important;
+  font-weight: 600;
+  background: #fff;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: rgba(33, 150, 243, 0.65);
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.12);
+  transform: translateY(-1px);
+}
+
+.copy-recovery-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+.recovery-code-box {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-top: 16px;
+  padding: 16px 46px 16px 14px;
+  border: 1px dashed rgba(76, 175, 80, 0.45);
+  border-radius: 14px;
+  font-family: monospace;
+  word-break: break-all;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(244, 253, 245, 0.98) 0%, rgba(238, 248, 239, 0.98) 100%);
+  color: rgba(15, 23, 42, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.recovery-code-text {
+  word-break: break-all;
+}
+
+.recovery-actions {
+  margin-top: 16px;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .mfa-layout {
+    padding: 16px 12px 24px;
+  }
+
+  .mfa-card {
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08) !important;
+  }
+
+  .mfa-stepper .v-stepper__content {
+    padding-left: 32px;
+  }
+
+  .auth-app-download-list {
+    gap: 14px;
+  }
+
+  .qrcode-img {
+    width: 152px;
+    height: 152px;
+  }
+
+  .code-input {
+    height: 50px;
+    letter-spacing: 7px;
+    font-size: 20px !important;
+  }
+
+  .mfa-bind-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mfa-bind-card {
+    padding: 12px;
+  }
+
+  .stepper-clickable:hover .v-stepper__label,
+  .stepper-clickable:hover .v-stepper__step__step {
+    opacity: 1;
+  }
+
+  .form-shell {
+    max-width: none;
+  }
+
+  .recovery-actions {
+    text-align: center;
+  }
+
+  .copy-recovery-btn {
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+  }
+
+  .recovery-actions .v-btn {
+    width: 100%;
+  }
+}
+</style>
+
+{% endblock %}
