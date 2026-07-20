@@ -70,6 +70,10 @@ module.exports = appInfo => {
       enableSyncSocketStatus: false,
       syncSocketStatusRefreshInterval: '60s',
 
+      // 登录超时
+      enableCleanExpiredUserSession: false,
+      authTokenMaxAge: 1000 * 60 * 60 * 24 * 30, // 用户登录态有效期（毫秒）
+
       // 开启用户信息缓存
       // 参考 schedule/syncDataToCache
       enableUserInfoCache: false,
