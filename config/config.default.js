@@ -133,7 +133,7 @@ module.exports = appInfo => {
 
       // MFA 登录认证配置
       enableMfaVerification: false,      // 启用 MFA
-      enableMfaRecoveryCode: true,       // 启用 MFA 恢复码
+      enableMfaRecoveryCode: false,       // 启用 MFA 恢复码
       mfaServiceIssuer: appPackageName,  // MFA 登录认证服务名称
       mfaTableName: '_user_mfa',         // MFA 登录认证表名
       mfaSecretEncryptKey: `${appPackageName}_mfa_secret_key`,  // MFA 登录认证密钥加密密钥
