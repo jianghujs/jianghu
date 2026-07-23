@@ -9,7 +9,7 @@ module.exports = appInfo => {
 
   const config = {
     appId: appPackageName,
-    authTokenKey: null,
+    authTokenKey: null, // 多应用场景才需要配置，单应用需要默认未空，否则可能出现读取不到 _user_session 问题
     keys: `${appPackageName}_1638108566009`,
     appTitle: '第一个应用',
     appLogo: `${appPackageName}/public/img/logo.svg`,
