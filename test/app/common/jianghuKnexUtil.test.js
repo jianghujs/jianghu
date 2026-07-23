@@ -34,6 +34,19 @@ describe('test/app/common/jianghuKnexUtil.test.js', () => {
       sinon.assert.calledOnceWithExactly(knexMock.raw, 'SELECT * FROM table');
     });
 
+    it('should forward bindings to knex.raw', async () => {
+      const jianghuKnex = jianghuKnexUtil.createJianghuKnex(knexMock);
+      const bindings = ['articleId', 'courseware_article'];
+
+      await jianghuKnex.raw('SELECT MAX(??) as maxBizId FROM ??', bindings);
+
+      sinon.assert.calledOnceWithExactly(
+        knexMock.raw,
+        'SELECT MAX(??) as maxBizId FROM ??',
+        bindings,
+      );
+    });
+
     it('should call knex.transaction with the given callback', async () => {
       const callback = sinon.stub().resolves();
       const jianghuKnex = jianghuKnexUtil.createJianghuKnex(knexMock);

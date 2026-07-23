@@ -247,8 +247,9 @@ function buildJianghuKnexFunc(knex, jhIdConfig = {}) {
 module.exports.createJianghuKnex = (knex, jhIdConfig = {}) => {
   const jianghuKnex = buildJianghuKnexFunc(knex, jhIdConfig);
 
-  jianghuKnex.raw = async sql => {
-    const result = await knex.raw(sql);
+  // 透传 bindings / options，兼容 knex.raw(sql, bindings)（如 idPlus 的 ?? 占位符）
+  jianghuKnex.raw = async (sql, ...bindings) => {
+    const result = await knex.raw(sql, ...bindings);
     return result;
   };
 
