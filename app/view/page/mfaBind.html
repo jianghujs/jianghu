@@ -43,7 +43,7 @@
                   </v-stepper-step>
                   <v-stepper-content step="2">
                     <div v-if="!otpauthUrl" class="step-panel step-loading">
-                      <v-progress-circular indeterminate color="success"></v-progress-circular>
+                      <v-progress-circular indeterminate color="primary"></v-progress-circular>
                       <div class="mt-3">正在生成绑定信息...</div>
                     </div>
                     <template v-else>
@@ -72,7 +72,7 @@
                               @keyup.enter.exact="doUiAction('bindMfa')"
                             />
                             <div class="form-hint caption grey--text">打开验证器输入当前 6 位动态码</div>
-                            <v-btn block color="success" class="bind-submit-btn" @click="doUiAction('bindMfa')" :loading="isSubmitting" :disabled="token.length !== 6 || isSubmitting">
+                            <v-btn block color="primary" class="bind-submit-btn" @click="doUiAction('bindMfa')" :loading="isSubmitting" :disabled="token.length !== 6 || isSubmitting">
                               完成绑定
                             </v-btn>
                           </div>
@@ -102,7 +102,7 @@
                           <div class="recovery-code-text">{{ recoveryCode }}</div>
                         </div>
                         <div class="recovery-actions">
-                          <v-btn block color="success" class="bind-submit-btn" @click="confirmMfaBind" :loading="isConfirming">我已保存，继续登录</v-btn>
+                          <v-btn block color="primary" class="bind-submit-btn" @click="confirmMfaBind" :loading="isConfirming">我已保存，继续登录</v-btn>
                         </div>
                       </div>
                       <div class="step-panel" v-else>

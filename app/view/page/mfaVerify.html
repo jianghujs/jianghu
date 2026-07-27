@@ -24,19 +24,19 @@
                       autofocus
                     />
                     <div class="countdown-timer">
-                      <v-progress-circular :rotate="-90" :size="40" :width="3" :value="countdownPercent" color="success">
+                      <v-progress-circular :rotate="-90" :size="40" :width="3" :value="countdownPercent" color="primary">
                         {{ countdown }}
                       </v-progress-circular>
                     </div>
                   </div>
                 </div>
 
-                <v-btn block color="success" @click="doUiAction('verifyMfaLogin')" :loading="isSubmitting" :disabled="token.length !== 6">
+                <v-btn block color="primary" @click="doUiAction('verifyMfaLogin')" :loading="isSubmitting" :disabled="token.length !== 6">
                   验证并登录
                 </v-btn>
 
                 <div v-if="enableRecoveryCode" class="mt-6 text-center">
-                  <a href="javascript:void(0)" class="caption success--text" @click="showRecovery = !showRecovery">使用恢复码重置 MFA</a>
+                  <a href="javascript:void(0)" class="caption primary--text" @click="showRecovery = !showRecovery">使用恢复码重置 MFA</a>
                 </div>
                 <div v-if="enableRecoveryCode && showRecovery" class="recovery-box mt-4">
                   <input class="jh-cus-input recovery-code-input mb-3" v-model="recoveryCode" placeholder="AAAA-BBBB-CCCC-DDDD" @input="formatRecoveryCodeInput" @keyup.enter.exact="doUiAction('resetMfaByRecoveryCode')" />
